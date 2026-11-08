@@ -63,10 +63,10 @@
             <label class="stat-input">Targets / jumps <input id="partyTargets" type="number" min="1" max="5" value="5" step="1" /> <span>for group / proc totals</span></label>
           </div>
         </div>
-        <p class="helper">Base values use Forever spell data. Bonus healing and shield spell power use their spell coefficients. Instants use a 1.5 sec global cooldown for throughput. Group healing is shown per target, with party totals in the details.</p>
+        <p class="helper">Each rank shows its Forever base range and the range after your bonus healing. Throughput and efficiency use the range midpoint. Instants use a 1.5 sec global cooldown for throughput. Group healing is shown per target, with party totals in the details.</p>
         <div class="spell-legend"><span><i class="dot heal-dot"></i> Healing</span><span><i class="dot shield-dot"></i> Absorb</span><span id="rankCount"></span></div>
         <div id="spellList" class="spell-list"></div>
-        <div class="method-note"><strong>How the numbers work</strong><p>Healing per cast time = (base healing + bonus healing × coefficient) ÷ cast time. Power Word: Shield uses 10% of bonus healing and reports absorb per cast time and absorb per mana. An instant uses the 1.5 sec global cooldown, including Renew; its total healing is displayed per cast and its tick duration is called out. Healing per mana uses total healing divided by displayed mana cost. Group spells use the target count above. Values are theoretical, before talents, critical heals, overhealing, and target limits. Gear totals with “+ ?” include known stats only; fill the unknown slots for a complete comparison. The costs shown are base costs; the reduction control applies Improved Healing to eligible spells.</p></div>
+        <div class="method-note"><strong>How the numbers work</strong><p>The displayed healing range is the client base range plus bonus healing × the spell coefficient at each endpoint. Mean healing is the midpoint of that range, and mean healing per time and per mana use that value. Power Word: Shield uses 10% of bonus healing and reports absorb per cast time and absorb per mana. An instant uses the 1.5 sec global cooldown, including Renew; its total healing is displayed per cast and its tick duration is called out. Healing per mana uses total healing divided by displayed mana cost. Group spells use the target count above. Values are theoretical, before talents, critical heals, overhealing, and target limits. Gear totals with “+ ?” include known stats only; fill the unknown slots for a complete comparison. The costs shown are base costs; the reduction control applies Improved Healing to eligible spells.</p></div>
       </section>
 
       <footer><span>FOREVER PRIEST PLANNER</span><span>Spell data: <a href="https://warcraftforever.games/classes/priest/spells" target="_blank" rel="noreferrer">Warcraft Forever ↗</a> · Calculations: <a href="https://forevermastery.com/en/tools/downrank" target="_blank" rel="noreferrer">Forever Mastery ↗</a></span></footer>
@@ -99,7 +99,7 @@
         <div class="dialog-actions"><span></span><button class="button quiet" type="button" id="cancelArmory">Cancel</button><button class="button primary" id="importArmory" value="import">Import gear</button></div>
       </form>
     </dialog>
-    <script src="spells.js?v=13"></script>
-    <script src="app.js?v=13"></script>
+    <script src="spells.js?v=14"></script>
+    <script src="app.js?v=14"></script>
   </body>
 </html>
