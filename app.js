@@ -13,7 +13,7 @@ let resolvedItemSubclass = "";
 function readGear() {
   try {
     const saved=JSON.parse(localStorage.getItem(STORE_KEY) || "{}");
-    for(const item of Object.values(saved)) if(item && ["healing","intellect","spirit","mp5"].every(key=>Number(item[key]||0)===0))
+    for(const item of Object.values(saved)) if(item && !item.name && ["healing","intellect","spirit","mp5"].every(key=>Number(item[key]||0)===0))
       for(const key of ["healing","intellect","spirit","mp5"]) item[key]=null;
     return saved;
   } catch { return {}; }
