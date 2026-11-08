@@ -273,6 +273,11 @@ function parseArmory(html) {
   }
   return {name:character.name,gear:imported};
 }
+function armoryUrlFromCharacterName(name) {
+  const slug=String(name).normalize("NFKD").replace(/[\u0300-\u036f]/g,"").trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  if(!slug) throw new Error("Enter a character name to look up.");
+  return `https://worldofwarcraft.blizzard.com/en-us/forever/us/armory/character/${encodeURIComponent(slug)}`;
+}
 async function fillArmoryHealingFromWowhead(imported) {
   const candidates=Object.entries(imported).filter(([,item])=>item._needsWowheadHealingLookup);
   let filled=0,failed=0,next=0;
@@ -321,16 +326,19 @@ async function refreshStoredWowheadHealing() {
 document.querySelector("#armoryForm").addEventListener("submit",async event=>{
   event.preventDefault(); if(event.submitter?.value==="cancel"){document.querySelector("#armoryDialog").close();return;}
   const status=document.querySelector("#armoryStatus"); status.textContent="Reading public Armory profile…";
-  const source=document.querySelector("#armorySource").value.trim(); const url=document.querySelector("#armoryUrl").value.trim();
+  const source=document.querySelector("#armorySource").value.trim(); const characterName=document.querySelector("#characterName").value.trim();
   try {
     let html=source;
-    if(!html){const parsedUrl=new URL(url); if(parsedUrl.protocol!=="https:" || parsedUrl.hostname!=="worldofwarcraft.blizzard.com" || !parsedUrl.pathname.includes("/armory/character/")) throw new Error("Enter a Blizzard Armory character URL."); const response=await fetch(throughCorsRelay(url)); if(!response.ok) throw new Error("The public profile relay returned an error. Paste the page source as a fallback."); html=await response.text();}
+    if(!html){const url=armoryUrlFromCharacterName(characterName); const response=await fetch(throughCorsRelay(url)); if(!response.ok) throw new Error("The public profile relay returned an error. Paste the page source as a fallback."); html=await response.text();}
     const result=parseArmory(html); status.textContent="Checking equipped items on Wowhead for healing stats…";
     const enrichment=await fillArmoryHealingFromWowhead(result.gear);
     gear=result.gear; saveGear();
     status.textContent=`Imported ${Object.keys(gear).length} equipped items from ${result.name}.${enrichment.filled?` Filled healing stats from Wowhead on ${enrichment.filled} item${enrichment.filled===1?"":"s"}.`:""}${enrichment.failed?` ${enrichment.failed} item lookup${enrichment.failed===1?"":"s"} failed; those stats remain unknown.`:""}`;
     setTimeout(()=>document.querySelector("#armoryDialog").close(),900);
-  } catch(error) { status.textContent=source ? (error.message || "Could not read this Armory page source.") : "Could not reach Blizzard through the public relay. Paste the Armory page source and retry."; }
+  } catch(error) {
+    const fallback="Could not reach Blizzard through the public relay. Paste the Armory page source and retry.";
+    status.textContent=source ? (error.message || "Could not read this Armory page source.") : error.name==="TypeError" ? fallback : (error.message || fallback);
+  }
 });
 renderGear();
 refreshStoredWowheadHealing();
