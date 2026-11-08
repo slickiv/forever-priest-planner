@@ -73,7 +73,7 @@
     </main>
     <dialog id="itemDialog">
       <form method="dialog" id="itemForm">
-        <div class="dialog-head"><div><p class="eyebrow">CLOTH SLOT</p><h3 id="dialogTitle">Add item</h3></div><button class="close" type="button" aria-label="Close">×</button></div>
+        <div class="dialog-head"><div><p class="eyebrow">GEAR SLOT</p><h3 id="dialogTitle">Add item</h3></div><button class="close" type="button" aria-label="Close">×</button></div>
         <input type="hidden" id="editSlot" />
         <label>Item name<input id="itemName" maxlength="70" placeholder="e.g. Robes of the Exalted" /></label>
         <label>Wowhead item ID<input id="itemId" inputmode="numeric" pattern="[0-9]+" placeholder="e.g. 13346" /></label>
@@ -93,13 +93,13 @@
       <form method="dialog" id="armoryForm">
         <div class="dialog-head"><div><p class="eyebrow">CHARACTER IMPORT</p><h3>Import from Armory</h3></div><button class="close" type="button" aria-label="Close">×</button></div>
         <label class="armory-label">Character Armory URL<input id="armoryUrl" type="url" value="https://worldofwarcraft.blizzard.com/en-us/forever/us/armory/character/annadra-warderer" /></label>
-        <p class="dialog-note">Imports the public profile’s equipped gear through a read-only CORS relay. No Blizzard credentials are sent. If the relay is unavailable, paste the page source: open the Armory, press Ctrl+U (⌘+Option+U on Mac), select all, copy, then paste here.</p>
+        <p class="dialog-note">Imports the public profile’s equipped gear through a read-only CORS relay. No Blizzard credentials are sent. Wowhead item and Armory profile requests pass through <a href="https://cors.dev/" target="_blank" rel="noreferrer">cors.dev</a> to work around browser CORS restrictions. If the relay is unavailable, paste the page source: open the Armory, press Ctrl+U (⌘+Option+U on Mac), select all, copy, then paste here.</p>
         <label class="armory-label">Armory page source <textarea id="armorySource" rows="5" placeholder="Optional fallback: paste the full page source"></textarea></label>
         <p id="armoryStatus" class="dialog-note" aria-live="polite"></p>
         <div class="dialog-actions"><span></span><button class="button quiet" type="button" id="cancelArmory">Cancel</button><button class="button primary" id="importArmory" value="import">Import gear</button></div>
       </form>
     </dialog>
-    <script src="spells.js?v=10"></script>
-    <script src="app.js?v=10"></script>
+    <script src="spells.js?v=11"></script>
+    <script src="app.js?v=11"></script>
   </body>
 </html>
