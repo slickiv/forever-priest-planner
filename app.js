@@ -144,6 +144,13 @@ function spellMetrics(spell, rank) {
 }
 function fmt(value, places=1) { return value == null || !Number.isFinite(value) ? "—" : Number(value.toFixed(places)).toLocaleString(undefined,{maximumFractionDigits:places}); }
 function fmtRange(min,max,places=1) { return min == null || max == null ? "—" : min === max ? fmt(min,places) : `${fmt(min,places)}–${fmt(max,places)}`; }
+function fmtTrainingCost(copper) {
+  if (copper == null) return "Free";
+  const gold = Math.floor(copper / 10000);
+  const silver = Math.floor((copper % 10000) / 100);
+  const coins = copper % 100;
+  return [gold ? `${gold}g` : "", silver ? `${silver}s` : "", coins ? `${coins}c` : ""].filter(Boolean).join(" ");
+}
 function renderSpells() {
   const host = document.querySelector("#spellList");
   if (!host) return;
@@ -159,7 +166,7 @@ function renderSpells() {
       const note = mana == null ? `<small>${esc(spell.manaNote || "Mana cost unavailable")}</small>` : `${m.mana.toLocaleString()} mana`;
       const range = fmtRange(m.healMin,m.healMax);
       const group = spell.name === "Binding Heal" ? `${range} × 2` : (spell.name === "Prayer of Healing" || spell.name === "Holy Nova" || spell.name === "Circle of Healing" ? `${range} / target` : range);
-      const learnedText = learned == null ? "—" : `Lv ${learned}`;
+      const learnedText = `${learned == null ? "Lv —" : `Lv ${learned}`} · ${fmtTrainingCost(window.TRAINING_COSTS[id])}`;
       const perTime = m.perSecond == null ? "—" : `${fmt(m.perSecond)} / sec`;
       const perMana = m.perMana == null ? "—" : `${fmt(m.perMana,2)} / mana`;
       const effectiveCast = rank[7] ?? spell.cast;
@@ -178,7 +185,7 @@ function renderSpells() {
     }).join("");
     return `<details class="spell-card" ${index < 3 ? "open" : ""}>
       <summary><span class="spell-glyph ${shield ? "shield-glyph" : ""}">${shield ? "◈" : "✦"}</span><span class="spell-title"><b>${esc(spell.name)}</b><small>${esc(spell.group)}</small></span><span class="spell-kind ${shield ? "shield-kind" : ""}">${kindLabel}</span><span class="rank-pill">${spell.ranks.length} ${spell.ranks.length === 1 ? "rank" : "ranks"}</span><span class="chevron">⌄</span></summary>
-      <div class="rank-table"><div class="rank-header"><span>Rank / learned</span><span>Healing range</span><span>Cast / mana</span><span>Mean / time</span><span>Mean / mana</span></div>${rows}</div>
+      <div class="rank-table"><div class="rank-header"><span>Rank / level · training</span><span>Healing range</span><span>Cast / mana</span><span>Mean / time</span><span>Mean / mana</span></div>${rows}</div>
     </details>`;
   }).join("");
   document.querySelector("#rankCount").textContent = `${ranksShown} ranks · ${window.HEALING_SPELLS.length} spells`;
