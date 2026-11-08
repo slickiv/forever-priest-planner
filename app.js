@@ -21,11 +21,12 @@ function renderGear() {
   const host = document.querySelector("#gearGrid");
   host.innerHTML = SLOTS.map(([id,label]) => {
     const item = gear[id];
+    const slotType = ["head","shoulders","back","chest","wrists","hands","waist","legs","feet"].includes(id) ? "CLOTH" : (["neck","finger1","finger2","trinket1","trinket2"].includes(id) ? "ACCESSORY" : "HELD ITEM");
     const itemHref = item?.id ? `https://www.wowhead.com/forever/item=${encodeURIComponent(item.id)}` : wowheadItems();
     const stats = item ? `<div class="slot-stats"><span>+${number(item.healing)} heal</span><span>+${number(item.spellPower)} SP</span><span>${number(item.intellect)} int</span><span>${number(item.spirit)} spi</span><span>${number(item.mp5)} mp5</span></div>` : "";
     const source = item?.source ? `<a class="slot-source" href="https://www.wowhead.com/forever/search?q=${encodeURIComponent(item.source)}" target="_blank" rel="noreferrer">Loot source: ${esc(item.source)} ↗</a>` : "";
     return `<article class="gear-slot ${item ? "filled" : ""}">
-      <div class="slot-top"><span class="slot-label">${label}</span><span class="cloth-tag">CLOTH</span></div>
+      <div class="slot-top"><span class="slot-label">${label}</span><span class="cloth-tag">${slotType}</span></div>
       ${item ? `<a class="slot-item" href="${itemHref}" target="_blank" rel="noreferrer">${esc(item.name || `Wowhead item ${item.id || ""}`)} ↗</a>${source}${stats}` : `<span class="empty-slot">No item selected</span>`}
       <div class="slot-actions"><a href="${wowheadItems()}" target="_blank" rel="noreferrer">Wowhead finder ↗</a><button type="button" data-edit="${id}">${item ? "Edit" : "Add item"}</button></div>
     </article>`;
