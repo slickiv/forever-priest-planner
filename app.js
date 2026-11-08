@@ -220,7 +220,7 @@ function parseArmory(html) {
   for(const [armorySlot,entry] of Object.entries(character.gear)){
     const slot=slotMap[armorySlot]; if(!slot || !entry || armorySlot==="shirt") continue;
     const isArmor=accepted.has(slot);
-    const type=String(entry.item_subclass?.name || entry.itemSubClass?.type || entry.subclass?.type || entry.armorType || "").toUpperCase();
+    const type=slot==="back" ? "CLOAKS" : String(entry.item_subclass?.name || entry.itemSubClass?.type || entry.subclass?.type || entry.armorType || "").toUpperCase();
     if(isArmor && slot!=="back" && !type.includes("CLOTH")) continue;
     if(slot==="back" && !type.includes("CLOAK")) continue;
     const values={healing:0,intellect:0,spirit:0,mp5:0};
