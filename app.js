@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 3098)
+Total output lines: 162
+
 const SLOTS = [
   ["head","Head"],["neck","Neck"],["shoulders","Shoulders"],["back","Back"],["chest","Chest"],
   ["wrists","Wrists"],["hands","Hands"],["waist","Waist"],["legs","Legs"],["feet","Feet"],
@@ -84,12 +87,7 @@ function spellMetrics(spell, rank) {
   const heal = rank[2] == null ? null : rank[2] + bonus * coefficient;
   let total = heal;
   if (total != null && spell.name === "Binding Heal") total *= 2;
-  if (total != null && spell.name === "Prayer of Healing") total *= targets;
-  if (total != null && spell.name === "Holy Nova") total *= targets;
-  if (total != null && (spell.name === "Prayer of Mending" || spell.name === "Lightwell")) total *= targets;
-  const amountLabel = spell.kind === "shield" ? "Absorb" : "Healing";
-  const perSecond = heal == null ? null : heal / cast;
-  const perMana = total == null || !mana ? null : total / mana;
+  if (total != null && spell.name === "Pra…98 tokens truncated…tal / mana;
   return {bonus,targets,mana,heal,total,perSecond,perMana,amountLabel};
 }
 function fmt(value, places=1) { return value == null || !Number.isFinite(value) ? "—" : Number(value.toFixed(places)).toLocaleString(undefined,{maximumFractionDigits:places}); }
@@ -114,7 +112,7 @@ function renderSpells() {
       const castText = spell.duration ? `${spell.instant ? "Instant · 1.5s GCD" : `${effectiveCast}s cast`} · ${spell.duration}s effect` : spell.instant ? "Instant · 1.5s GCD" : `${effectiveCast}s cast`;
       const details = spell.detail ? `<span class="rank-extra">${esc(spell.detail)}</span>` : "";
       const tickRate = spell.duration && m.heal != null ? `<span class="rank-extra">Arrival rate while ticking: ${fmt(m.heal / spell.duration)} / sec</span>` : "";
-      const tooltipValue = base == null ? "Heal amount not exposed" : `${base} ${shield ? "absorb" : "heal"}`;
+      const tooltipValue = base == null ? "Heal amount not exposed" : `${fmt(base,1)} ${shield ? "absorb" : "heal"}`;
       const totalLine = spell.name === "Binding Heal" ? `<span class="rank-extra">Two-target total: ${fmt(m.total)}${mana ? ` · ${fmt(m.perMana,2)} total per mana` : ""}</span>` : (spell.name === "Prayer of Healing" || spell.name === "Holy Nova" ? `<span class="rank-extra">Party total (${m.targets}): ${fmt(m.total)}</span>` : (spell.name === "Prayer of Mending" ? `<span class="rank-extra">Total for ${m.targets} jump${m.targets === 1 ? "" : "s"}: ${fmt(m.total)}</span>` : (spell.name === "Lightwell" ? `<span class="rank-extra">Total for ${m.targets} click${m.targets === 1 ? "" : "s"}: ${fmt(m.total)}</span>` : "")));
       return `<div class="rank-row ${shield ? "shield-row" : ""}">
         <div class="rank-name"><a href="${rankLink}" target="_blank" rel="noreferrer">R${rankNo} ↗</a><span>${learnedText}</span></div>
