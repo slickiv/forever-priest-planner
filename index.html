@@ -6,13 +6,22 @@
     <meta name="theme-color" content="Canvas" />
     <meta name="description" content="Plan cloth-only Priest gear and compare every healing spell rank in World of Warcraft: Forever." />
     <title>Forever Priest Planner</title>
-    <link rel="stylesheet" href="styles.css?v=2" />
+    <script>
+      try {
+        const theme = localStorage.getItem("forever-priest-planner-theme");
+        if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+      } catch {}
+    </script>
+    <link rel="stylesheet" href="styles.css?v=3" />
   </head>
   <body>
     <main class="shell">
       <header class="masthead">
         <div class="brand"><span class="brand-mark">✦</span><span>FOREVER<span class="brand-light"> / PRIEST</span></span></div>
-        <div class="header-note"><span class="status-dot"></span> WoW: Forever · cloth only</div>
+        <div class="masthead-actions">
+          <div class="header-note"><span class="status-dot"></span> WoW: Forever · cloth only</div>
+          <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false"><span aria-hidden="true">◐</span> Dark mode</button>
+        </div>
       </header>
 
       <section class="hero">
@@ -100,6 +109,6 @@
       </form>
     </dialog>
     <script src="spells.js?v=14"></script>
-    <script src="app.js?v=17"></script>
+    <script src="app.js?v=18"></script>
   </body>
 </html>
