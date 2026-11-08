@@ -11,6 +11,8 @@
   --accent-ink: AccentColorText;
   --round: 4px;
 }
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--page); color: var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 14px; line-height: 1.5; }
 button,input,select { font: inherit; color: inherit; }
@@ -21,7 +23,11 @@ a { color: inherit; }
 .brand { display: flex; gap: 11px; align-items: center; font-size: 12px; letter-spacing: .17em; font-weight: 800; }
 .brand-mark { color: var(--accent); font-size: 22px; }
 .brand-light { color: var(--muted); font-weight: 600; }
+.masthead-actions { display: flex; align-items: center; gap: 16px; }
 .header-note { color: var(--soft); font-size: 12px; display: flex; gap: 9px; align-items: center; }
+.theme-toggle { border: 1px solid var(--line); border-radius: var(--round); background: var(--surface); color: var(--soft); padding: 6px 9px; cursor: pointer; font-size: 11px; font-weight: 650; white-space: nowrap; }
+.theme-toggle:hover,.theme-toggle:focus-visible { border-color: var(--accent); color: var(--ink); }
+.theme-toggle span { padding-right: 4px; }
 .status-dot,.dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; display: inline-block; }
 .hero { min-height: 275px; padding: 50px 0 42px; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--line); }
 .eyebrow { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); font-weight: 750; margin: 0 0 10px; }
@@ -148,6 +154,7 @@ dialog::backdrop { background: color-mix(in srgb, CanvasText 45%, transparent); 
 @media (max-width: 700px) {
   .shell { width: min(100% - 28px, 540px); }
   .masthead { height: 62px; }
+  .masthead-actions { gap: 8px; }
   .header-note { font-size: 10px; }
   .hero { min-height: auto; padding: 37px 0 29px; align-items: flex-start; flex-direction: column; }
   .hero-stat { min-width: 0; padding: 0; border-left: 0; margin-top: 22px; }
@@ -170,4 +177,7 @@ dialog::backdrop { background: color-mix(in srgb, CanvasText 45%, transparent); 
   .rank-stat:nth-of-type(5) { grid-column: 3; }
   .rank-stat span { font-size: 9px; }
   footer { align-items: flex-start; flex-direction: column; justify-content: center; padding: 14px 0; }
+}
+@media (max-width: 480px) {
+  .header-note { display: none; }
 }
