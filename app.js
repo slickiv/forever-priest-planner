@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 3098)
-Total output lines: 162
-
 const SLOTS = [
   ["head","Head"],["neck","Neck"],["shoulders","Shoulders"],["back","Back"],["chest","Chest"],
   ["wrists","Wrists"],["hands","Hands"],["waist","Waist"],["legs","Legs"],["feet","Feet"],
@@ -87,7 +84,12 @@ function spellMetrics(spell, rank) {
   const heal = rank[2] == null ? null : rank[2] + bonus * coefficient;
   let total = heal;
   if (total != null && spell.name === "Binding Heal") total *= 2;
-  if (total != null && spell.name === "Pra…98 tokens truncated…tal / mana;
+  if (total != null && spell.name === "Prayer of Healing") total *= targets;
+  if (total != null && spell.name === "Holy Nova") total *= targets;
+  if (total != null && (spell.name === "Prayer of Mending" || spell.name === "Lightwell")) total *= targets;
+  const amountLabel = spell.kind === "shield" ? "Absorb" : "Healing";
+  const perSecond = heal == null ? null : heal / cast;
+  const perMana = total == null || !mana ? null : total / mana;
   return {bonus,targets,mana,heal,total,perSecond,perMana,amountLabel};
 }
 function fmt(value, places=1) { return value == null || !Number.isFinite(value) ? "—" : Number(value.toFixed(places)).toLocaleString(undefined,{maximumFractionDigits:places}); }
