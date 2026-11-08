@@ -37,7 +37,7 @@
             <button class="button quiet" id="resetBtn">Reset set</button>
           </div>
         </div>
-        <p class="helper">Armor slots accept cloth only. Neck, rings, and trinkets are unrestricted accessories and all their stats count toward throughput. Enter an item name or Wowhead ID; unknown stats stay marked until you look them up or enter them.</p>
+        <p class="helper">Cloth armor only in armor slots. Cloaks, neck, rings, trinkets, and held items are unrestricted by armor type; all their stats count toward throughput. Unknown stats stay marked until looked up or entered.</p>
         <div class="gear-layout">
           <div id="gearGrid" class="gear-grid"></div>
           <aside class="summary-card">
@@ -93,13 +93,13 @@
       <form method="dialog" id="armoryForm">
         <div class="dialog-head"><div><p class="eyebrow">CHARACTER IMPORT</p><h3>Import from Armory</h3></div><button class="close" type="button" aria-label="Close">×</button></div>
         <label class="armory-label">Character Armory URL<input id="armoryUrl" type="url" value="https://worldofwarcraft.blizzard.com/en-us/forever/us/armory/character/annadra-warderer" /></label>
-        <p class="dialog-note">First, import directly by URL. If your browser blocks Blizzard’s page, paste the page source below: open the Armory, press Ctrl+U (⌘+Option+U on Mac), select all, copy, then paste here. Only the public page’s embedded gear is read.</p>
+        <p class="dialog-note">Imports the public profile’s equipped gear through a read-only CORS relay. No Blizzard credentials are sent. If the relay is unavailable, paste the page source: open the Armory, press Ctrl+U (⌘+Option+U on Mac), select all, copy, then paste here.</p>
         <label class="armory-label">Armory page source <textarea id="armorySource" rows="5" placeholder="Optional fallback: paste the full page source"></textarea></label>
         <p id="armoryStatus" class="dialog-note" aria-live="polite"></p>
         <div class="dialog-actions"><span></span><button class="button quiet" type="button" id="cancelArmory">Cancel</button><button class="button primary" id="importArmory" value="import">Import gear</button></div>
       </form>
     </dialog>
-    <script src="spells.js?v=9"></script>
-    <script src="app.js?v=9"></script>
+    <script src="spells.js?v=10"></script>
+    <script src="app.js?v=10"></script>
   </body>
 </html>
