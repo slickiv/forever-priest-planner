@@ -33,12 +33,11 @@
         <div class="section-head">
           <div><p class="eyebrow">YOUR LOADOUT</p><h2>Cloth gear planner</h2></div>
           <div class="actions">
-            <button class="button quiet" id="exportBtn">Export</button>
-            <label class="button quiet file-button">Import<input id="importFile" type="file" accept="application/json,.json" /></label>
+            <button class="button quiet" id="armoryBtn">Import Armory</button>
             <button class="button quiet" id="resetBtn">Reset set</button>
           </div>
         </div>
-        <p class="helper">Each slot accepts a cloth item. Add its Wowhead item ID and the stats you want to track; the link opens the matching Wowhead entry.</p>
+        <p class="helper">Armor slots accept cloth only. Neck, rings, and trinkets are unrestricted accessories and all their stats count toward throughput. Enter an item name or Wowhead ID; unknown stats stay marked until you look them up or enter them.</p>
         <div class="gear-layout">
           <div id="gearGrid" class="gear-grid"></div>
           <aside class="summary-card">
@@ -49,10 +48,10 @@
             <div class="total"><span>Mana per 5 sec</span><b id="totalMp5">0</b></div>
             <div class="summary-rule"></div>
             <a class="button wowhead-button" href="https://www.wowhead.com/forever/items/class:5" target="_blank" rel="noreferrer">Browse Priest items on Wowhead ↗</a>
-            <p class="fineprint">Wowhead is the item and loot-table reference. This planner does not copy or maintain an item database.</p>
+            <p class="fineprint">Wowhead remains the item and loot-table reference. Gear is saved in this browser only.</p>
           </aside>
         </div>
-        <div class="loot-note"><span class="note-icon">↗</span><div><strong>Loot tables stay on Wowhead</strong><p>Open a boss or item entry on Wowhead to check its current source and loot table. Paste an item ID into a slot to add it to this set.</p></div></div>
+        <div class="loot-note"><span class="note-icon">↗</span><div><strong>Loot tables stay on Wowhead</strong><p>Open a boss or item entry on Wowhead to check its current source and loot table. Search items by name or enter an item ID to complete stats.</p></div></div>
       </section>
 
       <section id="spellsPanel" class="panel hidden">
@@ -67,7 +66,7 @@
         <p class="helper">Base values use Forever spell data. Bonus healing and shield spell power use their spell coefficients. Instants use a 1.5 sec global cooldown for throughput. Group healing is shown per target, with party totals in the details.</p>
         <div class="spell-legend"><span><i class="dot heal-dot"></i> Healing</span><span><i class="dot shield-dot"></i> Absorb</span><span id="rankCount"></span></div>
         <div id="spellList" class="spell-list"></div>
-        <div class="method-note"><strong>How the numbers work</strong><p>Healing per cast time = (base healing + bonus healing × coefficient) ÷ cast time. Power Word: Shield uses 10% of bonus healing and reports absorb per cast time and absorb per mana. An instant uses the 1.5 sec global cooldown, including Renew; its total healing is displayed per cast and its tick duration is called out. Healing per mana uses total healing divided by displayed mana cost. Group spells use the target count above. Values are theoretical, before talents, critical heals, overhealing, and target limits. The costs shown are base costs; the reduction control applies Improved Healing to eligible spells.</p></div>
+        <div class="method-note"><strong>How the numbers work</strong><p>Healing per cast time = (base healing + bonus healing × coefficient) ÷ cast time. Power Word: Shield uses 10% of bonus healing and reports absorb per cast time and absorb per mana. An instant uses the 1.5 sec global cooldown, including Renew; its total healing is displayed per cast and its tick duration is called out. Healing per mana uses total healing divided by displayed mana cost. Group spells use the target count above. Values are theoretical, before talents, critical heals, overhealing, and target limits. Gear totals with “+ ?” include known stats only; fill the unknown slots for a complete comparison. The costs shown are base costs; the reduction control applies Improved Healing to eligible spells.</p></div>
       </section>
 
       <footer><span>FOREVER PRIEST PLANNER</span><span>Spell data: <a href="https://warcraftforever.games/classes/priest/spells" target="_blank" rel="noreferrer">Warcraft Forever ↗</a> · Calculations: <a href="https://forevermastery.com/en/tools/downrank" target="_blank" rel="noreferrer">Forever Mastery ↗</a></span></footer>
@@ -77,19 +76,30 @@
         <div class="dialog-head"><div><p class="eyebrow">CLOTH SLOT</p><h3 id="dialogTitle">Add item</h3></div><button class="close" value="cancel" aria-label="Close">×</button></div>
         <input type="hidden" id="editSlot" />
         <label>Item name<input id="itemName" maxlength="70" placeholder="e.g. Robes of the Exalted" /></label>
-        <label>Wowhead item ID<input id="itemId" inputmode="numeric" pattern="[0-9]+" required placeholder="e.g. 13346" /></label>
+        <label>Wowhead item ID<input id="itemId" inputmode="numeric" pattern="[0-9]+" placeholder="e.g. 13346" /></label>
+        <button class="button quiet lookup-button" id="lookupItem" type="button">Fill stats from Wowhead</button><p id="lookupStatus" class="dialog-note" aria-live="polite"></p>
         <div class="item-stats">
-          <label>Healing<input id="itemHealing" type="number" min="0" step="1" value="0" /></label>
-          <label>Intellect<input id="itemIntellect" type="number" min="0" step="1" value="0" /></label>
-          <label>Spirit<input id="itemSpirit" type="number" min="0" step="1" value="0" /></label>
-          <label>MP5<input id="itemMp5" type="number" min="0" step="1" value="0" /></label>
+          <label>Healing<input id="itemHealing" type="number" min="0" step="1" placeholder="Unknown" /></label>
+          <label>Intellect<input id="itemIntellect" type="number" min="0" step="1" placeholder="Unknown" /></label>
+          <label>Spirit<input id="itemSpirit" type="number" min="0" step="1" placeholder="Unknown" /></label>
+          <label>MP5<input id="itemMp5" type="number" min="0" step="1" placeholder="Unknown" /></label>
         </div>
         <label>Loot source / boss <input id="itemSource" maxlength="80" placeholder="Optional · e.g. Baron Rivendare" /></label>
-        <p class="dialog-note">Armor type is fixed to cloth for every slot. Use Wowhead to verify item stats and loot source.</p>
+        <p class="dialog-note">Armor slots accept cloth only. Accessories and held items are unrestricted. Enter a name or ID to save partial information; blank stats remain unknown.</p>
         <div class="dialog-actions"><button class="button quiet" id="removeItem" type="button">Clear slot</button><span></span><button class="button primary" value="save">Save item</button></div>
       </form>
     </dialog>
-    <script src="spells.js?v=7"></script>
-    <script src="app.js?v=7"></script>
+    <dialog id="armoryDialog">
+      <form method="dialog" id="armoryForm">
+        <div class="dialog-head"><div><p class="eyebrow">CHARACTER IMPORT</p><h3>Import from Armory</h3></div><button class="close" value="cancel" aria-label="Close">×</button></div>
+        <label class="armory-label">Character Armory URL<input id="armoryUrl" type="url" value="https://worldofwarcraft.blizzard.com/en-us/forever/us/armory/character/annadra-warderer" /></label>
+        <p class="dialog-note">First, import directly by URL. If your browser blocks Blizzard’s page, paste the page source below: open the Armory, press Ctrl+U (⌘+Option+U on Mac), select all, copy, then paste here. Only the public page’s embedded gear is read.</p>
+        <label class="armory-label">Armory page source <textarea id="armorySource" rows="5" placeholder="Optional fallback: paste the full page source"></textarea></label>
+        <p id="armoryStatus" class="dialog-note" aria-live="polite"></p>
+        <div class="dialog-actions"><span></span><button class="button quiet" value="cancel">Cancel</button><button class="button primary" id="importArmory" value="import">Import gear</button></div>
+      </form>
+    </dialog>
+    <script src="spells.js?v=8"></script>
+    <script src="app.js?v=8"></script>
   </body>
 </html>
