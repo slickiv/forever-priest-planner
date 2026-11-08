@@ -7,6 +7,8 @@ const SLOTS = [
 const STORE_KEY = "forever-priest-planner-v1";
 const CORS_RELAY = "https://proxy.cors.dev/";
 let gear = readGear();
+const TALENT_STORE_KEY = "forever-priest-planner-talents-v1";
+let talents = readTalents();
 let editingSlot = null;
 let editingOriginalItem = null;
 let resolvedItemSubclass = "";
@@ -20,6 +22,18 @@ function readGear() {
   } catch { return {}; }
 }
 function saveGear() { localStorage.setItem(STORE_KEY, JSON.stringify(gear)); renderGear(); }
+function readTalents() {
+  try {
+    const saved=JSON.parse(localStorage.getItem(TALENT_STORE_KEY) || "{}");
+    return {twinDisciplines:clampRank(saved.twinDisciplines,5),improvedPws:clampRank(saved.improvedPws,3)};
+  } catch { return {twinDisciplines:0,improvedPws:0}; }
+}
+function clampRank(value,max) { return Math.max(0,Math.min(max,Math.floor(Number(value)||0))); }
+function saveTalents() {
+  talents={twinDisciplines:clampRank(document.querySelector("#twinDisciplines").value,5),improvedPws:clampRank(document.querySelector("#improvedPws").value,3)};
+  localStorage.setItem(TALENT_STORE_KEY,JSON.stringify(talents));
+  renderSpells();
+}
 function esc(value) { return String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function number(value) { return Number(value || 0); }
 function optionalNumber(value) { return value === "" || value == null ? null : Number(value); }
@@ -129,8 +143,11 @@ function spellMetrics(spell, rank) {
   const mana = rank[4] == null ? null : Math.floor(rank[4] * (1 - (improvedHealingApplies ? reduction : 0)));
   const baseMin = rank[2] == null ? null : rank[2];
   const baseMax = rank[3] == null ? null : rank[3];
-  const healMin = baseMin == null ? null : baseMin + bonus * coefficient;
-  const healMax = baseMax == null ? null : baseMax + bonus * coefficient;
+  const talentMultiplier=spell.kind === "shield"
+    ? [1,1.07,1.14,1.20][talents.improvedPws]
+    : spell.instant ? 1 + talents.twinDisciplines / 100 : 1;
+  const healMin = baseMin == null ? null : (baseMin + bonus * coefficient) * talentMultiplier;
+  const healMax = baseMax == null ? null : (baseMax + bonus * coefficient) * talentMultiplier;
   const heal = healMin == null || healMax == null ? null : (healMin + healMax) / 2;
   let total = heal;
   if (total != null && spell.name === "Binding Heal") total *= 2;
@@ -140,7 +157,7 @@ function spellMetrics(spell, rank) {
   const amountLabel = spell.kind === "shield" ? "Absorb" : "Healing";
   const perSecond = heal == null ? null : heal / cast;
   const perMana = total == null || !mana ? null : total / mana;
-  return {bonus,targets,mana,baseMin,baseMax,healMin,healMax,heal,total,perSecond,perMana,amountLabel};
+  return {bonus,targets,mana,baseMin,baseMax,healMin,healMax,heal,total,perSecond,perMana,amountLabel,talentMultiplier};
 }
 function fmt(value, places=1) { return value == null || !Number.isFinite(value) ? "—" : Number(value.toFixed(places)).toLocaleString(undefined,{maximumFractionDigits:places}); }
 function fmtRange(min,max,places=1) { return min == null || max == null ? "—" : min === max ? fmt(min,places) : `${fmt(min,places)}–${fmt(max,places)}`; }
@@ -173,7 +190,7 @@ function renderSpells() {
       const castText = spell.duration ? `${spell.instant ? "Instant · 1.5s GCD" : `${effectiveCast}s cast`} · ${spell.duration}s effect` : spell.instant ? "Instant · 1.5s GCD" : `${effectiveCast}s cast`;
       const details = spell.detail ? `<span class="rank-extra">${esc(spell.detail)}</span>` : "";
       const tickRate = spell.duration && m.heal != null ? `<span class="rank-extra">Arrival rate while ticking: ${fmt(m.heal / spell.duration)} / sec</span>` : "";
-      const tooltipValue = baseMin == null ? "Heal amount not exposed" : `Base ${fmtRange(baseMin,baseMax)} · with gear ${range}`;
+      const tooltipValue = baseMin == null ? "Heal amount not exposed" : `Base ${fmtRange(baseMin,baseMax)} · with gear / talents ${range}`;
       const totalLine = spell.name === "Binding Heal" ? `<span class="rank-extra">Two-target mean total: ${fmt(m.total)}${mana ? ` · ${fmt(m.perMana,2)} total per mana` : ""}</span>` : (spell.name === "Prayer of Healing" || spell.name === "Holy Nova" || spell.name === "Circle of Healing" ? `<span class="rank-extra">Party mean total (${m.targets}): ${fmt(m.total)}</span>` : (spell.name === "Prayer of Mending" ? `<span class="rank-extra">Mean total for ${m.targets} jump${m.targets === 1 ? "" : "s"}: ${fmt(m.total)}</span>` : (spell.name === "Lightwell" ? `<span class="rank-extra">Mean total for ${m.targets} click${m.targets === 1 ? "" : "s"}: ${fmt(m.total)}</span>` : "")));
       return `<div class="rank-row ${shield ? "shield-row" : ""}">
         <div class="rank-name"><a href="${rankLink}" target="_blank" rel="noreferrer">R${rankNo} ↗</a><span>${learnedText}</span></div>
@@ -197,6 +214,9 @@ document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", (
   document.querySelector("#spellsPanel").classList.toggle("hidden",tab.dataset.tab !== "spells");
 }));
 ["#bonusHealing","#manaReduction","#partyTargets"].forEach(selector => document.querySelector(selector).addEventListener("input",renderSpells));
+for(const selector of ["#twinDisciplines","#improvedPws"]) document.querySelector(selector).addEventListener("change",saveTalents);
+document.querySelector("#twinDisciplines").value=String(talents.twinDisciplines);
+document.querySelector("#improvedPws").value=String(talents.improvedPws);
 document.querySelector("#resetBtn").addEventListener("click", () => {
   if (!confirm("Clear all saved gear slots?")) return;
   gear = {}; saveGear();
@@ -280,7 +300,13 @@ function parseArmory(html) {
     }
     imported[slot]={name:String(entry.name || ""),id:String(entry.id || ""),source:"",armorType:type,healing:hasStats?values.healing:null,intellect:hasStats?values.intellect:null,spirit:hasStats?values.spirit:null,mp5:hasStats?values.mp5:null,_needsWowheadHealingLookup:!hasHealingStat && Boolean(entry.id)};
   }
-  return {name:character.name,gear:imported};
+  const importedTalents={twinDisciplines:0,improvedPws:0};
+  for(const spec of character.specs || []) for(const talent of spec.talents || []) {
+    const name=String(talent.name || "").toLowerCase();
+    if(name==="twin disciplines") importedTalents.twinDisciplines=clampRank(talent.rank,5);
+    if(name==="improved power word: shield") importedTalents.improvedPws=clampRank(talent.rank,3);
+  }
+  return {name:character.name,gear:imported,talents:importedTalents,talentsAvailable:Array.isArray(character.specs)};
 }
 function armoryUrlFromCharacterName(name) {
   const slug=String(name).normalize("NFKD").replace(/[\u0300-\u036f]/g,"").trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
@@ -342,7 +368,14 @@ document.querySelector("#armoryForm").addEventListener("submit",async event=>{
     const result=parseArmory(html); status.textContent="Checking equipped items on Wowhead for healing stats…";
     const enrichment=await fillArmoryHealingFromWowhead(result.gear);
     gear=result.gear; saveGear();
-    status.textContent=`Imported ${Object.keys(gear).length} equipped items from ${result.name}.${enrichment.filled?` Filled healing stats from Wowhead on ${enrichment.filled} item${enrichment.filled===1?"":"s"}.`:""}${enrichment.failed?` ${enrichment.failed} item lookup${enrichment.failed===1?"":"s"} failed; those stats remain unknown.`:""}`;
+    if(result.talentsAvailable){
+      talents=result.talents;
+      document.querySelector("#twinDisciplines").value=String(talents.twinDisciplines);
+      document.querySelector("#improvedPws").value=String(talents.improvedPws);
+      localStorage.setItem(TALENT_STORE_KEY,JSON.stringify(talents));
+      renderSpells();
+    }
+    status.textContent=`Imported ${Object.keys(gear).length} equipped items${result.talentsAvailable?" and current talent ranks":""} from ${result.name}.${enrichment.filled?` Filled healing stats from Wowhead on ${enrichment.filled} item${enrichment.filled===1?"":"s"}.`:""}${enrichment.failed?` ${enrichment.failed} item lookup${enrichment.failed===1?"":"s"} failed; those stats remain unknown.`:""}`;
     setTimeout(()=>document.querySelector("#armoryDialog").close(),900);
   } catch(error) {
     const fallback="Could not reach Blizzard through the public relay. Paste the Armory page source and retry.";
