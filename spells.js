@@ -8,9 +8,9 @@ window.HEALING_SPELLS = [
     [6,38,270,205,6078],[7,44,370,250,10927],[8,50,510,305,10928],[9,56,670,365,10929],[10,60,830,410,25315]
   ]},
   { name:"Desperate Prayer", group:"Holy · racial", kind:"heal", cast:1.5, instant:true, coefficient:0, wowhead:13908, ranks:[
-    [1,10,149,null,13908],[2,18,276,null,19236],[3,26,458,null,19238],[4,34,595,null,19240],
-    [5,42,856,null,19241],[6,50,1143,null,19242],[7,58,1383,null,19243]
-  ], manaNote:"Mana cost varies by rank / character; check spell tooltip."},
+    [1,10,149,0,13908],[2,18,276,0,19236],[3,26,458,0,19238],[4,34,595,0,19240],
+    [5,42,856,0,19241],[6,50,1143,0,19242],[7,58,1383,0,19243]
+  ]},
   { name:"Heal", group:"Holy", kind:"heal", cast:3, coefficient:0.857, wowhead:2054, ranks:[
     [1,16,291,155,2054],[2,22,405,205,2055],[3,28,523,255,6063],[4,34,651,305,6064]
   ]},
@@ -38,11 +38,11 @@ window.HEALING_SPELLS = [
   ], detail:"Per jump; use the target count control for the number of jumps that land (up to five)."},
   { name:"Circle of Healing", group:"Holy · group", kind:"group", cast:1.5, instant:true, coefficient:0, wowhead:401946, ranks:[
     [1,null,null,null,401946]
-  ], detail:"Forever spell recorder does not expose its heal range or mana amount; ratios are omitted until verified."},
+  ], manaNote:"56% of base mana", detail:"The spell record lists a 56% base-mana cost but does not expose its healing range; throughput and healing-per-mana ratios are omitted."},
   { name:"Divine Grace", group:"Holy · racial", kind:"heal", cast:1.5, instant:true, coefficient:0, wowhead:1277370, ranks:[
-    [1,10,149,null,1277370],[2,18,276,null,1277371],[3,26,458,null,1277372],[4,34,595,null,1277374],
-    [5,42,856,null,1277376],[6,50,1143,null,1277377],[7,58,1383,null,1277378]
-  ], manaNote:"Mana cost not exposed by the spell recorder."},
+    [1,10,149,0,1277370],[2,18,276,0,1277371],[3,26,458,0,1277372],[4,34,595,0,1277374],
+    [5,42,856,0,1277376],[6,50,1143,0,1277377],[7,58,1383,0,1277378]
+  ]},
   { name:"Penance", group:"Discipline · channeled", kind:"heal", cast:2, coefficient:0, wowhead:402174, ranks:[
     [1,30,552,100,402174],[2,40,873,185,1240720],[3,50,1446,270,1240721],[4,60,2019,355,1316991]
   ], detail:"Total covers three bolts over a 2 sec channel; the client list does not publish its bonus-healing share."},
