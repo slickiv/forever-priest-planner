@@ -26,8 +26,7 @@ a { color: inherit; }
 .hero { min-height: 275px; padding: 50px 0 42px; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--line); }
 .eyebrow { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); font-weight: 750; margin: 0 0 10px; }
 h1,h2,h3,p { margin-top: 0; }
-h1 { font-size: clamp(42px, 6vw, 70px); line-height: .98; letter-spacing: -.055em; margin-bottom: 18px; font-weight: 800; }
-h1 em { font-family: Georgia, "Times New Roman", serif; font-weight: 500; letter-spacing: -.04em; }
+h1 { font-size: clamp(18px, 4.5vw, 56px); line-height: 1.05; letter-spacing: -.055em; margin-bottom: 18px; font-weight: 800; white-space: nowrap; }
 .hero-sub { max-width: 420px; font-size: 14px; color: var(--soft); margin: 0; }
 .hero-stat { padding: 0 6px 4px 34px; border-left: 1px solid var(--line); min-width: 190px; display: flex; flex-direction: column; }
 .hero-stat strong { font-size: 40px; letter-spacing: -.06em; line-height: 1.1; }
@@ -150,8 +149,8 @@ dialog::backdrop { background: color-mix(in srgb, CanvasText 45%, transparent); 
   .shell { width: min(100% - 28px, 540px); }
   .masthead { height: 62px; }
   .header-note { font-size: 10px; }
-  .hero { min-height: auto; padding: 37px 0 29px; align-items: flex-start; }
-  .hero-stat { min-width: 118px; padding-left: 15px; margin-top: 48px; }
+  .hero { min-height: auto; padding: 37px 0 29px; align-items: flex-start; flex-direction: column; }
+  .hero-stat { min-width: 0; padding: 0; border-left: 0; margin-top: 22px; }
   .hero-stat strong { font-size: 30px; }
   .hero-stat .eyebrow { font-size: 8px; }
   .hero-sub { max-width: 285px; }
