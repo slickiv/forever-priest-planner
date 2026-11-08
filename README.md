@@ -21,7 +21,7 @@ For coefficient assumptions and cross-checks, see [Forever Mastery's downrank ca
 - Instant spells: use a 1.5 second GCD as the cast-time denominator.
 - Penance: total healing across three bolts, divided by its 2 second channel; no bonus-healing share is published.
 - Prayer of Healing and Holy Nova: show per-target healing and an adjustable party total. Binding Heal totals both recipients.
-- Power Word: Shield: shows absorb per cast time and per mana; its bonus uses spell power × 10%.
+- Power Word: Shield: shows absorb per cast time and per mana; its bonus uses bonus healing × 10%.
 - HPM uses total healing for a cast divided by the adjusted displayed mana cost. Improved Healing applies only to Lesser Heal, Heal, Greater Heal, Penance, and Prayer of Mending.
 
 These are theoretical values before talents other than the optional Improved Healing discount, critical heals, overhealing, or target-specific effects. Gear stats are user-entered from Wowhead and saved locally.
