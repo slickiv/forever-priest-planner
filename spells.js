@@ -36,9 +36,9 @@ window.HEALING_SPELLS = [
   { name:"Prayer of Mending", group:"Holy · reactive / jumps", kind:"group", cast:1.5, instant:true, coefficient:0, wowhead:401859, ranks:[
     [1,40,172,210,401859],[2,50,298,305,1240826],[3,60,413,390,1240827]
   ], detail:"Per jump; use the target count control for the number of jumps that land (up to five)."},
-  { name:"Circle of Healing", group:"Holy · group", kind:"group", cast:1.5, instant:true, coefficient:0, wowhead:401946, ranks:[
-    [1,null,null,null,401946]
-  ], manaNote:"56% of base mana", detail:"The spell record lists a 56% base-mana cost but does not expose its healing range; throughput and healing-per-mana ratios are omitted."},
+  { name:"Circle of Healing", group:"Holy · group", kind:"group", cast:1.5, instant:true, coefficient:0.214, wowhead:401946, ranks:[
+    [1,null,922.32465612,770,401946]
+  ], detail:"Level 60 baseline from Wowhead's 875.1986–969.4507 formula range, averaged. Cost uses 56% × 1,376 Priest base mana, floored to 770."},
   { name:"Divine Grace", group:"Holy · racial", kind:"heal", cast:1.5, instant:true, coefficient:0, wowhead:1277370, ranks:[
     [1,10,149,0,1277370],[2,18,276,0,1277371],[3,26,458,0,1277372],[4,34,595,0,1277374],
     [5,42,856,0,1277376],[6,50,1143,0,1277377],[7,58,1383,0,1277378]
