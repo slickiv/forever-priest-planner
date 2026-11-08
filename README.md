@@ -12,7 +12,7 @@ This repository is plain HTML, CSS, and JavaScript. In GitHub, open **Settings â
 
 ## Spell values and calculations
 
-The spell rank records use the Forever-specific class spellbook from [Warcraft Forever](https://warcraftforever.games/classes/priest/spells), cross-checked against [Priest healing notes](https://lorddemonos.github.io/wow-forever/healing/priest/) and [Forever Mastery's downrank calculator](https://forevermastery.com/en/tools/downrank). Ranged tooltip heals use their exact arithmetic average. Values use the rank's learned-level baseline. Desperate Prayer and Divine Grace show 0 mana because the Forever spell records list no mana cost; Circle of Healing displays its 56% base-mana cost. Its heal range is absent from the spell record, so its throughput and healing-per-mana ratios remain unavailable rather than guessed. The UI links each rank to its Wowhead Forever spell page.
+The spell rank records use the Forever-specific class spellbook from [Warcraft Forever](https://warcraftforever.games/classes/priest/spells), cross-checked against [Priest healing notes](https://lorddemonos.github.io/wow-forever/healing/priest/) and [Forever Mastery's downrank calculator](https://forevermastery.com/en/tools/downrank). Ranged tooltip heals use their exact arithmetic average. Values use the rank's learned-level baseline. Desperate Prayer and Divine Grace show 0 mana because the Forever spell records list no mana cost. Circle of Healing uses Wowhead's level-60 healing formula and 0.214 bonus-healing coefficient; its range endpoints are averaged for throughput. Its 56% base-mana cost is converted using a 1,376 level-60 Priest base-mana baseline, then floored to match in-game percentage-cost rounding. This is an explicit level-60 assumption because Circle of Healing has one rank but scales with character level. The UI links each rank to its Wowhead Forever spell page.
 
 For coefficient assumptions and cross-checks, see [Forever Mastery's downrank calculator](https://forevermastery.com/en/tools/downrank) and [Priest healing notes](https://lorddemonos.github.io/wow-forever/healing/priest/). These are community references, not Blizzard-published calculators. The records currently describe Forever client build 1.60.1.70790; recheck after spell balance updates.
 
@@ -20,7 +20,7 @@ For coefficient assumptions and cross-checks, see [Forever Mastery's downrank ca
 - Renew: uses its full listed heal value and a 1.5 second GCD for cast throughput; the 15 second tick duration is called out separately.
 - Instant spells: use a 1.5 second GCD as the cast-time denominator.
 - Penance: total healing across three bolts, divided by its 2 second channel; no bonus-healing share is published.
-- Prayer of Healing and Holy Nova: show per-target healing and an adjustable party total. Binding Heal totals both recipients.
+- Prayer of Healing, Holy Nova, and Circle of Healing: show per-target healing and an adjustable party total. Binding Heal totals both recipients.
 - Power Word: Shield: shows absorb per cast time and per mana; its bonus uses bonus healing Ã— 10%.
 - HPM uses total healing for a cast divided by the adjusted displayed mana cost. Improved Healing applies only to Lesser Heal, Heal, Greater Heal, Penance, and Prayer of Mending.
 
