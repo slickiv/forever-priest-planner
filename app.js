@@ -124,10 +124,14 @@ function spellMetrics(spell, rank) {
   const reduction = number(document.querySelector("#manaReduction").value) / 100;
   const improvedHealingApplies = ["Lesser Heal","Heal","Greater Heal","Penance","Prayer of Mending"].includes(spell.name);
   const targets = Math.max(1, Math.min(5, number(document.querySelector("#partyTargets").value) || 1));
-  const cast = rank[6] ?? spell.cast;
-  const coefficient = rank[5] ?? spell.coefficient;
-  const mana = rank[3] == null ? null : Math.floor(rank[3] * (1 - (improvedHealingApplies ? reduction : 0)));
-  const heal = rank[2] == null ? null : rank[2] + bonus * coefficient;
+  const cast = rank[7] ?? spell.cast;
+  const coefficient = rank[6] ?? spell.coefficient;
+  const mana = rank[4] == null ? null : Math.floor(rank[4] * (1 - (improvedHealingApplies ? reduction : 0)));
+  const baseMin = rank[2] == null ? null : rank[2];
+  const baseMax = rank[3] == null ? null : rank[3];
+  const healMin = baseMin == null ? null : baseMin + bonus * coefficient;
+  const healMax = baseMax == null ? null : baseMax + bonus * coefficient;
+  const heal = healMin == null || healMax == null ? null : (healMin + healMax) / 2;
   let total = heal;
   if (total != null && spell.name === "Binding Heal") total *= 2;
   if (total != null && spell.name === "Prayer of Healing") total *= targets;
@@ -136,9 +140,10 @@ function spellMetrics(spell, rank) {
   const amountLabel = spell.kind === "shield" ? "Absorb" : "Healing";
   const perSecond = heal == null ? null : heal / cast;
   const perMana = total == null || !mana ? null : total / mana;
-  return {bonus,targets,mana,heal,total,perSecond,perMana,amountLabel};
+  return {bonus,targets,mana,baseMin,baseMax,healMin,healMax,heal,total,perSecond,perMana,amountLabel};
 }
 function fmt(value, places=1) { return value == null || !Number.isFinite(value) ? "—" : Number(value.toFixed(places)).toLocaleString(undefined,{maximumFractionDigits:places}); }
+function fmtRange(min,max,places=1) { return min == null || max == null ? "—" : min === max ? fmt(min,places) : `${fmt(min,places)}–${fmt(max,places)}`; }
 function renderSpells() {
   const host = document.querySelector("#spellList");
   if (!host) return;
@@ -148,19 +153,20 @@ function renderSpells() {
     const shield = spell.kind === "shield";
     const kindLabel = shield ? "ABSORB" : "HEAL";
     const rows = spell.ranks.map(rank => {
-      const [rankNo,learned,base,mana,id] = rank;
+      const [rankNo,learned,baseMin,baseMax,mana,id] = rank;
       const m = spellMetrics(spell,rank);
       const rankLink = `https://www.wowhead.com/forever/spell=${encodeURIComponent(id)}`;
       const note = mana == null ? `<small>${esc(spell.manaNote || "Mana cost unavailable")}</small>` : `${m.mana.toLocaleString()} mana`;
-      const group = spell.name === "Binding Heal" ? `${fmt(m.heal)} × 2` : (spell.name === "Prayer of Healing" || spell.name === "Holy Nova" ? `${fmt(m.heal)} / target` : fmt(m.heal));
+      const range = fmtRange(m.healMin,m.healMax);
+      const group = spell.name === "Binding Heal" ? `${range} × 2` : (spell.name === "Prayer of Healing" || spell.name === "Holy Nova" || spell.name === "Circle of Healing" ? `${range} / target` : range);
       const learnedText = learned == null ? "—" : `Lv ${learned}`;
       const perTime = m.perSecond == null ? "—" : `${fmt(m.perSecond)} / sec`;
       const perMana = m.perMana == null ? "—" : `${fmt(m.perMana,2)} / mana`;
-      const effectiveCast = rank[6] ?? spell.cast;
+      const effectiveCast = rank[7] ?? spell.cast;
       const castText = spell.duration ? `${spell.instant ? "Instant · 1.5s GCD" : `${effectiveCast}s cast`} · ${spell.duration}s effect` : spell.instant ? "Instant · 1.5s GCD" : `${effectiveCast}s cast`;
       const details = spell.detail ? `<span class="rank-extra">${esc(spell.detail)}</span>` : "";
       const tickRate = spell.duration && m.heal != null ? `<span class="rank-extra">Arrival rate while ticking: ${fmt(m.heal / spell.duration)} / sec</span>` : "";
-      const tooltipValue = base == null ? "Heal amount not exposed" : `${fmt(base,1)} ${shield ? "absorb" : "heal"}`;
+      const tooltipValue = baseMin == null ? "Heal amount not exposed" : `Base ${fmtRange(baseMin,baseMax)} · with gear ${range}`;
       const totalLine = spell.name === "Binding Heal" ? `<span class="rank-extra">Two-target total: ${fmt(m.total)}${mana ? ` · ${fmt(m.perMana,2)} total per mana` : ""}</span>` : (spell.name === "Prayer of Healing" || spell.name === "Holy Nova" ? `<span class="rank-extra">Party total (${m.targets}): ${fmt(m.total)}</span>` : (spell.name === "Prayer of Mending" ? `<span class="rank-extra">Total for ${m.targets} jump${m.targets === 1 ? "" : "s"}: ${fmt(m.total)}</span>` : (spell.name === "Lightwell" ? `<span class="rank-extra">Total for ${m.targets} click${m.targets === 1 ? "" : "s"}: ${fmt(m.total)}</span>` : "")));
       return `<div class="rank-row ${shield ? "shield-row" : ""}">
         <div class="rank-name"><a href="${rankLink}" target="_blank" rel="noreferrer">R${rankNo} ↗</a><span>${learnedText}</span></div>
@@ -172,7 +178,7 @@ function renderSpells() {
     }).join("");
     return `<details class="spell-card" ${index < 3 ? "open" : ""}>
       <summary><span class="spell-glyph ${shield ? "shield-glyph" : ""}">${shield ? "◈" : "✦"}</span><span class="spell-title"><b>${esc(spell.name)}</b><small>${esc(spell.group)}</small></span><span class="spell-kind ${shield ? "shield-kind" : ""}">${kindLabel}</span><span class="rank-pill">${spell.ranks.length} ${spell.ranks.length === 1 ? "rank" : "ranks"}</span><span class="chevron">⌄</span></summary>
-      <div class="rank-table"><div class="rank-header"><span>Rank / learned</span><span>Base healing</span><span>Cast / mana</span><span>Per time</span><span>Per mana</span></div>${rows}</div>
+      <div class="rank-table"><div class="rank-header"><span>Rank / learned</span><span>Healing range</span><span>Cast / mana</span><span>Mean / time</span><span>Mean / mana</span></div>${rows}</div>
     </details>`;
   }).join("");
   document.querySelector("#rankCount").textContent = `${ranksShown} ranks · ${window.HEALING_SPELLS.length} spells`;
