@@ -331,7 +331,7 @@ document.querySelector("#armoryForm").addEventListener("submit",async event=>{
   const source=document.querySelector("#armorySource").value.trim(); const characterName=document.querySelector("#characterName").value.trim();
   try {
     let html=source;
-    if(!html){const url=armoryUrlFromCharacterName(characterName); const response=await fetch(throughCorsRelay(url)); if(!response.ok) throw new Error("The public profile relay returned an error. Paste the page source as a fallback."); html=await response.text();}
+    if(!html){const url=armoryUrlFromCharacterName(characterName); const response=await fetch(throughCorsRelay(url)); if(!response.ok){if(response.status===404||response.status===500) throw new Error(`No public profile found for ${characterName}.`); throw new Error("The public profile relay returned an error. Paste the page source as a fallback.");} html=await response.text();}
     const result=parseArmory(html); status.textContent="Checking equipped items on Wowhead for healing stats…";
     const enrichment=await fillArmoryHealingFromWowhead(result.gear);
     gear=result.gear; saveGear();
