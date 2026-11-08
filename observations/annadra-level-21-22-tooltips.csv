@@ -1,0 +1,23 @@
+character,level,bonus_healing,twin_disciplines_rank,improved_pws_rank,spell,rank,spell_id,mana_cost,cast_time_seconds,effect_duration_seconds,effect,observed_min,observed_max,current_model_min,current_model_max,notes
+Annadra Warderer,21,45,3,0,Power Word: Shield,1,17,45,1.5,30,absorb,52,52,52,52,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
+Annadra Warderer,21,45,3,0,Power Word: Shield,2,592,80,1.5,30,absorb,96,96,96,96,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
+Annadra Warderer,21,45,3,0,Power Word: Shield,3,600,130,1.5,30,absorb,163,163,163,163,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
+Annadra Warderer,21,45,3,0,Lesser Heal,1,2050,30,1.5,,heal,60,71,60,71,Rank 1 uses the measured exception calibrated against the L21/L22 tooltips.
+Annadra Warderer,21,45,3,0,Lesser Heal,2,2052,45,2,,heal,115,132,115,132,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
+Annadra Warderer,21,45,3,0,Lesser Heal,3,2053,75,2.5,,heal,189,214,189,214,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
+Annadra Warderer,21,45,3,0,Heal,1,2054,155,3,,heal,298,339,298,339,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
+Annadra Warderer,21,45,3,0,Flash Heal,1,2061,125,1.5,,heal,195,236,195,236,Per-level growth is inferred from the L21/L22 tooltip change.
+Annadra Warderer,21,45,3,0,Renew,1,139,30,1.5,15,heal,92,92,92,92,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
+Annadra Warderer,21,45,3,0,Renew,2,6074,65,1.5,15,heal,123,123,123,123,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
+Annadra Warderer,21,45,3,0,Renew,3,6075,105,1.5,15,heal,175,175,175,175,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
+Annadra Warderer,22,45,3,0,Power Word: Shield,1,17,45,1.5,30,absorb,52,52,52,52,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
+Annadra Warderer,22,45,3,0,Power Word: Shield,2,592,80,1.5,30,absorb,96,96,96,96,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
+Annadra Warderer,22,45,3,0,Power Word: Shield,3,600,130,1.5,30,absorb,164,164,164,164,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
+Annadra Warderer,22,45,3,0,Lesser Heal,1,2050,30,1.5,,heal,59,70,59,70,Rank 1 uses the measured exception calibrated against the L21/L22 tooltips.
+Annadra Warderer,22,45,3,0,Lesser Heal,2,2052,45,2,,heal,113,130,113,130,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
+Annadra Warderer,22,45,3,0,Lesser Heal,3,2053,75,2.5,,heal,189,214,189,214,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
+Annadra Warderer,22,45,3,0,Heal,1,2054,155,3,,heal,298,339,298,339,Heal rank 2 was intentionally omitted from the supplied screenshots.
+Annadra Warderer,22,45,3,0,Flash Heal,1,2061,125,1.5,,heal,197,238,197,238,Per-level growth is inferred from the L21/L22 tooltip change.
+Annadra Warderer,22,45,3,0,Renew,1,139,30,1.5,15,heal,92,92,92,92,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
+Annadra Warderer,22,45,3,0,Renew,2,6074,65,1.5,15,heal,123,123,123,123,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
+Annadra Warderer,22,45,3,0,Renew,3,6075,105,1.5,15,heal,175,175,175,175,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
