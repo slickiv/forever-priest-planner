@@ -67,6 +67,7 @@
         <div class="section-head spell-head">
           <div><p class="eyebrow">RANK-BY-RANK REFERENCE</p><h2>Healing spellbook</h2></div>
           <div class="spell-controls">
+            <label class="stat-input">Character level <input id="characterLevel" type="number" min="1" max="60" value="22" step="1" /></label>
             <label class="stat-input">Bonus healing <input id="bonusHealing" type="number" min="0" value="0" step="1" /> <span>from gear</span></label>
             <label class="stat-input">Improved Healing <select id="manaReduction"><option value="0">0/3</option><option value="5">1/3</option><option value="10">2/3</option><option value="15">3/3</option></select></label>
             <label class="stat-input">Twin Disciplines <select id="twinDisciplines"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
@@ -74,10 +75,10 @@
             <label class="stat-input">Targets / jumps <input id="partyTargets" type="number" min="1" max="5" value="5" step="1" /> <span>for group / proc totals</span></label>
           </div>
         </div>
-        <p class="helper">Each rank shows its Forever base range and the range after your bonus healing. Throughput and efficiency use the range midpoint. Instants use a 1.5 sec global cooldown for throughput. Group healing is shown per target, with party totals in the details.</p>
+        <p class="helper">Each rank shows its level-scaled base range and its range after gear and talents. Lower-rank gear healing fades with level. Throughput and efficiency use the midpoint of the displayed range. Instants use a 1.5 sec global cooldown for throughput.</p>
         <div class="spell-legend"><span><i class="dot heal-dot"></i> Healing</span><span><i class="dot shield-dot"></i> Absorb</span><span id="rankCount"></span></div>
         <div id="spellList" class="spell-list"></div>
-        <div class="method-note"><strong>How the numbers work</strong><p>The displayed healing range is the client base range plus bonus healing × the spell coefficient at each endpoint, then applicable talent multipliers. Mean healing is the midpoint of that range, and mean healing per time and per mana use that value. Power Word: Shield uses 10% of bonus healing and reports absorb per cast time and absorb per mana; Improved Power Word: Shield increases the resulting absorb, while Twin Disciplines does not affect shields. An instant uses the 1.5 sec global cooldown, including Renew; its total healing is displayed per cast and its tick duration is called out. Healing per mana uses total healing divided by displayed mana cost. Group spells use the target count above. Values are theoretical, before critical heals, overhealing, and target limits. Gear totals with “+ ?” include known stats only; fill the unknown slots for a complete comparison. The costs shown are base costs; the reduction control applies Improved Healing to eligible spells.</p></div>
+        <div class="method-note"><strong>How the numbers work</strong><p>Where client growth data is available, base healing is increased by its per-level amount up to that rank’s growth cap. Bonus healing is multiplied by the spell coefficient and the Forever downranking share: full share for the first 17 levels after learning, then 5 percentage points less per level. Lesser Heal rank 1 uses its separately measured exception. The resulting endpoints are shown as tooltip-style integers; throughput and efficiency use the displayed range midpoint. Power Word: Shield uses 10% of bonus healing and Improved Power Word: Shield applies its rank values (7%, 14%, or 20%); Twin Disciplines does not affect absorbs. Other instant heals use the 1.5 sec global cooldown. Ranks without verified level-growth data retain their listed base values. These are theoretical values before critical heals, overhealing, and target limits.</p></div>
       </section>
 
       <footer><span>FOREVER PRIEST PLANNER</span><span>Spell data: <a href="https://theforeverera.com/en/spells/priest/" target="_blank" rel="noreferrer">The Forever Era ↗</a> · Calculations: <a href="https://foreverchanges.pro/downrank-calculator" target="_blank" rel="noreferrer">ForeverChanges ↗</a></span></footer>
@@ -110,7 +111,7 @@
         <div class="dialog-actions"><span></span><button class="button quiet" type="button" id="cancelArmory">Cancel</button><button class="button primary" id="importArmory" value="import">Import gear</button></div>
       </form>
     </dialog>
-    <script src="spells.js?v=14"></script>
-    <script src="app.js?v=19"></script>
+    <script src="spells.js?v=15"></script>
+    <script src="app.js?v=20"></script>
   </body>
 </html>
