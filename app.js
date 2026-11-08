@@ -249,6 +249,8 @@ function parseArmory(html) {
   const script=html.match(/var\s+characterProfileInitialState\s*=\s*(\{[\s\S]*?\})\s*;\s*<\/script/i);
   if(!script) throw new Error("No embedded Armory character data was found. Make sure the page source is from a character profile.");
   const state=JSON.parse(script[1]); const character=state.character;
+  const className=typeof character?.class==="string" ? character.class : character?.class?.name;
+  if(className && className.toLowerCase()!=="priest") throw new Error(`${className}s cannot be imported.`);
   if(!character?.gear) throw new Error("The Armory page does not include equipped gear data.");
   const slotMap={head:"head",neck:"neck",shoulder:"shoulders",back:"back",chest:"chest",wrist:"wrists",hand:"hands",waist:"waist",leg:"legs",foot:"feet",leftFinger:"finger1",rightFinger:"finger2",trinket1:"trinket1",trinket2:"trinket2",weapon:"mainhand",offHand:"offhand",ranged:"ranged"};
   const accepted=new Set(["head","shoulders","back","chest","wrists","hands","waist","legs","feet"]);
