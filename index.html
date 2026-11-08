@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="Canvas" />
+    <meta name="description" content="Plan cloth-only Priest gear and compare every healing spell rank in World of Warcraft: Forever." />
+    <title>Forever Priest Planner</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="masthead">
+        <div class="brand"><span class="brand-mark">✦</span><span>FOREVER<span class="brand-light"> / PRIEST</span></span></div>
+        <div class="header-note"><span class="status-dot"></span> WoW: Forever · cloth only</div>
+      </header>
+
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">FIELD KIT · HEALING & GEAR</p>
+          <h1>Build your<br /><em>healing set.</em></h1>
+          <p class="hero-sub">Plan your cloth loadout, then compare every healing rank by cast throughput and mana efficiency.</p>
+        </div>
+        <div class="hero-stat"><span class="eyebrow">EQUIPPED HEALING</span><strong id="heroHealing">0</strong><span>bonus healing</span></div>
+      </section>
+
+      <nav class="tabs" aria-label="Planner sections">
+        <button class="tab active" data-tab="gear">01 <span>Gear planner</span></button>
+        <button class="tab" data-tab="spells">02 <span>Healing spells</span></button>
+      </nav>
+
+      <section id="gearPanel" class="panel">
+        <div class="section-head">
+          <div><p class="eyebrow">YOUR LOADOUT</p><h2>Cloth gear planner</h2></div>
+          <div class="actions">
+            <button class="button quiet" id="exportBtn">Export</button>
+            <label class="button quiet file-button">Import<input id="importFile" type="file" accept="application/json,.json" /></label>
+            <button class="button quiet" id="resetBtn">Reset set</button>
+          </div>
+        </div>
+        <p class="helper">Each slot accepts a cloth item. Add its Wowhead item ID and the stats you want to track; the link opens the matching Wowhead entry.</p>
+        <div class="gear-layout">
+          <div id="gearGrid" class="gear-grid"></div>
+          <aside class="summary-card">
+            <p class="eyebrow">SET TOTALS</p>
+            <div class="total"><span>Healing</span><b id="totalHealing">0</b></div>
+            <div class="total"><span>Spell power</span><b id="totalSpellPower">0</b></div>
+            <div class="total"><span>Intellect</span><b id="totalIntellect">0</b></div>
+            <div class="total"><span>Spirit</span><b id="totalSpirit">0</b></div>
+            <div class="total"><span>Mana per 5 sec</span><b id="totalMp5">0</b></div>
+            <div class="summary-rule"></div>
+            <a class="button wowhead-button" href="https://www.wowhead.com/classic/items" target="_blank" rel="noreferrer">Browse items on Wowhead ↗</a>
+            <p class="fineprint">Wowhead is the item and loot-table reference. This planner does not copy or maintain an item database.</p>
+          </aside>
+        </div>
+        <div class="loot-note"><span class="note-icon">↗</span><div><strong>Loot tables stay on Wowhead</strong><p>Open a boss or item entry on Wowhead to check its current source and loot table. Paste an item ID into a slot to add it to this set.</p></div></div>
+      </section>
+
+      <section id="spellsPanel" class="panel hidden">
+        <div class="section-head spell-head">
+          <div><p class="eyebrow">RANK-BY-RANK REFERENCE</p><h2>Healing spellbook</h2></div>
+          <div class="spell-controls">
+            <label class="stat-input">Bonus healing <input id="bonusHealing" type="number" min="0" value="0" step="1" /> <span>from gear</span></label>
+            <label class="stat-input">Spell power <input id="bonusSpellPower" type="number" min="0" value="0" step="1" /> <span>for shields</span></label>
+            <label class="stat-input">Improved Healing <select id="manaReduction"><option value="0">0/3</option><option value="5">1/3</option><option value="10">2/3</option><option value="15">3/3</option></select></label>
+            <label class="stat-input">Targets / jumps <input id="partyTargets" type="number" min="1" max="5" value="5" step="1" /> <span>for group / proc totals</span></label>
+          </div>
+        </div>
+        <p class="helper">Base values use Forever spell data. Bonus healing and shield spell power use their spell coefficients. Instants use a 1.5 sec global cooldown for throughput. Group healing is shown per target, with party totals in the details.</p>
+        <div class="spell-legend"><span><i class="dot heal-dot"></i> Healing</span><span><i class="dot shield-dot"></i> Absorb</span><span id="rankCount"></span></div>
+        <div id="spellList" class="spell-list"></div>
+        <div class="method-note"><strong>How the numbers work</strong><p>Healing per cast time = (base healing + bonus healing × coefficient) ÷ cast time. Power Word: Shield uses spell power × 10% instead and reports absorb per cast time and absorb per mana. An instant uses the 1.5 sec global cooldown, including Renew; its total healing is displayed per cast and its tick duration is called out. Healing per mana uses total healing divided by displayed mana cost. Group spells use the target count above. Values are theoretical, before talents, critical heals, overhealing, and target limits. The costs shown are base costs; the reduction control applies Improved Healing to eligible spells.</p></div>
+      </section>
+
+      <footer><span>FOREVER PRIEST PLANNER</span><span>Spell data: <a href="https://warcraftforever.games/classes/priest/spells" target="_blank" rel="noreferrer">Warcraft Forever ↗</a> · Calculations: <a href="https://forevermastery.com/en/tools/downrank" target="_blank" rel="noreferrer">Forever Mastery ↗</a></span></footer>
+    </main>
+    <dialog id="itemDialog">
+      <form method="dialog" id="itemForm">
+        <div class="dialog-head"><div><p class="eyebrow">CLOTH SLOT</p><h3 id="dialogTitle">Add item</h3></div><button class="close" value="cancel" aria-label="Close">×</button></div>
+        <input type="hidden" id="editSlot" />
+        <label>Item name<input id="itemName" maxlength="70" placeholder="e.g. Robes of the Exalted" /></label>
+        <label>Wowhead item ID<input id="itemId" inputmode="numeric" pattern="[0-9]+" required placeholder="e.g. 13346" /></label>
+        <div class="item-stats">
+          <label>Healing<input id="itemHealing" type="number" min="0" step="1" value="0" /></label>
+          <label>Spell power<input id="itemSpellPower" type="number" min="0" step="1" value="0" /></label>
+          <label>Intellect<input id="itemIntellect" type="number" min="0" step="1" value="0" /></label>
+          <label>Spirit<input id="itemSpirit" type="number" min="0" step="1" value="0" /></label>
+          <label>MP5<input id="itemMp5" type="number" min="0" step="1" value="0" /></label>
+        </div>
+        <label>Loot source / boss <input id="itemSource" maxlength="80" placeholder="Optional · e.g. Baron Rivendare" /></label>
+        <p class="dialog-note">Armor type is fixed to cloth for every slot. Use Wowhead to verify item stats and loot source.</p>
+        <div class="dialog-actions"><button class="button quiet" id="removeItem" type="button">Clear slot</button><span></span><button class="button primary" value="save">Save item</button></div>
+      </form>
+    </dialog>
+    <script src="spells.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
