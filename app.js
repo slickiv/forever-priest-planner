@@ -5,10 +5,12 @@ const SLOTS = [
   ["mainhand","Main hand"],["offhand","Off hand"],["ranged","Ranged"]
 ];
 const STORE_KEY = "forever-priest-planner-v1";
+const CHARACTER_LEVEL_KEY = "forever-priest-planner-character-level-v1";
 const CORS_RELAY = "https://proxy.cors.dev/";
 let gear = readGear();
 const TALENT_STORE_KEY = "forever-priest-planner-talents-v1";
 let talents = readTalents();
+let characterLevel = readCharacterLevel();
 let editingSlot = null;
 let editingOriginalItem = null;
 let resolvedItemSubclass = "";
@@ -22,6 +24,12 @@ function readGear() {
   } catch { return {}; }
 }
 function saveGear() { localStorage.setItem(STORE_KEY, JSON.stringify(gear)); renderGear(); }
+function readCharacterLevel() {
+  try {
+    const saved=Number(localStorage.getItem(CHARACTER_LEVEL_KEY));
+    return Number.isInteger(saved) && saved >= 1 && saved <= 60 ? saved : 22;
+  } catch { return 22; }
+}
 function readTalents() {
   try {
     const saved=JSON.parse(localStorage.getItem(TALENT_STORE_KEY) || "{}");
@@ -141,13 +149,21 @@ function spellMetrics(spell, rank) {
   const cast = rank[7] ?? spell.cast;
   const coefficient = rank[6] ?? spell.coefficient;
   const mana = rank[4] == null ? null : Math.floor(rank[4] * (1 - (improvedHealingApplies ? reduction : 0)));
-  const baseMin = rank[2] == null ? null : rank[2];
-  const baseMax = rank[3] == null ? null : rank[3];
+  const learnedLevel=rank[1];
+  const growth=spell.levelGrowth?.[rank[5]];
+  const growthLevels=growth && learnedLevel != null ? Math.max(0,Math.min(characterLevel,growth.cap)-learnedLevel) : 0;
+  const baseMin = rank[2] == null ? null : rank[2] + (growth?.perLevel || 0) * growthLevels;
+  const baseMax = rank[3] == null ? null : rank[3] + (growth?.perLevel || 0) * growthLevels;
+  const generalRetention=learnedLevel == null ? 1 : Math.max(0,1-Math.max(0,characterLevel-learnedLevel-17)*0.05);
+  const coefficientRetention=Math.max(0,generalRetention-(growth?.downrankOffset || 0));
+  const effectiveCoefficient=coefficient*coefficientRetention;
   const talentMultiplier=spell.kind === "shield"
-    ? [1,1.07,1.14,1.20][talents.improvedPws]
+    ? 1 + talents.improvedPws * 0.07
     : spell.instant ? 1 + talents.twinDisciplines / 100 : 1;
-  const healMin = baseMin == null ? null : (baseMin + bonus * coefficient) * talentMultiplier;
-  const healMax = baseMax == null ? null : (baseMax + bonus * coefficient) * talentMultiplier;
+  const rawMin = baseMin == null ? null : (baseMin + bonus * effectiveCoefficient) * talentMultiplier;
+  const rawMax = baseMax == null ? null : (baseMax + bonus * effectiveCoefficient) * talentMultiplier;
+  const healMin = rawMin == null ? null : Math.floor(rawMin + 1e-9);
+  const healMax = rawMax == null ? null : (baseMin === baseMax ? Math.floor(rawMax + 1e-9) : Math.ceil(rawMax - 1e-9));
   const heal = healMin == null || healMax == null ? null : (healMin + healMax) / 2;
   let total = heal;
   if (total != null && spell.name === "Binding Heal") total *= 2;
@@ -157,7 +173,7 @@ function spellMetrics(spell, rank) {
   const amountLabel = spell.kind === "shield" ? "Absorb" : "Healing";
   const perSecond = heal == null ? null : heal / cast;
   const perMana = total == null || !mana ? null : total / mana;
-  return {bonus,targets,mana,baseMin,baseMax,healMin,healMax,heal,total,perSecond,perMana,amountLabel,talentMultiplier};
+  return {bonus,targets,mana,baseMin,baseMax,healMin,healMax,heal,total,perSecond,perMana,amountLabel,talentMultiplier,effectiveCoefficient,coefficientRetention};
 }
 function fmt(value, places=1) { return value == null || !Number.isFinite(value) ? "—" : Number(value.toFixed(places)).toLocaleString(undefined,{maximumFractionDigits:places}); }
 function fmtRange(min,max,places=1) { return min == null || max == null ? "—" : min === max ? fmt(min,places) : `${fmt(min,places)}–${fmt(max,places)}`; }
@@ -213,6 +229,15 @@ document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", (
   document.querySelector("#gearPanel").classList.toggle("hidden",tab.dataset.tab !== "gear");
   document.querySelector("#spellsPanel").classList.toggle("hidden",tab.dataset.tab !== "spells");
 }));
+document.querySelector("#characterLevel").value=String(characterLevel);
+document.querySelector("#characterLevel").addEventListener("input",event=>{
+  const value=Number(event.currentTarget.value);
+  if(Number.isInteger(value) && value >= 1 && value <= 60){
+    characterLevel=value;
+    try { localStorage.setItem(CHARACTER_LEVEL_KEY,String(value)); } catch {}
+    renderSpells();
+  }
+});
 ["#bonusHealing","#manaReduction","#partyTargets"].forEach(selector => document.querySelector(selector).addEventListener("input",renderSpells));
 for(const selector of ["#twinDisciplines","#improvedPws"]) document.querySelector(selector).addEventListener("change",saveTalents);
 document.querySelector("#twinDisciplines").value=String(talents.twinDisciplines);
@@ -306,7 +331,9 @@ function parseArmory(html) {
     if(name==="twin disciplines") importedTalents.twinDisciplines=clampRank(talent.rank,5);
     if(name==="improved power word: shield") importedTalents.improvedPws=clampRank(talent.rank,3);
   }
-  return {name:character.name,gear:imported,talents:importedTalents,talentsAvailable:Array.isArray(character.specs)};
+  const levelValue=typeof character.level==="object" ? (character.level.level ?? character.level.value) : character.level;
+  const level=Number(levelValue);
+  return {name:character.name,level:Number.isInteger(level) && level >= 1 && level <= 60 ? level : null,gear:imported,talents:importedTalents,talentsAvailable:Array.isArray(character.specs)};
 }
 function armoryUrlFromCharacterName(name) {
   const slug=String(name).normalize("NFKD").replace(/[\u0300-\u036f]/g,"").trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
@@ -368,6 +395,12 @@ document.querySelector("#armoryForm").addEventListener("submit",async event=>{
     const result=parseArmory(html); status.textContent="Checking equipped items on Wowhead for healing stats…";
     const enrichment=await fillArmoryHealingFromWowhead(result.gear);
     gear=result.gear; saveGear();
+    if(result.level){
+      characterLevel=result.level;
+      document.querySelector("#characterLevel").value=String(characterLevel);
+      try { localStorage.setItem(CHARACTER_LEVEL_KEY,String(characterLevel)); } catch {}
+      renderSpells();
+    }
     if(result.talentsAvailable){
       talents=result.talents;
       document.querySelector("#twinDisciplines").value=String(talents.twinDisciplines);
@@ -375,7 +408,7 @@ document.querySelector("#armoryForm").addEventListener("submit",async event=>{
       localStorage.setItem(TALENT_STORE_KEY,JSON.stringify(talents));
       renderSpells();
     }
-    status.textContent=`Imported ${Object.keys(gear).length} equipped items${result.talentsAvailable?" and current talent ranks":""} from ${result.name}.${enrichment.filled?` Filled healing stats from Wowhead on ${enrichment.filled} item${enrichment.filled===1?"":"s"}.`:""}${enrichment.failed?` ${enrichment.failed} item lookup${enrichment.failed===1?"":"s"} failed; those stats remain unknown.`:""}`;
+    status.textContent=`Imported ${Object.keys(gear).length} equipped items${result.level?` at level ${result.level}`:""}${result.talentsAvailable?" and current talent ranks":""} from ${result.name}.${enrichment.filled?` Filled healing stats from Wowhead on ${enrichment.filled} item${enrichment.filled===1?"":"s"}.`:""}${enrichment.failed?` ${enrichment.failed} item lookup${enrichment.failed===1?"":"s"} failed; those stats remain unknown.`:""}`;
     setTimeout(()=>document.querySelector("#armoryDialog").close(),900);
   } catch(error) {
     const fallback="Could not reach Blizzard through the public relay. Paste the Armory page source and retry.";
