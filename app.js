@@ -8,6 +8,7 @@ const STORE_KEY = "forever-priest-planner-v1";
 const CORS_RELAY = "https://proxy.cors.dev/";
 let gear = readGear();
 let editingSlot = null;
+let editingOriginalItem = null;
 let resolvedItemSubclass = "";
 
 function readGear() {
@@ -53,6 +54,7 @@ function renderGear() {
 function openItem(slot) {
   editingSlot = slot;
   const item = gear[slot] || {};
+  editingOriginalItem = Object.keys(item).length ? structuredClone(item) : null;
   document.querySelector("#dialogTitle").textContent = `${item.name ? "Edit" : "Add"} ${SLOTS.find(s => s[0] === slot)[1]} item`;
   document.querySelector("#itemName").value = item.name || "";
   document.querySelector("#itemId").value = item.id || "";
@@ -67,15 +69,36 @@ function openItem(slot) {
   document.querySelector("#itemDialog").showModal();
 }
 document.querySelector("#itemForm .close").addEventListener("click",()=>document.querySelector("#itemDialog").close());
-function saveItem() {
+async function saveItem() {
   const idInput = document.querySelector("#itemId");
-  const wowheadId = idInput.value.trim().replace(/\D/g,"");
-  const name = document.querySelector("#itemName").value.trim();
-  const vals = {healing:optionalNumber(document.querySelector("#itemHealing").value),intellect:optionalNumber(document.querySelector("#itemIntellect").value),spirit:optionalNumber(document.querySelector("#itemSpirit").value),mp5:optionalNumber(document.querySelector("#itemMp5").value)};
+  let wowheadId = idInput.value.trim().replace(/\D/g,"");
+  let name = document.querySelector("#itemName").value.trim();
+  let vals = {healing:optionalNumber(document.querySelector("#itemHealing").value),intellect:optionalNumber(document.querySelector("#itemIntellect").value),spirit:optionalNumber(document.querySelector("#itemSpirit").value),mp5:optionalNumber(document.querySelector("#itemMp5").value)};
   if (!wowheadId && !name && Object.values(vals).every(v => v == null)) {
     idInput.setCustomValidity("Enter an item name, Wowhead ID, or at least one stat."); idInput.reportValidity(); return false;
   }
   idInput.setCustomValidity("");
+  const statsUntouched=editingOriginalItem && ["healing","intellect","spirit","mp5"].every(key=>(vals[key]??null)===(editingOriginalItem[key]??null));
+  const itemChanged=editingOriginalItem ? wowheadId!==String(editingOriginalItem.id||"") : Boolean(wowheadId) && Object.values(vals).every(value=>value==null);
+  if(wowheadId && itemChanged && (!editingOriginalItem || statsUntouched)) {
+    const status=document.querySelector("#lookupStatus"); status.textContent="Filling item stats from Wowhead…";
+    try {
+      const result=await fetchWowheadItem(wowheadId);
+      wowheadId=result.id; name=result.name;
+      vals={...result.stats}; resolvedItemSubclass=result.subclass;
+      document.querySelector("#itemName").value=name; idInput.value=wowheadId;
+      for(const [key,value] of Object.entries(vals)) document.querySelector(`#item${key[0].toUpperCase()}${key.slice(1)}`).value=value;
+      status.textContent=`Filled stats for ${name} from Wowhead.`;
+    } catch(error) {
+      if(editingOriginalItem && itemChanged && statsUntouched) vals={healing:null,intellect:null,spirit:null,mp5:null};
+      if(editingOriginalItem && itemChanged && !name) document.querySelector("#itemName").value="";
+      document.querySelector("#itemHealing").value=vals.healing??"";
+      document.querySelector("#itemIntellect").value=vals.intellect??"";
+      document.querySelector("#itemSpirit").value=vals.spirit??"";
+      document.querySelector("#itemMp5").value=vals.mp5??"";
+      document.querySelector("#lookupStatus").textContent="Wowhead lookup failed. Saving the item ID with unknown stats; retry the lookup or enter stats manually.";
+    }
+  }
   const clothSlots=new Set(["head","shoulders","chest","wrists","hands","waist","legs","feet"]);
   if(clothSlots.has(editingSlot) && !String(resolvedItemSubclass).toLowerCase().includes("cloth")) {
     document.querySelector("#lookupStatus").textContent="Verify this is Cloth Armor with Wowhead before saving an armor slot."; return false;
@@ -86,10 +109,10 @@ function saveItem() {
   gear[editingSlot] = {name,id:wowheadId,...vals,source:document.querySelector("#itemSource").value.trim(),armorType:resolvedItemSubclass};
   document.querySelector("#itemDialog").close(); saveGear(); return true;
 }
-document.querySelector("#itemForm").addEventListener("submit", event => {
+document.querySelector("#itemForm").addEventListener("submit", async event => {
   event.preventDefault();
   if (event.submitter?.value === "cancel") { document.querySelector("#itemDialog").close(); return; }
-  saveItem();
+  await saveItem();
 });
 document.querySelector("#removeItem").addEventListener("click", () => {
   if (editingSlot) delete gear[editingSlot];
@@ -166,6 +189,12 @@ document.querySelector("#resetBtn").addEventListener("click", () => {
   gear = {}; saveGear();
 });
 function throughCorsRelay(url) { return `${CORS_RELAY}${url}`; }
+async function fetchWowheadItem(itemId) {
+  const url=`https://www.wowhead.com/forever/item=${encodeURIComponent(itemId)}&xml`;
+  const response=await fetch(throughCorsRelay(url));
+  if(!response.ok) throw new Error(`Wowhead lookup returned ${response.status}.`);
+  return parseWowheadItem(await response.text());
+}
 function parseWowheadItem(xmlText) {
   const doc=new DOMParser().parseFromString(xmlText,"application/xml");
   if(doc.querySelector("parsererror")) throw new Error("Wowhead returned unreadable item data.");
@@ -191,10 +220,11 @@ document.querySelector("#lookupItem").addEventListener("click", async () => {
   status.textContent="Looking up item on Wowhead…";
   try {
     const query=id ? `item=${encodeURIComponent(id)}` : `item=${encodeURIComponent(name)}`;
-    const url=`https://www.wowhead.com/forever/${query}&xml`;
-    const response=await fetch(throughCorsRelay(url));
-    if(!response.ok) throw new Error(`The lookup service returned ${response.status}.`);
-    const result=parseWowheadItem(await response.text());
+    const result=id ? await fetchWowheadItem(id) : await (async()=>{
+      const response=await fetch(throughCorsRelay(`https://www.wowhead.com/forever/${query}&xml`));
+      if(!response.ok) throw new Error(`The lookup service returned ${response.status}.`);
+      return parseWowheadItem(await response.text());
+    })();
     document.querySelector("#itemId").value=result.id;
     document.querySelector("#itemName").value=result.name;
     for(const [key,value] of Object.entries(result.stats)) document.querySelector(`#item${key[0].toUpperCase()}${key.slice(1)}`).value=value;
@@ -225,17 +255,62 @@ function parseArmory(html) {
     if(slot==="back" && !type.includes("CLOAK")) continue;
     const values={healing:0,intellect:0,spirit:0,mp5:0};
     const hasStats=Array.isArray(entry.stats);
-    const statTypes=new Set();
+    let hasHealingStat=false;
     for(const stat of entry.stats || []){
       const kind=String(stat.type?.type || stat.type || "").toUpperCase(); const value=Number(stat.value || 0);
-      if(kind==="SPELL_HEALING_DONE" || kind==="SPELL_POWER") {values.healing+=value;statTypes.add("healing");}
-      if(kind==="INTELLECT"){values.intellect+=value;statTypes.add("intellect");}
-      if(kind==="SPIRIT"){values.spirit+=value;statTypes.add("spirit");}
-      if(kind==="MANA_REGENERATION" || kind==="MANA_PER_5_SEC"){values.mp5+=value;statTypes.add("mp5");}
+      if(kind==="SPELL_HEALING_DONE" || kind==="SPELL_POWER") {values.healing+=value;hasHealingStat=true;}
+      if(kind==="INTELLECT") values.intellect+=value;
+      if(kind==="SPIRIT") values.spirit+=value;
+      if(kind==="MANA_REGENERATION" || kind==="MANA_PER_5_SEC") values.mp5+=value;
     }
-    imported[slot]={name:String(entry.name || ""),id:String(entry.id || ""),source:"",armorType:type,healing:hasStats?values.healing:null,intellect:hasStats?values.intellect:null,spirit:hasStats?values.spirit:null,mp5:hasStats?values.mp5:null};
+    imported[slot]={name:String(entry.name || ""),id:String(entry.id || ""),source:"",armorType:type,healing:hasStats?values.healing:null,intellect:hasStats?values.intellect:null,spirit:hasStats?values.spirit:null,mp5:hasStats?values.mp5:null,_needsWowheadHealingLookup:!hasHealingStat && Boolean(entry.id)};
   }
   return {name:character.name,gear:imported};
+}
+async function fillArmoryHealingFromWowhead(imported) {
+  const candidates=Object.entries(imported).filter(([,item])=>item._needsWowheadHealingLookup);
+  let filled=0,failed=0,next=0;
+  const worker=async()=>{
+    while(next<candidates.length){
+      const index=next++, [slot,item]=candidates[index];
+      try {
+        const result=await fetchWowheadItem(item.id);
+        if(result.stats.healing>0){item.healing=number(item.healing)+result.stats.healing;filled++;}
+        delete item._needsWowheadHealingLookup;
+      } catch {
+        failed++;
+        if(item.healing===0) item.healing=null;
+        delete item._needsWowheadHealingLookup;
+      }
+    }
+  };
+  await Promise.all(Array.from({length:Math.min(3,candidates.length)},worker));
+  return {filled,failed};
+}
+async function refreshStoredWowheadHealing() {
+  const candidates=Object.entries(gear).filter(([,item])=>item?.id && (item.healing==null || Number(item.healing)===0 || !item.name));
+  let next=0,changed=false;
+  const worker=async()=>{
+    while(next<candidates.length){
+      const [slot,snapshot]=candidates[next++];
+      try {
+        const result=await fetchWowheadItem(snapshot.id);
+        const current=gear[slot];
+        if(!current || current.id!==snapshot.id || current.healing!==snapshot.healing) continue;
+        const namesMatch=!current.name || current.name===result.name || current.name===`Wowhead item ${current.id}`;
+        if(namesMatch){
+          current.name=result.name;
+          current.healing=result.stats.healing;
+          current.intellect=current.intellect==null?result.stats.intellect:current.intellect;
+          current.spirit=current.spirit==null?result.stats.spirit:current.spirit;
+          current.mp5=current.mp5==null?result.stats.mp5:current.mp5;
+          changed=true;
+        }
+      } catch {}
+    }
+  };
+  await Promise.all(Array.from({length:Math.min(3,candidates.length)},worker));
+  if(changed) saveGear();
 }
 document.querySelector("#armoryForm").addEventListener("submit",async event=>{
   event.preventDefault(); if(event.submitter?.value==="cancel"){document.querySelector("#armoryDialog").close();return;}
@@ -244,8 +319,12 @@ document.querySelector("#armoryForm").addEventListener("submit",async event=>{
   try {
     let html=source;
     if(!html){const parsedUrl=new URL(url); if(parsedUrl.protocol!=="https:" || parsedUrl.hostname!=="worldofwarcraft.blizzard.com" || !parsedUrl.pathname.includes("/armory/character/")) throw new Error("Enter a Blizzard Armory character URL."); const response=await fetch(throughCorsRelay(url)); if(!response.ok) throw new Error("The public profile relay returned an error. Paste the page source as a fallback."); html=await response.text();}
-    const result=parseArmory(html); gear=result.gear; saveGear(); status.textContent=`Imported ${Object.keys(gear).length} equipped items from ${result.name}.`;
+    const result=parseArmory(html); status.textContent="Checking equipped items on Wowhead for healing stats…";
+    const enrichment=await fillArmoryHealingFromWowhead(result.gear);
+    gear=result.gear; saveGear();
+    status.textContent=`Imported ${Object.keys(gear).length} equipped items from ${result.name}.${enrichment.filled?` Filled healing stats from Wowhead on ${enrichment.filled} item${enrichment.filled===1?"":"s"}.`:""}${enrichment.failed?` ${enrichment.failed} item lookup${enrichment.failed===1?"":"s"} failed; those stats remain unknown.`:""}`;
     setTimeout(()=>document.querySelector("#armoryDialog").close(),900);
   } catch(error) { status.textContent=source ? (error.message || "Could not read this Armory page source.") : "Could not reach Blizzard through the public relay. Paste the Armory page source and retry."; }
 });
 renderGear();
+refreshStoredWowheadHealing();
