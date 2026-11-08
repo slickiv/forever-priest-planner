@@ -23,7 +23,7 @@ function renderGear() {
     const item = gear[id];
     const slotType = ["head","shoulders","back","chest","wrists","hands","waist","legs","feet"].includes(id) ? "CLOTH" : (["neck","finger1","finger2","trinket1","trinket2"].includes(id) ? "ACCESSORY" : "HELD ITEM");
     const itemHref = item?.id ? `https://www.wowhead.com/forever/item=${encodeURIComponent(item.id)}` : wowheadItems();
-    const stats = item ? `<div class="slot-stats"><span>+${number(item.healing)} heal</span><span>+${number(item.spellPower)} SP</span><span>${number(item.intellect)} int</span><span>${number(item.spirit)} spi</span><span>${number(item.mp5)} mp5</span></div>` : "";
+    const stats = item ? `<div class="slot-stats"><span>+${number(item.healing)} heal</span><span>${number(item.intellect)} int</span><span>${number(item.spirit)} spi</span><span>${number(item.mp5)} mp5</span></div>` : "";
     const source = item?.source ? `<a class="slot-source" href="https://www.wowhead.com/forever/search?q=${encodeURIComponent(item.source)}" target="_blank" rel="noreferrer">Loot source: ${esc(item.source)} ↗</a>` : "";
     return `<article class="gear-slot ${item ? "filled" : ""}">
       <div class="slot-top"><span class="slot-label">${label}</span><span class="cloth-tag">${slotType}</span></div>
@@ -32,11 +32,10 @@ function renderGear() {
     </article>`;
   }).join("");
   host.querySelectorAll("[data-edit]").forEach(button => button.addEventListener("click", () => openItem(button.dataset.edit)));
-  const totals = {healing:sum("healing"),spellPower:sum("spellPower"),intellect:sum("intellect"),spirit:sum("spirit"),mp5:sum("mp5")};
+  const totals = {healing:sum("healing"),intellect:sum("intellect"),spirit:sum("spirit"),mp5:sum("mp5")};
   for (const [key,value] of Object.entries(totals)) document.querySelector(`#total${key[0].toUpperCase()}${key.slice(1)}`).textContent = value;
   document.querySelector("#heroHealing").textContent = totals.healing;
   document.querySelector("#bonusHealing").value = totals.healing;
-  document.querySelector("#bonusSpellPower").value = totals.spellPower;
   renderSpells();
 }
 
@@ -47,7 +46,6 @@ function openItem(slot) {
   document.querySelector("#itemName").value = item.name || "";
   document.querySelector("#itemId").value = item.id || "";
   document.querySelector("#itemHealing").value = item.healing || 0;
-  document.querySelector("#itemSpellPower").value = item.spellPower || 0;
   document.querySelector("#itemIntellect").value = item.intellect || 0;
   document.querySelector("#itemSpirit").value = item.spirit || 0;
   document.querySelector("#itemMp5").value = item.mp5 || 0;
@@ -63,7 +61,7 @@ document.querySelector("#itemForm").addEventListener("submit", event => {
   document.querySelector("#itemId").setCustomValidity("");
   gear[editingSlot] = {
     name:document.querySelector("#itemName").value.trim(), id:wowheadId,
-    healing:number(document.querySelector("#itemHealing").value), spellPower:number(document.querySelector("#itemSpellPower").value), intellect:number(document.querySelector("#itemIntellect").value),
+    healing:number(document.querySelector("#itemHealing").value), intellect:number(document.querySelector("#itemIntellect").value),
     spirit:number(document.querySelector("#itemSpirit").value), mp5:number(document.querySelector("#itemMp5").value),
     source:document.querySelector("#itemSource").value.trim(), armorType:"cloth"
   };
@@ -77,14 +75,13 @@ document.querySelector("#removeItem").addEventListener("click", () => {
 
 function spellMetrics(spell, rank) {
   const bonus = number(document.querySelector("#bonusHealing").value);
-  const spellPower = number(document.querySelector("#bonusSpellPower").value);
   const reduction = number(document.querySelector("#manaReduction").value) / 100;
   const improvedHealingApplies = ["Lesser Heal","Heal","Greater Heal","Penance","Prayer of Mending"].includes(spell.name);
   const targets = Math.max(1, Math.min(5, number(document.querySelector("#partyTargets").value) || 1));
   const cast = rank[6] ?? spell.cast;
   const coefficient = rank[5] ?? spell.coefficient;
   const mana = rank[3] == null ? null : Math.floor(rank[3] * (1 - (improvedHealingApplies ? reduction : 0)));
-  const heal = rank[2] == null ? null : rank[2] + (spell.kind === "shield" ? spellPower * coefficient : bonus * coefficient);
+  const heal = rank[2] == null ? null : rank[2] + bonus * coefficient;
   let total = heal;
   if (total != null && spell.name === "Binding Heal") total *= 2;
   if (total != null && spell.name === "Prayer of Healing") total *= targets;
@@ -140,7 +137,7 @@ document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", (
   document.querySelector("#gearPanel").classList.toggle("hidden",tab.dataset.tab !== "gear");
   document.querySelector("#spellsPanel").classList.toggle("hidden",tab.dataset.tab !== "spells");
 }));
-["#bonusHealing","#bonusSpellPower","#manaReduction","#partyTargets"].forEach(selector => document.querySelector(selector).addEventListener("input",renderSpells));
+["#bonusHealing","#manaReduction","#partyTargets"].forEach(selector => document.querySelector(selector).addEventListener("input",renderSpells));
 document.querySelector("#resetBtn").addEventListener("click", () => {
   if (!confirm("Clear all saved gear slots?")) return;
   gear = {}; saveGear();
@@ -156,7 +153,7 @@ document.querySelector("#importFile").addEventListener("change", async event => 
     const incoming = parsed.gear || parsed;
     const next = {};
     for (const [slot,item] of Object.entries(incoming)) if (SLOTS.some(s => s[0] === slot) && item && typeof item === "object") {
-      next[slot] = {name:String(item.name || "").slice(0,70),id:String(item.id || "").replace(/\D/g,""),healing:number(item.healing),spellPower:number(item.spellPower),intellect:number(item.intellect),spirit:number(item.spirit),mp5:number(item.mp5),source:String(item.source || "").slice(0,80),armorType:"cloth"};
+      next[slot] = {name:String(item.name || "").slice(0,70),id:String(item.id || "").replace(/\D/g,""),healing:number(item.healing),intellect:number(item.intellect),spirit:number(item.spirit),mp5:number(item.mp5),source:String(item.source || "").slice(0,80),armorType:"cloth"};
     }
     gear = next; saveGear();
   } catch { alert("That file is not a valid planner export."); }
