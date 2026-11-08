@@ -1,6 +1,6 @@
 # Forever Priest Planner
 
-A static, client-side planner for World of Warcraft: Forever. It has a cloth-only gear planner and a rank-by-rank healing spell reference. No item catalog is copied into this project: the gear planner links to Wowhead's Forever item finder and each entered item ID links to that Wowhead item page.
+A static, client-side planner for World of Warcraft: Forever. It has a cloth-only gear planner and a rank-by-rank healing spell reference. No item catalog is copied into this project: the gear planner links to Wowhead's Forever item finder and fetches an entered or equipped item by ID from Wowhead when its stats need filling.
 
 ## Run locally
 
@@ -24,7 +24,7 @@ For coefficient assumptions and cross-checks, see [Forever Mastery's downrank ca
 - Power Word: Shield: shows absorb per cast time and per mana; its bonus uses bonus healing × 10%.
 - HPM uses total healing for a cast divided by the adjusted displayed mana cost. Improved Healing applies only to Lesser Heal, Heal, Greater Heal, Penance, and Prayer of Mending.
 
-These are theoretical values before talents other than the optional Improved Healing discount, critical heals, overhealing, or target-specific effects. Gear stats are user-entered from Wowhead and saved locally.
+These are theoretical values before talents other than the optional Improved Healing discount, critical heals, overhealing, or target-specific effects. Gear stats are saved locally. Armory item stat arrays can omit equip effects such as bonus healing; the import fills those missing healing stats from Wowhead's item XML by item ID. Existing saved items with unknown, zero, or missing-name healing data are refreshed from Wowhead when the planner opens.
 
 ## GitHub Pages workflow
 
