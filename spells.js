@@ -1,6 +1,15 @@
-/* Forever build 1.60.1.70862 values. Rank rows are [rank, learned level, min, max, mana, spell ID, coefficient, cast]. */
+/* Forever build 1.60.1.70862 values. Rank rows are [rank, learned level, min, max, mana, spell ID, coefficient, cast].
+   Level-growth metadata is sourced from live-client spell data:
+   https://bindonforever.com/spell/2050, /2052, /2053, /2054, /2061, /17, /592, /600.
+   Downranking: https://foreverchanges.pro/downranking.
+   Lesser Heal R1 exception measurement: https://www.curseforge.com/wow/addons/heal-rank-advisor.
+   Growth caps are the last level at which that rank's base continues to rise; LH R3's
+   cap at 15 is supported by its level-15 tooltip and Annadra's later tooltip readings.
+   LH R1's coefficient exception is fit to the L21/L22 observations and the addon report
+   of ~24% retained at L30; this is a measured exception, not the generic rank formula. */
 window.HEALING_SPELLS = [
-  { name:"Lesser Heal", group:"Holy", kind:"heal", cast:1.5, coefficient:0.429, wowhead:2050, ranks:[
+  { name:"Lesser Heal", group:"Holy", kind:"heal", cast:1.5, coefficient:0.429, wowhead:2050,
+    levelGrowth:{2050:{perLevel:0.3,cap:3,downrankOffset:0.15},2052:{perLevel:0.7,cap:9},2053:{perLevel:1.2,cap:15}}, ranks:[
     [1,1,46,56,30,2050,0.429,1.5],[2,4,86,102,45,2052,0.571,2],[3,10,151,175,75,2053,0.714,2.5]
   ]},
   { name:"Renew", group:"Holy", kind:"heal", cast:1.5, instant:true, duration:15, coefficient:1, wowhead:139, ranks:[
@@ -11,10 +20,12 @@ window.HEALING_SPELLS = [
     [1,10,131,167,0,13908],[2,18,247,305,0,19236],[3,26,414,502,0,19238],[4,34,540,650,0,19240],
     [5,42,781,931,0,19241],[6,50,1046,1240,0,19242],[7,58,1269,1497,0,19243]
   ]},
-  { name:"Heal", group:"Holy", kind:"heal", cast:3, coefficient:0.857, wowhead:2054, ranks:[
+  { name:"Heal", group:"Holy", kind:"heal", cast:3, coefficient:0.857, wowhead:2054,
+    levelGrowth:{2054:{perLevel:2,cap:21}}, ranks:[
     [1,16,250,290,155,2054],[2,22,350,400,205,2055],[3,28,490,556,255,6063],[4,34,611,691,305,6064]
   ]},
-  { name:"Flash Heal", group:"Holy", kind:"heal", cast:1.5, coefficient:0.429, wowhead:2061, ranks:[
+  { name:"Flash Heal", group:"Holy", kind:"heal", cast:1.5, coefficient:0.429, wowhead:2061,
+    levelGrowth:{2061:{perLevel:2,cap:25}}, ranks:[
     [1,20,174,214,125,2061],[2,26,225,273,155,9472],[3,32,283,341,185,9473],[4,38,349,417,215,9474],
     [5,44,463,551,265,10915],[6,50,589,699,315,10916],[7,56,757,893,380,10917]
   ]},
@@ -46,12 +57,12 @@ window.HEALING_SPELLS = [
   { name:"Penance", group:"Discipline · channeled", kind:"heal", cast:2, coefficient:0, wowhead:402174, ranks:[
     [1,30,126,126,150,402174],[2,40,200,200,220,1240720],[3,50,268,268,270,1240721],[4,60,425,425,385,1316991]
   ], detail:"Each rank’s value is the total across three bolts over a 2 sec channel."},
-  { name:"Power Word: Shield", group:"Discipline · absorb", kind:"shield", cast:1.5, instant:true, coefficient:0.1, wowhead:17, ranks:[
+  { name:"Power Word: Shield", group:"Discipline · absorb", kind:"shield", cast:1.5, instant:true, coefficient:0.1, wowhead:17,
+    levelGrowth:{17:{perLevel:0.8,cap:11},592:{perLevel:1.2,cap:17},600:{perLevel:1.6,cap:23}}, ranks:[
     [1,6,44,44,45,17],[2,12,86,86,80,592],[3,18,154,154,130,600],[4,24,226,226,175,3747],[5,30,291,291,210,6065],
     [6,36,368,368,250,6066],[7,42,470,470,300,10898],[8,48,591,591,355,10899],[9,54,749,749,425,10900],[10,60,928,928,500,10901]
   ], detail:"Absorb amount is shown as effective shielding; actual value is capped by incoming damage."}
 ];
-
 
 /* Trainer prices (copper). Read from the live in-game spell recorder at
    https://warcraftforever.games/classes/priest/spells on 2026-11-08.
