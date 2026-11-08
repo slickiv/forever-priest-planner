@@ -125,7 +125,12 @@ dialog::backdrop { background: color-mix(in srgb, CanvasText 45%, transparent); 
 .dialog-head h3 { font-size: 24px; letter-spacing: -.035em; margin: 0; }
 .close { border: 0; background: none; font-size: 25px; color: var(--muted); cursor: pointer; line-height: 1; }
 #itemForm > label { display: flex; flex-direction: column; gap: 5px; margin-bottom: 13px; font-size: 11px; color: var(--soft); }
-#itemForm input { width: 100%; padding: 9px 10px; border: 1px solid var(--line); background: var(--surface); border-radius: var(--round); }
+#itemForm input,#armoryForm input,#armoryForm textarea { width: 100%; padding: 9px 10px; border: 1px solid var(--line); background: var(--surface); border-radius: var(--round); }
+#armoryForm { padding: 22px; }
+#armoryForm .armory-label { display:flex; flex-direction:column; gap:5px; margin-bottom:13px; color:var(--soft); font-size:11px; }
+#armoryForm textarea { resize:vertical; font: 11px ui-monospace,monospace; }
+.lookup-button { margin: -4px 0 10px; }
+#lookupStatus,#armoryStatus { min-height: 1em; }
 .item-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 13px; }
 .item-stats label { display: flex; flex-direction: column; gap: 5px; color: var(--soft); font-size: 10px; }
 .dialog-note { font-size: 10px; color: var(--muted); margin: 0 0 17px; }
