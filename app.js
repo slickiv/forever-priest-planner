@@ -32,9 +32,10 @@ function readCharacterLevel() {
 }
 function readTalents() {
   try {
-    const saved=JSON.parse(localStorage.getItem(TALENT_STORE_KEY) || "{}");
-    return {twinDisciplines:clampRank(saved.twinDisciplines,5),improvedPws:clampRank(saved.improvedPws,3)};
-  } catch { return {twinDisciplines:0,improvedPws:0}; }
+    const saved=JSON.parse(localStorage.getItem(TALENT_STORE_KEY) || "null");
+    if(!saved) return {twinDisciplines:3,improvedPws:0};
+    return {twinDisciplines:clampRank(saved.twinDisciplines ?? 3,5),improvedPws:clampRank(saved.improvedPws ?? 0,3)};
+  } catch { return {twinDisciplines:3,improvedPws:0}; }
 }
 function clampRank(value,max) { return Math.max(0,Math.min(max,Math.floor(Number(value)||0))); }
 function saveTalents() {
