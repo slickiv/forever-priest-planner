@@ -342,5 +342,17 @@ document.querySelector("#armoryForm").addEventListener("submit",async event=>{
     status.textContent=source ? (error.message || "Could not read this Armory page source.") : error.name==="TypeError" ? fallback : (error.message || fallback);
   }
 });
+const themeToggle=document.querySelector("#themeToggle");
+const prefersDark=window.matchMedia("(prefers-color-scheme: dark)");
+function currentTheme() { return document.documentElement.dataset.theme || (prefersDark.matches ? "dark" : "light"); }
+function syncThemeToggle() { themeToggle.setAttribute("aria-pressed",String(currentTheme()==="dark")); }
+themeToggle.addEventListener("click",()=>{
+  const theme=currentTheme()==="dark" ? "light" : "dark";
+  document.documentElement.dataset.theme=theme;
+  try { localStorage.setItem("forever-priest-planner-theme",theme); } catch {}
+  syncThemeToggle();
+});
+prefersDark.addEventListener("change",()=>{ if(!document.documentElement.dataset.theme) syncThemeToggle(); });
+syncThemeToggle();
 renderGear();
 refreshStoredWowheadHealing();
