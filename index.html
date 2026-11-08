@@ -92,14 +92,14 @@
     <dialog id="armoryDialog">
       <form method="dialog" id="armoryForm">
         <div class="dialog-head"><div><p class="eyebrow">CHARACTER IMPORT</p><h3>Import from Armory</h3></div><button class="close" type="button" aria-label="Close">×</button></div>
-        <label class="armory-label">Character Armory URL<input id="armoryUrl" type="url" value="https://worldofwarcraft.blizzard.com/en-us/forever/us/armory/character/annadra-warderer" /></label>
-        <p class="dialog-note">Imports the public profile’s equipped gear, then checks Wowhead for healing effects the Armory omits (such as Staff of Orgrimmar). No Blizzard credentials are sent. Wowhead item and Armory profile requests pass through a read-only CORS relay. If the relay is unavailable, paste the page source: open the Armory, press Ctrl+U (⌘+Option+U on Mac), select all, copy, then paste here.</p>
+        <label class="armory-label">Character name<input id="characterName" type="text" value="Annadra Warderer" autocomplete="off" placeholder="e.g. Mrs Boneface" /></label>
+        <p class="dialog-note">Looks up the public WoW Forever US profile by character name, imports equipped gear, then checks Wowhead for healing effects the Armory omits. No Blizzard credentials are sent. Requests pass through a read-only CORS relay. If the relay is unavailable, paste the page source: open the Armory, press Ctrl+U (⌘+Option+U on Mac), select all, copy, then paste here.</p>
         <label class="armory-label">Armory page source <textarea id="armorySource" rows="5" placeholder="Optional fallback: paste the full page source"></textarea></label>
         <p id="armoryStatus" class="dialog-note" aria-live="polite"></p>
         <div class="dialog-actions"><span></span><button class="button quiet" type="button" id="cancelArmory">Cancel</button><button class="button primary" id="importArmory" value="import">Import gear</button></div>
       </form>
     </dialog>
     <script src="spells.js?v=14"></script>
-    <script src="app.js?v=14"></script>
+    <script src="app.js?v=15"></script>
   </body>
 </html>
