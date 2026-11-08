@@ -44,7 +44,6 @@
           <aside class="summary-card">
             <p class="eyebrow">SET TOTALS</p>
             <div class="total"><span>Healing</span><b id="totalHealing">0</b></div>
-            <div class="total"><span>Spell power</span><b id="totalSpellPower">0</b></div>
             <div class="total"><span>Intellect</span><b id="totalIntellect">0</b></div>
             <div class="total"><span>Spirit</span><b id="totalSpirit">0</b></div>
             <div class="total"><span>Mana per 5 sec</span><b id="totalMp5">0</b></div>
@@ -61,7 +60,6 @@
           <div><p class="eyebrow">RANK-BY-RANK REFERENCE</p><h2>Healing spellbook</h2></div>
           <div class="spell-controls">
             <label class="stat-input">Bonus healing <input id="bonusHealing" type="number" min="0" value="0" step="1" /> <span>from gear</span></label>
-            <label class="stat-input">Spell power <input id="bonusSpellPower" type="number" min="0" value="0" step="1" /> <span>for shields</span></label>
             <label class="stat-input">Improved Healing <select id="manaReduction"><option value="0">0/3</option><option value="5">1/3</option><option value="10">2/3</option><option value="15">3/3</option></select></label>
             <label class="stat-input">Targets / jumps <input id="partyTargets" type="number" min="1" max="5" value="5" step="1" /> <span>for group / proc totals</span></label>
           </div>
@@ -69,7 +67,7 @@
         <p class="helper">Base values use Forever spell data. Bonus healing and shield spell power use their spell coefficients. Instants use a 1.5 sec global cooldown for throughput. Group healing is shown per target, with party totals in the details.</p>
         <div class="spell-legend"><span><i class="dot heal-dot"></i> Healing</span><span><i class="dot shield-dot"></i> Absorb</span><span id="rankCount"></span></div>
         <div id="spellList" class="spell-list"></div>
-        <div class="method-note"><strong>How the numbers work</strong><p>Healing per cast time = (base healing + bonus healing × coefficient) ÷ cast time. Power Word: Shield uses spell power × 10% instead and reports absorb per cast time and absorb per mana. An instant uses the 1.5 sec global cooldown, including Renew; its total healing is displayed per cast and its tick duration is called out. Healing per mana uses total healing divided by displayed mana cost. Group spells use the target count above. Values are theoretical, before talents, critical heals, overhealing, and target limits. The costs shown are base costs; the reduction control applies Improved Healing to eligible spells.</p></div>
+        <div class="method-note"><strong>How the numbers work</strong><p>Healing per cast time = (base healing + bonus healing × coefficient) ÷ cast time. Power Word: Shield uses 10% of bonus healing and reports absorb per cast time and absorb per mana. An instant uses the 1.5 sec global cooldown, including Renew; its total healing is displayed per cast and its tick duration is called out. Healing per mana uses total healing divided by displayed mana cost. Group spells use the target count above. Values are theoretical, before talents, critical heals, overhealing, and target limits. The costs shown are base costs; the reduction control applies Improved Healing to eligible spells.</p></div>
       </section>
 
       <footer><span>FOREVER PRIEST PLANNER</span><span>Spell data: <a href="https://warcraftforever.games/classes/priest/spells" target="_blank" rel="noreferrer">Warcraft Forever ↗</a> · Calculations: <a href="https://forevermastery.com/en/tools/downrank" target="_blank" rel="noreferrer">Forever Mastery ↗</a></span></footer>
@@ -82,7 +80,6 @@
         <label>Wowhead item ID<input id="itemId" inputmode="numeric" pattern="[0-9]+" required placeholder="e.g. 13346" /></label>
         <div class="item-stats">
           <label>Healing<input id="itemHealing" type="number" min="0" step="1" value="0" /></label>
-          <label>Spell power<input id="itemSpellPower" type="number" min="0" step="1" value="0" /></label>
           <label>Intellect<input id="itemIntellect" type="number" min="0" step="1" value="0" /></label>
           <label>Spirit<input id="itemSpirit" type="number" min="0" step="1" value="0" /></label>
           <label>MP5<input id="itemMp5" type="number" min="0" step="1" value="0" /></label>
@@ -92,7 +89,7 @@
         <div class="dialog-actions"><button class="button quiet" id="removeItem" type="button">Clear slot</button><span></span><button class="button primary" value="save">Save item</button></div>
       </form>
     </dialog>
-    <script src="spells.js?v=2"></script>
-    <script src="app.js?v=2"></script>
+    <script src="spells.js?v=3"></script>
+    <script src="app.js?v=3"></script>
   </body>
 </html>
