@@ -5,12 +5,18 @@ const SLOTS = [
   ["mainhand","Main hand"],["offhand","Off hand"],["ranged","Ranged"]
 ];
 const STORE_KEY = "forever-priest-planner-v1";
+const CORS_RELAY = "https://proxy.cors.dev/";
 let gear = readGear();
 let editingSlot = null;
+let resolvedItemSubclass = "";
 
 function readGear() {
-  try { return JSON.parse(localStorage.getItem(STORE_KEY) || "{}"); }
-  catch { return {}; }
+  try {
+    const saved=JSON.parse(localStorage.getItem(STORE_KEY) || "{}");
+    for(const item of Object.values(saved)) if(item && ["healing","intellect","spirit","mp5"].every(key=>Number(item[key]||0)===0))
+      for(const key of ["healing","intellect","spirit","mp5"]) item[key]=null;
+    return saved;
+  } catch { return {}; }
 }
 function saveGear() { localStorage.setItem(STORE_KEY, JSON.stringify(gear)); renderGear(); }
 function esc(value) { return String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
@@ -26,7 +32,7 @@ function renderGear() {
   const host = document.querySelector("#gearGrid");
   host.innerHTML = SLOTS.map(([id,label]) => {
     const item = gear[id];
-    const slotType = ["head","shoulders","back","chest","wrists","hands","waist","legs","feet"].includes(id) ? "CLOTH" : (["neck","finger1","finger2","trinket1","trinket2"].includes(id) ? "ACCESSORY" : "HELD ITEM");
+    const slotType = id === "back" ? "CLOAK" : (["head","shoulders","chest","wrists","hands","waist","legs","feet"].includes(id) ? "CLOTH" : (["neck","finger1","finger2","trinket1","trinket2"].includes(id) ? "ACCESSORY" : "HELD ITEM"));
     const itemHref = item?.id ? `https://www.wowhead.com/forever/item=${encodeURIComponent(item.id)}` : wowheadItems();
     const stats = item ? `<div class="slot-stats"><span>${item.healing == null ? "? heal" : `+${item.healing} heal`}</span><span>${item.intellect == null ? "? int" : `${item.intellect} int`}</span><span>${item.spirit == null ? "? spi" : `${item.spirit} spi`}</span><span>${item.mp5 == null ? "? mp5" : `${item.mp5} mp5`}</span></div>` : "";
     const source = item?.source ? `<a class="slot-source" href="https://www.wowhead.com/forever/search?q=${encodeURIComponent(item.source)}" target="_blank" rel="noreferrer">Loot source: ${esc(item.source)} ↗</a>` : "";
@@ -56,6 +62,7 @@ function openItem(slot) {
   document.querySelector("#itemMp5").value = item.mp5 ?? "";
   document.querySelector("#lookupStatus").textContent = "";
   document.querySelector("#itemSource").value = item.source || "";
+  resolvedItemSubclass = item.armorType || "";
   document.querySelector("#removeItem").disabled = !item.name && !item.id;
   document.querySelector("#itemDialog").showModal();
 }
@@ -69,7 +76,14 @@ function saveItem() {
     idInput.setCustomValidity("Enter an item name, Wowhead ID, or at least one stat."); idInput.reportValidity(); return false;
   }
   idInput.setCustomValidity("");
-  gear[editingSlot] = {name,id:wowheadId,...vals,source:document.querySelector("#itemSource").value.trim(),armorType:"cloth"};
+  const clothSlots=new Set(["head","shoulders","chest","wrists","hands","waist","legs","feet"]);
+  if(clothSlots.has(editingSlot) && !String(resolvedItemSubclass).toLowerCase().includes("cloth")) {
+    document.querySelector("#lookupStatus").textContent="Verify this is Cloth Armor with Wowhead before saving an armor slot."; return false;
+  }
+  if(editingSlot==="back" && !String(resolvedItemSubclass).toLowerCase().includes("cloak")) {
+    document.querySelector("#lookupStatus").textContent="Verify this is a cloak with Wowhead before saving the back slot."; return false;
+  }
+  gear[editingSlot] = {name,id:wowheadId,...vals,source:document.querySelector("#itemSource").value.trim(),armorType:resolvedItemSubclass};
   document.querySelector("#itemDialog").close(); saveGear(); return true;
 }
 document.querySelector("#itemForm").addEventListener("submit", event => {
@@ -151,41 +165,45 @@ document.querySelector("#resetBtn").addEventListener("click", () => {
   if (!confirm("Clear all saved gear slots?")) return;
   gear = {}; saveGear();
 });
-// Wowhead tooltip data is the canonical stat lookup; if its endpoint blocks browser requests,
-// the item can still be saved by name/ID with unknown stats shown explicitly.
-function tooltipStats(html) {
-  const doc = new DOMParser().parseFromString(html,"text/html");
-  const text = (doc.body.textContent || "").replace(/\u00a0/g," ");
-  const values = {healing:null,intellect:null,spirit:null,mp5:null};
-  const patterns = {
-    healing:[/\+([\d,]+)\s+(?:spell )?healing/i,/\+([\d,]+)\s+spell power/i],
-    intellect:[/\+([\d,]+)\s+intellect/i], spirit:[/\+([\d,]+)\s+spirit/i],
-    mp5:[/\+([\d,]+)\s+(?:mana regeneration per 5 sec|mana per 5 sec|mana every 5 sec)/i]
-  };
-  for (const [key,regexes] of Object.entries(patterns)) for (const re of regexes) { const m=text.match(re); if(m){values[key]=Number(m[1].replace(/,/g,""));break;} }
-  return values;
+function throughCorsRelay(url) { return `${CORS_RELAY}${url}`; }
+function parseWowheadItem(xmlText) {
+  const doc=new DOMParser().parseFromString(xmlText,"application/xml");
+  if(doc.querySelector("parsererror")) throw new Error("Wowhead returned unreadable item data.");
+  const item=doc.querySelector("wowhead > item");
+  if(!item) throw new Error("Wowhead did not find a matching item.");
+  const name=item.querySelector("name")?.textContent?.trim() || "";
+  const id=item.getAttribute("id") || "";
+  const subclass=item.querySelector("subclass")?.textContent?.trim() || "";
+  const equipText=item.querySelector("jsonEquip")?.textContent?.trim() || "";
+  let equip={};
+  if(equipText) { try { equip=JSON.parse(`{${equipText.replace(/^\{|\}$/g,"")}}`); } catch { throw new Error("Could not read the Wowhead item stats."); } }
+  return {id,name,subclass,stats:{
+    healing:(Number(equip.splheal)||0)+(Number(equip.splpwr)||0),
+    intellect:Number(equip.int)||0,spirit:Number(equip.spi)||0,
+    mp5:Number(equip.manargn ?? equip.m5)||0
+  }};
 }
 document.querySelector("#lookupItem").addEventListener("click", async () => {
   const id=document.querySelector("#itemId").value.trim().replace(/\D/g,"");
   const name=document.querySelector("#itemName").value.trim();
   const status=document.querySelector("#lookupStatus");
-  if(!id){
-    if(name) window.open(`https://www.wowhead.com/forever/search?q=${encodeURIComponent(name)}`,"_blank","noopener");
-    status.textContent=name ? "Choose the matching item on Wowhead and enter its ID, then use Fill stats." : "Enter an item name or Wowhead ID first.";
-    return;
-  }
-  status.textContent="Looking up Wowhead tooltip…";
+  if(!id && !name){status.textContent="Enter an item name or Wowhead ID first.";return;}
+  status.textContent="Looking up item on Wowhead…";
   try {
-    const url=`https://www.wowhead.com/forever/tooltip/item/${encodeURIComponent(id)}?dataEnv=7&locale=0`;
-    const response=await fetch(url,{headers:{Accept:"application/json,text/html"}});
-    if(!response.ok) throw new Error(`Wowhead returned ${response.status}`);
-    const payload=await response.json();
-    const found=tooltipStats(payload.tooltip || payload.html || JSON.stringify(payload));
-    for(const [key,value] of Object.entries(found)) document.querySelector(`#item${key[0].toUpperCase()}${key.slice(1)}`).value=value ?? 0;
-    const count=Object.values(found).filter(v=>v!=null).length;
-    if(count){ if(!name && payload.name) document.querySelector("#itemName").value=payload.name; status.textContent=`Filled ${count} available stats from Wowhead. Check the item link for loot source.`; }
-    else status.textContent="Wowhead returned no matching stats. Check the item ID, or enter the stats manually.";
-  } catch { status.textContent="Could not read Wowhead from this browser. You can still save the item by name or ID and fill stats manually."; }
+    const query=id ? `item=${encodeURIComponent(id)}` : `item=${encodeURIComponent(name)}`;
+    const url=`https://www.wowhead.com/forever/${query}&xml`;
+    const response=await fetch(throughCorsRelay(url));
+    if(!response.ok) throw new Error(`The lookup service returned ${response.status}.`);
+    const result=parseWowheadItem(await response.text());
+    document.querySelector("#itemId").value=result.id;
+    document.querySelector("#itemName").value=result.name;
+    for(const [key,value] of Object.entries(result.stats)) document.querySelector(`#item${key[0].toUpperCase()}${key.slice(1)}`).value=value;
+    resolvedItemSubclass=result.subclass;
+    const slot=editingSlot;
+    if(slot==="back" && !result.subclass.toLowerCase().includes("cloak")) status.textContent=`${result.name} is ${result.subclass || "not a cloak"}. Choose a cloak for this slot.`;
+    else if(["head","shoulders","chest","wrists","hands","waist","legs","feet"].includes(slot) && !result.subclass.toLowerCase().includes("cloth")) status.textContent=`${result.name} is ${result.subclass || "not cloth armor"}. Only cloth armor can go in this slot.`;
+    else status.textContent=`Filled stats for ${result.name} from Wowhead.`;
+  } catch(error) { status.textContent=error.message || "Could not read this item from Wowhead. Try its item ID, or enter the stats manually."; }
 });
 
 document.querySelector("#armoryBtn").addEventListener("click",()=>document.querySelector("#armoryDialog").showModal());
@@ -203,7 +221,8 @@ function parseArmory(html) {
     const slot=slotMap[armorySlot]; if(!slot || !entry || armorySlot==="shirt") continue;
     const isArmor=accepted.has(slot);
     const type=String(entry.item_subclass?.name || entry.itemSubClass?.type || entry.subclass?.type || entry.armorType || "").toUpperCase();
-    if(isArmor && type !== "CLOTH") continue;
+    if(isArmor && slot!=="back" && !type.includes("CLOTH")) continue;
+    if(slot==="back" && !type.includes("CLOAK")) continue;
     const values={healing:0,intellect:0,spirit:0,mp5:0};
     const hasStats=Array.isArray(entry.stats);
     const statTypes=new Set();
@@ -214,7 +233,7 @@ function parseArmory(html) {
       if(kind==="SPIRIT"){values.spirit+=value;statTypes.add("spirit");}
       if(kind==="MANA_REGENERATION" || kind==="MANA_PER_5_SEC"){values.mp5+=value;statTypes.add("mp5");}
     }
-    imported[slot]={name:String(entry.name || ""),id:String(entry.id || ""),source:"",armorType:"cloth",healing:hasStats?values.healing:null,intellect:hasStats?values.intellect:null,spirit:hasStats?values.spirit:null,mp5:hasStats?values.mp5:null};
+    imported[slot]={name:String(entry.name || ""),id:String(entry.id || ""),source:"",armorType:type,healing:hasStats?values.healing:null,intellect:hasStats?values.intellect:null,spirit:hasStats?values.spirit:null,mp5:hasStats?values.mp5:null};
   }
   return {name:character.name,gear:imported};
 }
@@ -224,9 +243,9 @@ document.querySelector("#armoryForm").addEventListener("submit",async event=>{
   const source=document.querySelector("#armorySource").value.trim(); const url=document.querySelector("#armoryUrl").value.trim();
   try {
     let html=source;
-    if(!html){const response=await fetch(url,{credentials:"omit"}); if(!response.ok) throw new Error("Browser blocked or could not read Blizzard’s Armory page. Paste the page source as the fallback."); html=await response.text();}
+    if(!html){const parsedUrl=new URL(url); if(parsedUrl.protocol!=="https:" || parsedUrl.hostname!=="worldofwarcraft.blizzard.com" || !parsedUrl.pathname.includes("/armory/character/")) throw new Error("Enter a Blizzard Armory character URL."); const response=await fetch(throughCorsRelay(url)); if(!response.ok) throw new Error("The public profile relay returned an error. Paste the page source as a fallback."); html=await response.text();}
     const result=parseArmory(html); gear=result.gear; saveGear(); status.textContent=`Imported ${Object.keys(gear).length} equipped items from ${result.name}.`;
     setTimeout(()=>document.querySelector("#armoryDialog").close(),900);
-  } catch(error) { status.textContent=error.message || "Could not read this Armory page. Paste its page source and retry."; }
+  } catch(error) { status.textContent=source ? (error.message || "Could not read this Armory page source.") : "Could not reach Blizzard through the public relay. Paste the Armory page source and retry."; }
 });
 renderGear();
