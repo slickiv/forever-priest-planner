@@ -4,7 +4,7 @@ A static, client-side planner for World of Warcraft: Forever. It has a cloth-onl
 
 ## Run locally
 
-Open `index.html` in a modern browser, or serve this directory with any static file server. Gear plans are stored in the browser's local storage. Use Import Armory with a character name to load equipped gear from the public WoW Forever US profile.
+Open `index.html` in a modern browser, or serve this directory with any static file server. Gear plans are stored in the browser's local storage. Use Import Armory with a character name to load equipped gear from the public WoW Forever US profile; non-Priest profiles are rejected.
 
 ## Publish with GitHub Pages
 
