@@ -59,6 +59,7 @@ function openItem(slot) {
   document.querySelector("#removeItem").disabled = !item.name && !item.id;
   document.querySelector("#itemDialog").showModal();
 }
+document.querySelector("#itemForm .close").addEventListener("click",()=>document.querySelector("#itemDialog").close());
 function saveItem() {
   const idInput = document.querySelector("#itemId");
   const wowheadId = idInput.value.trim().replace(/\D/g,"");
@@ -188,6 +189,8 @@ document.querySelector("#lookupItem").addEventListener("click", async () => {
 });
 
 document.querySelector("#armoryBtn").addEventListener("click",()=>document.querySelector("#armoryDialog").showModal());
+document.querySelector("#armoryForm .close").addEventListener("click",()=>document.querySelector("#armoryDialog").close());
+document.querySelector("#cancelArmory").addEventListener("click",()=>document.querySelector("#armoryDialog").close());
 function parseArmory(html) {
   const script=html.match(/var\s+characterProfileInitialState\s*=\s*(\{[\s\S]*?\})\s*;\s*<\/script/i);
   if(!script) throw new Error("No embedded Armory character data was found. Make sure the page source is from a character profile.");
