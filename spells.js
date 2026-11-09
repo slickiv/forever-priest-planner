@@ -45,7 +45,7 @@ window.HEALING_SPELLS = [
     [1,20,174,214,125,2061],[2,26,225,273,155,9472],[3,32,283,341,185,9473],[4,38,349,417,215,9474],
     [5,44,463,551,265,10915],[6,50,589,699,315,10916],[7,56,757,893,380,10917]
   ], description:"A fast 40-yard direct heal for one friendly target."},
-  { name:"Holy Nova", group:"Holy · group · mixed", kind:"group", cast:1.5, instant:true, coefficient:0.107, damageCoefficient:0.107, damageGrowth:{15237:{min:25.2,max:28.8,perLevel:0.2,cap:27},15430:{min:45.36,max:52.64,perLevel:0.4,cap:35},15431:{min:69.6,max:80.4,perLevel:0.6,cap:43},27799:{min:98.8,max:113.2,perLevel:0.8,cap:51},27800:{min:132.5,max:153.5,perLevel:1,cap:59},27801:{min:174,max:200,perLevel:1.2,cap:60}}, wowhead:15237, talentRank:1, talentPoints:11, talentTree:"Holy", ranks:[
+  { name:"Holy Nova", group:"Holy · group · mixed", kind:"group", school:"holy", cast:1.5, instant:true, coefficient:0.107, damageCoefficient:0.107, damageGrowth:{15237:{min:25.2,max:28.8,perLevel:0.2,cap:27},15430:{min:45.36,max:52.64,perLevel:0.4,cap:35},15431:{min:69.6,max:80.4,perLevel:0.6,cap:43},27799:{min:98.8,max:113.2,perLevel:0.8,cap:51},27800:{min:132.5,max:153.5,perLevel:1,cap:59},27801:{min:174,max:200,perLevel:1.2,cap:60}}, wowhead:15237, talentRank:1, talentPoints:11, talentTree:"Holy", ranks:[
     [1,20,47,55,185,15237],[2,28,77,87,290,15430],[3,36,108,124,400,15431],[4,44,147,171,520,27799],[5,52,221,255,635,27800],[6,60,288,334,750,27801]
   ], description:"Requires the Holy Nova talent. An instant explosion around the caster that damages nearby enemies and heals nearby party members; it causes no threat."},
   { name:"Prayer of Healing", group:"Holy · group", kind:"group", cast:3, coefficient:0.286, wowhead:596, ranks:[
@@ -64,7 +64,7 @@ window.HEALING_SPELLS = [
     [1,10,131,167,0,1277370],[2,18,247,305,0,1277371],[3,26,414,502,0,1277372],[4,34,540,650,0,1277374],
     [5,42,781,931,0,1277376],[6,50,1046,1240,0,1277377],[7,58,1269,1497,0,1277378]
   ], description:"Human Priest racial. Instantly heals a friendly target below 50% health and removes Weakened Soul; cannot be cast on self. It has a 10-minute cooldown."},
-  { name:"Penance", group:"Discipline · mixed channel", kind:"heal", school:"holy", cast:2, channel:true, bolts:3, periodicTicks:3, coefficient:0.19, damageCoefficient:0.19, damageGrowth:{402174:{min:42,max:42,perLevel:0.33,cap:39},1240720:{min:50,max:50,perLevel:0.33,cap:49},1240721:{min:68,max:68,perLevel:0.44,cap:59},1316995:{min:92,max:92,perLevel:0,cap:60}}, wowhead:402174, talentRank:1, talentPoints:21, talentTree:"Discipline",
+  { name:"Penance", group:"Discipline · mixed channel", kind:"heal", school:"holy", cast:2, instant:true, channel:true, bolts:3, periodicTicks:3, coefficient:0.19, damageCoefficient:0.19, damageGrowth:{402174:{min:42,max:42,perLevel:0.33,cap:39},1240720:{min:50,max:50,perLevel:0.33,cap:49},1240721:{min:68,max:68,perLevel:0.44,cap:59},1316995:{min:92,max:92,perLevel:0,cap:60}}, wowhead:402174, talentRank:1, talentPoints:21, talentTree:"Discipline",
     levelGrowth:{402289:{perLevel:0.87,cap:39},1240723:{perLevel:0.98,cap:49},1240724:{perLevel:1.27,cap:59}}, ranks:[
     [1,30,126,126,150,402174,0.19,2,402289],[2,40,200,200,220,1240720,0.19,2,1240723],
     [3,50,268,268,270,1240721,0.19,2,1240724],[4,60,425,425,385,1316995,0.19,2,1316991]

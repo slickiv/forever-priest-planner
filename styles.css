@@ -119,7 +119,7 @@ h2 { font-size: clamp(26px, 3.3vw, 36px); letter-spacing: -.045em; margin: 0; li
 .chevron { font-size: 17px; color: var(--muted); padding-left: 4px; transition: transform .15s; }
 .spell-card[open] .chevron { transform: rotate(180deg); }
 .rank-table { border-top: 1px solid var(--line); overflow-x: auto; }
-.rank-header,.rank-row { display: grid; grid-template-columns: minmax(130px,1.2fr) minmax(195px,1.7fr) repeat(13,minmax(110px,1fr)) minmax(120px,1fr); gap: 10px; align-items: center; min-width: 2200px; }
+.rank-header,.rank-row { display: grid; grid-template-columns: minmax(130px,1.2fr) minmax(195px,1.7fr) repeat(14,minmax(110px,1fr)) minmax(120px,1fr); gap: 10px; align-items: center; min-width: 2310px; }
 .rank-header { padding: 9px 15px; color: var(--muted); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; background: var(--surface); }
 .sort-header { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; text-transform: inherit; cursor: pointer; }
 .sort-header:hover,.sort-header:focus-visible { color: var(--accent); }
@@ -131,7 +131,7 @@ h2 { font-size: clamp(26px, 3.3vw, 36px); letter-spacing: -.045em; margin: 0; li
 .rank-name .training-cost { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
 .training-source-marker { display: inline-block; margin-left: 3px; color: var(--muted); font-size: 8px; font-weight: 400; text-decoration: underline; text-underline-offset: 2px; }
 .training-source-marker:hover { color: var(--accent); }
-.rank-sources { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; min-width: 2200px; padding: 8px 15px; border-top: 1px solid var(--line); color: var(--muted); font-size: 8px; }
+.rank-sources { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; min-width: 2310px; padding: 8px 15px; border-top: 1px solid var(--line); color: var(--muted); font-size: 8px; }
 .rank-sources > span { color: var(--soft); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
 .rank-sources small { font-size: inherit; }
 .rank-sources a { color: inherit; font-size: inherit; font-weight: 400; text-decoration: underline; text-underline-offset: 2px; }
@@ -197,7 +197,7 @@ dialog::backdrop { background: color-mix(in srgb, CanvasText 45%, transparent); 
   .summary-card { grid-template-columns: repeat(2,1fr); }
   .spell-card summary { padding: 9px; gap: 8px; }
   .rank-header { display: grid; }
-  .rank-row { grid-template-columns: minmax(130px,1.2fr) minmax(195px,1.7fr) repeat(13,minmax(110px,1fr)) minmax(120px,1fr); gap: 8px; padding: 9px; }
+  .rank-row { grid-template-columns: minmax(130px,1.2fr) minmax(195px,1.7fr) repeat(14,minmax(110px,1fr)) minmax(120px,1fr); gap: 8px; padding: 9px; }
   .rank-stat span { font-size: 9px; }
   footer { align-items: flex-start; flex-direction: column; justify-content: center; padding: 14px 0; }
 }
