@@ -68,6 +68,15 @@ test("Warlock direct and periodic damage catalog matches its audited rank invent
   }
 });
 
+test("Warlock spell descriptions appear once per card, not in every rank row", () => {
+  const source = fs.readFileSync(require.resolve("../app.js"), "utf8");
+  const start = source.indexOf("function renderWarlockDamageSpells");
+  const end = source.indexOf("function renderDamageSpells", start);
+  const renderer = source.slice(start, end);
+  assert.equal((renderer.match(/spell\.description/g) || []).length, 1);
+  assert.match(renderer, /m\.immolateRequired\?"Requires Immolate on target":""/);
+});
+
 test("instant Warlock cooldowns drive per-cast DPS and display only the GCD plus cooldown", () => {
   const fixtures = [
     ["Death Coil", 120, [272, 359, 454]],
