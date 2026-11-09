@@ -1,139 +1,6 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="Canvas" />
-    <meta name="description" content="Plan cloth-only Priest gear and compare every healing spell rank in World of Warcraft: Forever." />
-    <title>Forever Priest Planner</title>
-    <script>
-      try {
-        const theme = localStorage.getItem("forever-priest-planner-theme");
-        if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
-      } catch {}
-    </script>
-    <link rel="stylesheet" href="styles.css?v=13" />
-  </head>
-  <body>
-    <main class="shell">
-      <header class="masthead">
-        <div class="brand"><span class="brand-mark">âœ¦</span><span>FOREVER<span class="brand-light"> / PRIEST</span></span></div>
-        <div class="masthead-actions">
-          <div class="header-note"><span class="status-dot"></span> WoW: Forever Â· cloth only</div>
-          <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false"><span aria-hidden="true">â—</span> Dark mode</button>
-        </div>
-      </header>
-
-      <section class="hero">
-        <div class="hero-copy">
-          <p class="eyebrow">FIELD KIT Â· HEALING & GEAR</p>
-          <h1>WoW Forever Priest Throughput</h1>
-          <p class="hero-sub">Plan your cloth loadout, then compare every healing rank by cast throughput and mana efficiency.</p>
-        </div>
-        <div class="hero-stat"><span class="eyebrow">EQUIPPED HEALING</span><strong id="heroHealing">0</strong><span>bonus healing</span></div>
-      </section>
-
-      <nav class="tabs" aria-label="Planner sections">
-        <button class="tab active" data-tab="gear">01 <span>Gear planner</span></button>
-        <button class="tab" data-tab="spells">02 <span>Healing spells</span></button>
-      </nav>
-
-      <section id="gearPanel" class="panel">
-        <div class="section-head">
-          <div><p class="eyebrow">YOUR LOADOUT</p><h2>Cloth gear planner</h2></div>
-          <div class="actions">
-            <button class="button quiet" id="armoryBtn">Import Armory</button>
-            <button class="button quiet" id="resetBtn">Reset set</button>
-          </div>
-        </div>
-        <p class="helper">Cloth armor only in armor slots. Cloaks, neck, rings, trinkets, and held items are unrestricted by armor type; all their stats count toward throughput. Armory imports check Wowhead for equipped-item healing effects that the Armory stat list omits.</p>
-        <div class="gear-layout">
-          <div id="gearGrid" class="gear-grid"></div>
-          <aside class="summary-card">
-            <p class="eyebrow">SET TOTALS</p>
-            <div class="total"><span>Healing</span><b id="totalHealing">0</b></div>
-            <div class="total"><span>Spell damage</span><b id="totalDamage">0</b></div>
-            <div class="total"><span>Intellect</span><b id="totalIntellect">0</b></div>
-            <div class="total"><span>Spirit</span><b id="totalSpirit">0</b></div>
-            <div class="total"><span>Mana per 5 sec</span><b id="totalMp5">0</b></div>
-            <div class="summary-rule"></div>
-            <a class="button wowhead-button" href="https://www.wowhead.com/forever/items/class:5" target="_blank" rel="noreferrer">Browse Priest items on Wowhead â†—</a>
-            <p class="fineprint">Wowhead remains the item and loot-table reference. Gear is saved in this browser only.</p>
-          </aside>
-        </div>
-        <div class="loot-note"><span class="note-icon">â†—</span><div><strong>Loot tables stay on Wowhead</strong><p>Open a boss or item entry on Wowhead to check its current source and loot table. Search items by name or enter an item ID to complete stats.</p></div></div>
-      </section>
-
-      <section id="spellsPanel" class="panel hidden">
-        <div class="section-head spell-head">
-          <div><p class="eyebrow">RANK-BY-RANK REFERENCE</p><h2>Healing spellbook</h2></div>
-          <div class="spell-list-controls" aria-label="Spell list controls">
-            <label>Sort spells <select id="spellSort"><option value="learned">Order learned</option><option value="name">Name</option><option value="category">Category</option><option value="rank-count">Total rank count</option></select></label>
-            <label>Show ranks <select id="spellLevelScope"><option value="level">Available at selected level</option><option value="all">All levels</option></select></label>
-          </div>
-        </div>
-        <details class="settings-disclosure">
-          <summary>Healing settings</summary>
-          <div class="settings-groups">
-            <fieldset class="settings-group"><legend>Character and healing stats</legend><div class="spell-controls">
-              <label class="stat-input">Character race <select id="characterRace"><option value="">Choose race</option><option>Human</option><option>Dwarf</option><option>Night Elf</option><option>Gnome</option><option>Troll</option><option>Undead</option></select></label>
-              <label class="stat-input">Character level <input id="characterLevel" type="number" min="1" max="60" value="22" step="1" /></label>
-              <label class="stat-input">Enemy targets <input id="enemyTargets" type="number" min="1" max="10" value="1" step="1" /> <span>Holy Nova</span></label>
-              <label class="stat-input">Bonus healing <input id="bonusHealing" type="number" min="0" value="0" step="1" /> <span>effective total</span></label>
-              <label class="stat-input">Other healing bonus <input id="bonusHealingAdjustment" type="number" min="0" value="0" step="1" /> <span>not on equipped items</span></label>
-              <label class="stat-input">Bonus spell damage <input id="bonusSpellDamage" type="number" min="0" value="0" step="1" /> <span>effective total</span></label>
-              <label class="stat-input">Other spell damage <input id="bonusSpellDamageAdjustment" type="number" min="0" value="0" step="1" /> <span>not on equipped items</span></label>
-              <label class="stat-input">Base spell crit <input id="baseCrit" type="number" min="0" max="100" value="0" step="0.1" /> <span>%</span></label>
-              <label class="stat-input">Total Spirit <input id="totalSpirit" type="number" min="0" value="0" step="1" /></label>
-              <label class="stat-input">Successful heals / targets / clicks <input id="partyTargets" type="number" min="1" max="6" value="5" step="1" /> <span>PoM: 1 initial heal + up to 5 transfers; Lightwell: up to 5 clicks</span></label>
-            </div></fieldset>
-            <fieldset class="settings-group"><legend>Talent spells</legend><div class="spell-controls">
-              <label class="stat-input"><input id="holyNovaTalent" type="checkbox" /> Holy Nova (11 Holy points)</label>
-              <label class="stat-input"><input id="penanceTalent" type="checkbox" /> Penance (21 Discipline points)</label>
-              <label class="stat-input"><input id="prayerOfMendingTalent" type="checkbox" /> Prayer of Mending (31 Holy points)</label>
-            </div></fieldset>
-            <fieldset class="settings-group"><legend>Healing and mana talents</legend><div class="spell-controls">
-              <label class="stat-input">Twin Disciplines <select id="twinDisciplines"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
-              <label class="stat-input">Improved PW:S <select id="improvedPws"><option value="0">0/3</option><option value="1">1/3</option><option value="2">2/3</option><option value="3">3/3</option></select></label>
-              <label class="stat-input">Improved Renew <select id="improvedRenew"><option value="0">0/3</option><option value="1">1/3</option><option value="2">2/3</option><option value="3">3/3</option></select></label>
-              <label class="stat-input">Holy Specialization <select id="holySpecialization"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
-              <label class="stat-input">Divine Fury <select id="divineFury"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
-              <label class="stat-input">Spiritual Healing <select id="spiritualHealing"><option value="0">0/3</option><option value="1">1/3</option><option value="2">2/3</option><option value="3">3/3</option></select></label>
-              <label class="stat-input">Spiritual Guidance <select id="spiritualGuidance"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
-              <label class="stat-input">Improved Healing <select id="manaReduction"><option value="0">0/3</option><option value="5">1/3</option><option value="10">2/3</option><option value="15">3/3</option></select></label>
-              <label class="stat-input">Mental Agility <select id="mentalAgility"><option value="0">0/3</option><option value="1">1/3</option><option value="2">2/3</option><option value="3">3/3</option></select></label>
-              <label class="stat-input">Soul Warding <select id="soulWarding"><option value="0">No</option><option value="1">Yes</option></select></label>
-              <label class="stat-input">Litany of Light <select id="litanyOfLight"><option value="0">0/2</option><option value="1">1/2</option><option value="2">2/2</option></select></label>
-              <label class="stat-input">Holy Binding <select id="holyBinding"><option value="0">No</option><option value="1">Yes</option></select></label>
-              <label class="stat-input">Divine Aegis <select id="divineAegis"><option value="0">0/3</option><option value="1">1/3</option><option value="2">2/3</option><option value="3">3/3</option></select></label>
-              <label class="stat-input">Inspiration <select id="inspiration"><option value="0">0/3</option><option value="1">1/3</option><option value="2">2/3</option><option value="3">3/3</option></select></label>
-            </div></fieldset>
-            <fieldset class="settings-group"><legend>Target conditions and active effects</legend><div class="spell-controls">
-              <label class="stat-input"><input id="weakenedSoulTarget" type="checkbox" /> Target has Weakened Soul</label>
-              <label class="stat-input"><input id="differentPreviousHeal" type="checkbox" /> Previous heal was different</label>
-              <label class="stat-input"><input id="flashHealOtherTarget" type="checkbox" /> Flash Heal targets someone else</label>
-              <label class="stat-input">Renewed Hope <select id="renewedHope"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
-              <label class="stat-input">Inner Focus <select id="innerFocus"><option value="0">Not talented</option><option value="1">Talented</option></select></label>
-              <label class="stat-input"><input id="innerFocusReady" type="checkbox" /> Inner Focus ready for cast</label>
-              <label class="stat-input">Searing Light <select id="searingLight"><option value="0">0/2</option><option value="1">1/2</option><option value="2">2/2</option></select></label>
-              <label class="stat-input">Power in Light <select id="powerInLight"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
-              <label class="stat-input"><input id="powerInLightTarget" type="checkbox" /> Penance target has Holy Fire or Shadow Word: Pain</label>
-              <label class="stat-input"><input id="holyNovaProcReady" type="checkbox" /> Holy Nova free proc ready</label>
-              <label class="stat-input">Power Infusion <select id="powerInfusionTalent"><option value="0">Not talented</option><option value="1">Talented</option></select></label>
-              <label class="stat-input"><input id="powerInfusionActive" type="checkbox" /> Power Infusion active on caster</label>
-              <label class="stat-input">Spirit of Redemption <select id="spiritOfRedemptionTalent"><option value="0">Not talented</option><option value="1">Talented</option></select></label>
-              <label class="stat-input"><input id="spiritOfRedemptionActive" type="checkbox" /> Spirit of Redemption active</label>
-            </div></fieldset>
-          </div>
-        </details>
-        <p class="helper">Sort spell cards above and ranks by any column. Selected-level view hides later ranks; All levels includes every rank. Damage uses equipped spell damage plus the separate damage input; unknown stats remain flagged in gear totals. Expected healing and damage include the selected crit chance and 150% critical effects. Instants use a 1.5 sec global cooldown for throughput. Racial spells appear only after you select or import a race.</p>
-        <div class="spell-legend"><span><i class="dot heal-dot"></i> Healing</span><span><i class="dot damage-dot"></i> Damage</span><span><i class="dot shield-dot"></i> Absorb</span><span id="rankCount"></span></div>
-        <div id="spellList" class="spell-list"></div>
-        <div class="method-note"><strong>How the numbers work</strong>
-          <p>Base heal ranges use each rank's client BasePoints, points per level, variance, and BaseLevel/MaxLevel. Level growth stops at MaxLevel. The client applies points per level to both range endpoints, then the displayed base endpoints round to the nearest whole heal. Healing power and talents apply after that base range.</p>
-          <p>Bonus healing combines gear, other entered healing, and the Spiritual Guidance bonus, then applies the rank coefficient and downrank retention. Retention stays at 100% through 17 levels above the learned level, then drops by 5 percentage points for each additional level; values above level 30 extrapolate the observed curve. Lesser Heal Rank 1 keeps its tooltip-fitted exception. Talent healing multipliers apply after base and bonus healing; the low and high endpoints round down and up.</p>
-          <p>Throughput and mana efficiency use the midpoint of the displayed healing range. Heal and Greater Heal cast times include Divine Fury; instant spells use a 1.5-second global cooldown.</p>
-          <p>Expected healing and damage = mean Ã— [1 + (critical chance Ã— 0.5)], assuming critical effects deal 150%. Healing and damage use separate crit chances. Both include entered sheet chance, Holy Specialization adds chance to Holy spells, and ready Inner Focus adds 25 percentage points to eligible direct events. Renewed Hope applies to its listed healing spells when Weakened Soul is present; it does not increase damage crit chance.</p>
+YªçŠx-®éÜj×¢ëiºÚ+Š§j[h‘éÜ¢éíïŞôN‹Z–‹­¦ëeŠw¬Ôğ…‘½ÑåÁ”¡Ñµ°ø(ñ¡Ñµ°±…¹œô‰•¸ˆø(€€ñ¡•…ø(€€€€ñµ•Ñ„¡…ÉÍ•Ğô‰ÕÑ˜´àˆ€¼ø(€€€€ñµ•Ñ„¹…µ”ô‰Ù¥•İÁ½ÉĞˆ½¹Ñ•¹Ğô‰İ¥‘Ñ õ‘•Ù¥”µİ¥‘Ñ °¥¹¥Ñ¥…°µÍ…±”ôÄˆ€¼ø(€€€€ñµ•Ñ„¹…µ”ô‰Ñ¡•µ”µ½±½Èˆ½¹Ñ•¹Ğô‰…¹Ù…Ìˆ€¼ø(€€€€ñµ•Ñ„¹…µ”ô‰‘•ÍÉ¥ÁÑ¥½¸ˆ½¹Ñ•¹Ğô‰A±…¸±½Ñ µ½¹±äAÉ¥•ÍĞ•…È…¹½µÁ…É”•Ù•Éä¡•…±¥¹œÍÁ•±°É…¹¬¥¸]½É±½˜]…ÉÉ…™Ğè½É•Ù•È¸ˆ€¼ø(€€€€ñÑ¥Ñ±”ù½É•Ù•ÈAÉ¥•ÍĞA±…¹¹•Èğ½Ñ¥Ñ±”ø(€€€€ñÍÉ¥ÁĞø(€€€€€ÑÉäì(€€€€€€€½¹ÍĞÑ¡•µ”€ô±½…±MÑ½É…”¹•Ñ%Ñ•´ ‰™½É•Ù•ÈµÁÉ¥•ÍĞµÁ±…¹¹•ÈµÑ¡•µ”ˆ¤ì(€€€€€€€¥˜€¡Ñ¡•µ”€ôôô€‰±¥¡ĞˆñğÑ¡•µ”€ôôô€‰‘…É¬ˆ¤‘½Õµ•¹Ğ¹‘½Õµ•¹Ñ±•µ•¹Ğ¹‘…Ñ…Í•Ğ¹Ñ¡•µ”€ôÑ¡•µ”ì(€€€€€ô…Ñ íô(€€€€ğ½ÍÉ¥ÁĞø(€€€€ñ±¥¹¬É•°ô‰ÍÑå±•Í¡••Ğˆ¡É•˜ô‰ÍÑå±•Ì¹ÍÌıØôÄÌˆ€¼ø(€€ğ½¡•…ø(€€ñ‰½‘äø(€€€€ñµ…¥¸±…ÍÌô‰Í¡•±°ˆø(€€€€€€ñ¡•…‘•È±…ÍÌô‰µ…ÍÑ¡•…ˆø(€€€€€€€€ñ‘¥Ø±…ÍÌô‰‰É…¹ˆøñÍÁ…¸±…ÍÌô‰‰É…¹µµ…É¬ˆûŠr˜ğ½ÍÁ…¸øñÍÁ…¸ù=IYHñÍÁ…¸±…ÍÌô‰‰É…¹µ±¥¡Ğˆø€¼AI%MPğ½ÍÁ…¸øğ½ÍÁ…¸øğ½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÌô‰µ…ÍÑ¡•…µ…Ñ¥½¹Ìˆø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰¡•…‘•Èµ¹½Ñ”ˆøñÍÁ…¸±…ÍÌô‰ÍÑ…ÑÕÌµ‘½Ğˆøğ½ÍÁ…¸ø]½\è½É•Ù•Èƒ
+Ü±½Ñ ½¹±äğ½‘¥Øø(€€€€€€€€€€ñ‰ÕÑÑ½¸±…ÍÌô‰Ñ¡•µ”µÑ½±”ˆ¥ô‰Ñ¡•µ•Q½±”ˆÑåÁ”ô‰‰ÕÑÑ½¸ˆ…É¥„µÁÉ•ÍÍ•ô‰™…±Í”ˆøñÍÁ…¸…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆûŠ^@ğ½ÍÁ…¸ø…É¬µ½‘”ğ½‰ÕÑÑ½¸ø(€€€€€€€€ğ½‘¥Øø(€€€€€€ğ½¡•…‘•Èø((€€€€€€ñÍ•Ñ¥½¸±…ÍÌô‰¡•É¼ˆø(€€€€€€€€ñ‘¥Ø±…ÍÌô‰¡•É¼µ½Áäˆø(€€€€€€€€€€ñÀ±…ÍÌô‰•å•‰É½Üˆù%1-%Pƒ
+Ü!1%9€˜Hğ½Àø(€€€€€€€€€€ñ Äù]½\½É•Ù•ÈAÉ¥•ÍĞQ¡É½Õ¡ÁÕĞğ½ Äø(€€€€€€€€€€ñÀ±…ÍÌô‰¡•É¼µÍÕˆˆùA±…¸å½ÕÈ±½Ñ ±½…‘½ÕĞ°Ñ¡•¸½µÁ…É”•Ù•Éä¡•…±¥¹œÉ…¹¬‰ä…ÍĞÑ¡É½Õ¡ÁÕĞ…¹µ…¹„•™™¥¥•¹ä¸ğ½Àø(€€€€€€€€ğ½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÌô‰¡•É¼µÍÑ…ĞˆøñÍÁ…¸±…ÍÌô‰•å•‰É½ÜˆùEU%AA!1%9ğ½ÍÁ…¸øñÍÑÉ½¹œ¥ô‰¡•É½!•…±¥¹œˆøÀğ½ÍÑÉ½¹œøñÍÁ…¸ù‰½¹ÕÌ¡•…±¥¹œğ½ÍÁ…¸øğ½‘¥Øø(€€€€€€ğ½Í•Ñ¥½¸ø((€€€€€€ñ¹…Ø±…ÍÌô‰Ñ…‰Ìˆ…É¥„µ±…‰•°ô‰A±…¹¹•ÈÍ•Ñ¥½¹Ìˆø(€€€€€€€€ñ‰ÕÑÑ½¸±…ÍÌô‰Ñ…ˆ…Ñ¥Ù”ˆ‘…Ñ„µÑ…ˆô‰•…ÈˆøÀÄ€ñÍÁ…¸ù•…ÈÁ±…¹¹•Èğ½ÍÁ…¸øğ½‰ÕÑÑ½¸ø(€€€€€€€€ñ‰ÕÑÑ½¸±…ÍÌô‰Ñ…ˆˆ‘…Ñ„µÑ…ˆô‰ÍÁ•±±ÌˆøÀÈ€ñÍÁ…¸ù!•…±¥¹œÍÁ•±±Ìğ½ÍÁ…¸øğ½‰ÕÑÑ½¸ø(€€€€€€ğ½¹…Øø((€€€€€€ñÍ•Ñ¥½¸¥ô‰•…ÉA…¹•°ˆ±…ÍÌô‰Á…¹•°ˆø(€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í•Ñ¥½¸µ¡•…ˆø(€€€€€€€€€€ñ‘¥ØøñÀ±…ÍÌô‰•å•‰É½Üˆùe=UH1==UPğ½Àøñ Èù±½Ñ •…ÈÁ±…¹¹•Èğ½ Èøğ½‘¥Øø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰…Ñ¥½¹Ìˆø(€€€€€€€€€€€€ñ‰ÕÑÑ½¸±…ÍÌô‰‰ÕÑÑ½¸ÅÕ¥•Ğˆ¥ô‰…Éµ½Éå	Ñ¸ˆù%µÁ½ÉĞÉµ½Éäğ½‰ÕÑÑ½¸ø(€€€€€€€€€€€€ñ‰ÕÑÑ½¸±…ÍÌô‰‰ÕÑÑ½¸ÅÕ¥•Ğˆ¥ô‰É•Í•Ñ	Ñ¸ˆùI•Í•ĞÍ•Ğğ½‰ÕÑÑ½¸ø(€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€ğ½‘¥Øø(€€€€€€€€ñÀ±…ÍÌô‰¡•±Á•Èˆù±½Ñ …Éµ½È½¹±ä¥¸…Éµ½ÈÍ±½ÑÌ¸±½…­Ì°¹•¬°É¥¹Ì°ÑÉ¥¹­•ÑÌ°…¹¡•±¥Ñ•µÌ…É”Õ¹É•ÍÑÉ¥Ñ•‰ä…Éµ½ÈÑåÁ”ì…±°Ñ¡•¥ÈÍÑ…ÑÌ½Õ¹ĞÑ½İ…ÉÑ¡É½Õ¡ÁÕĞ¸Éµ½Éä¥µÁ½ÉÑÌ¡•¬]½İ¡•…™½È•ÅÕ¥ÁÁ•µ¥Ñ•´¡•…±¥¹œ•™™•ÑÌÑ¡…ĞÑ¡”Éµ½ÉäÍÑ…Ğ±¥ÍĞ½µ¥ÑÌ¸ğ½Àø(€€€€€€€€ñ‘¥Ø±…ÍÌô‰•…Èµ±…å½ÕĞˆø(€€€€€€€€€€ñ‘¥Ø¥ô‰•…ÉÉ¥ˆ±…ÍÌô‰•…ÈµÉ¥ˆøğ½‘¥Øø(€€€€€€€€€€ñ…Í¥‘”±…ÍÌô‰ÍÕµµ…Éäµ…Éˆø(€€€€€€€€€€€€ñÀ±…ÍÌô‰•å•‰É½ÜˆùMPQ=Q1Lğ½Àø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Ñ½Ñ…°ˆøñÍÁ…¸ù!•…±¥¹œğ½ÍÁ…¸øñˆ¥ô‰Ñ½Ñ…±!•…±¥¹œˆøÀğ½ˆøğ½‘¥Øø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Ñ½Ñ…°ˆøñÍÁ…¸ùMÁ•±°‘…µ…”ğ½ÍÁ…¸øñˆ¥ô‰Ñ½Ñ…±…µ…”ˆøÀğ½ˆøğ½‘¥Øø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Ñ½Ñ…°ˆøñÍÁ…¸ù%¹Ñ•±±•Ğğ½ÍÁ…¸øñˆ¥ô‰Ñ½Ñ…±%¹Ñ•±±•ĞˆøÀğ½ˆøğ½‘¥Øø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Ñ½Ñ…°ˆøñÍÁ…¸ùMÁ¥É¥Ğğ½ÍÁ…¸øñˆ¥ô‰Ñ½Ñ…±MÁ¥É¥ĞˆøÀğ½ˆøğ½‘¥Øø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Ñ½Ñ…°ˆøñÍÁ…¸ù5…¹„Á•È€ÔÍ•Œğ½ÍÁ…¸øñˆ¥ô‰Ñ½Ñ…±5ÀÔˆøÀğ½ˆøğ½‘¥Øø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰ÍÕµµ…ÉäµÉÕ±”ˆøğ½‘¥Øø(€€€€€€€€€€€€ñ„±…ÍÌô‰‰ÕÑÑ½¸İ½İ¡•…µ‰ÕÑÑ½¸ˆ¡É•˜ô‰¡ÑÑÁÌè¼½İİÜ¹İ½İ¡•…¹½´½™½É•Ù•È½¥Ñ•µÌ½±…ÍÌèÔˆÑ…É•Ğô‰}‰±…¹¬ˆÉ•°ô‰¹½É•™•ÉÉ•Èˆù	É½İÍ”AÉ¥•ÍĞ¥Ñ•µÌ½¸]½İ¡•…ƒŠ\ğ½„ø(€€€€€€€€€€€€ñÀ±…ÍÌô‰™¥¹•ÁÉ¥¹Ğˆù]½İ¡•…É•µ…¥¹ÌÑ¡”¥Ñ•´…¹±½½ĞµÑ…‰±”É•™•É•¹”¸•…È¥ÌÍ…Ù•¥¸Ñ¡¥Ì‰É½İÍ•È½¹±ä¸ğ½Àø(€€€€€€€€€€ğ½…Í¥‘”ø(€€€€€€€€ğ½‘¥Øø(€€€€€€€€ñ‘¥Ø±…ÍÌô‰±½½Ğµ¹½Ñ”ˆøñÍÁ…¸±…ÍÌô‰¹½Ñ”µ¥½¸ˆûŠ\ğ½ÍÁ…¸øñ‘¥ØøñÍÑÉ½¹œù1½½ĞÑ…‰±•ÌÍÑ…ä½¸]½İ¡•…ğ½ÍÑÉ½¹œøñÀù=Á•¸„‰½ÍÌ½È¥Ñ•´•¹ÑÉä½¸]½İ¡•…Ñ¼¡•¬¥ÑÌÕÉÉ•¹ĞÍ½ÕÉ”…¹±½½ĞÑ…‰±”¸M•…É ¥Ñ•µÌ‰ä¹…µ”½È•¹Ñ•È…¸¥Ñ•´%Ñ¼½µÁ±•Ñ”ÍÑ…ÑÌ¸ğ½Àøğ½‘¥Øøğ½‘¥Øø(€€€€€€ğ½Í•Ñ¥½¸ø((€€€€€€ñÍ•Ñ¥½¸¥ô‰ÍÁ•±±ÍA…¹•°ˆ±…ÍÌô‰Á…¹•°¡¥‘‘•¸ˆø(€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í•Ñ¥½¸µ¡•…ÍÁ•±°µ¡•…ˆø(€€€€€€€€€€ñ‘¥ØøñÀ±…ÍÌô‰•å•‰É½ÜˆùI9,µ	dµI9,II9ğ½Àøñ Èù!•…±¥¹œÍÁ•±±‰½½¬ğ½ Èøğ½‘¥Øø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰ÍÁ•±°µ±¥ÍĞµ½¹ÑÉ½±Ìˆ…É¥„µ±…‰•°ô‰MÁ•±°±¥ÍĞ½¹ÑÉ½±Ìˆø(€€€€€€€€€€€€ñ±…‰•°ùM½ÉĞÍÁ•±±Ì€ñÍ•±•Ğ¥ô‰ÍÁ•±±M½ÉĞˆøñ½ÁÑ¥½¸Ù…±Õ”ô‰±•…É¹•ˆù=É‘•È±•…É¹•ğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ô‰¹…µ”ˆù9…µ”ğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ô‰…Ñ•½Éäˆù…Ñ•½Éäğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ô‰É…¹¬µ½Õ¹ĞˆùQ½Ñ…°É…¹¬½Õ¹Ğğ½½ÁÑ¥½¸øğ½Í•±•Ğøğ½±…‰•°ø(€€€€€€€€€€€€ñ±…‰•°ùM¡½ÜÉ…¹­Ì€ñÍ•±•Ğ¥ô‰ÍÁ•±±1•Ù•±M½Á”ˆøñ½ÁÑ¥½¸Ù…±Õ”ô‰±•Ù•°ˆùÙ…¥±…‰±”…ĞÍ•±•Ñ•±•Ù•°ğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ô‰…±°ˆù±°±•Ù•±Ìğ½½ÁÑ¥½¸øğ½Í•±•Ğøğ½±…‰•°ø(€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€ğ½‘¥Øø(€€€€€€€€ñ‘•Ñ…¥±Ì±…ÍÌô‰Í•ÑÑ¥¹Ìµ‘¥Í±½ÍÕÉ”ˆø(€€€€€€€€€€ñÍÕµµ…Éäù!•…±¥¹œÍ•ÑÑ¥¹Ìğ½ÍÕµµ…Éäø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í•ÑÑ¥¹ÌµÉ½ÕÁÌˆø(€€€€€€€€€€€€ñ™¥•±‘Í•Ğ±…ÍÌô‰Í•ÑÑ¥¹ÌµÉ½ÕÀˆøñ±••¹ù¡…É…Ñ•È…¹¡•…±¥¹œÍÑ…ÑÌğ½±••¹øñ‘¥Ø±…ÍÌô‰ÍÁ•±°µ½¹ÑÉ½±Ìˆø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆù¡…É…Ñ•ÈÉ…”€ñÍ•±•Ğ¥ô‰¡…É…Ñ•ÉI…”ˆøñ½ÁÑ¥½¸Ù…±Õ”ôˆˆù¡½½Í”É…”ğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸ù!Õµ…¸ğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸ùİ…É˜ğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸ù9¥¡Ğ±˜ğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸ù¹½µ”ğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸ùQÉ½±°ğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸ùU¹‘•…ğ½½ÁÑ¥½¸øğ½Í•±•Ğøğ½±…‰•°ø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆù¡…É…Ñ•È±•Ù•°€ñ¥¹ÁÕĞ¥ô‰¡…É…Ñ•É1•Ù•°ˆÑåÁ”ô‰¹Õµ‰•Èˆµ¥¸ôˆÄˆµ…àôˆØÀˆÙ…±Õ”ôˆÈÈˆÍÑ•ÀôˆÄˆ€¼øğ½±…‰•°ø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆù¹•µäÑ…É•ÑÌ€ñ¥¹ÁÕĞ¥ô‰•¹•µåQ…É•ÑÌˆÑåÁ”ô‰¹Õµ‰•Èˆµ¥¸ôˆÄˆµ…àôˆÄÀˆÙ…±Õ”ôˆÄˆÍÑ•ÀôˆÄˆ€¼ø€ñÍÁ…¸ù!½±ä9½Ù„ğ½ÍÁ…¸øğ½±…‰•°ø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆù	½¹ÕÌ¡•…±¥¹œ€ñ¥¹ÁÕĞ¥ô‰‰½¹ÕÍ!•…±¥¹œˆÑåÁ”ô‰¹Õµ‰•Èˆµ¥¸ôˆÀˆÙ…±Õ”ôˆÀˆÍÑ•ÀôˆÄˆ€¼ø€ñÍÁ…¸ù•™™•Ñ¥Ù”Ñ½Ñ…°ğ½ÍÁ…¸øğ½±…‰•°ø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆù=Ñ¡•È¡•…±¥¹œ‰½¹ÕÌ€ñ¥¹ÁÕĞ¥ô‰‰½¹ÕÍ!•…±¥¹‘©ÕÍÑµ•¹ĞˆÑåÁ”ô‰¹Õµ‰•Èˆµ¥¸ôˆÀˆÙ…±Õ”ôˆÀˆÍÑ•ÀôˆÄˆ€¼ø€ñÍÁ…¸ù¹½Ğ½¸•ÅÕ¥ÁÁ•¥Ñ•µÌğ½ÍÁ…¸øğ½±…‰•°ø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆù	½¹ÕÌÍÁ•±°‘…µ…”€ñ¥¹ÁÕĞ¥ô‰‰½¹ÕÍMÁ•±±…µ…”ˆÑåÁ”ô‰¹Õµ‰•Èˆµ¥¸ôˆÀˆÙ…±Õ”ôˆÀˆÍÑ•ÀôˆÄˆ€¼ø€ñÍÁ…¸ù•™™•Ñ¥Ù”Ñ½Ñ…°ğ½ÍÁ…¸øğ½±…‰•°ø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆù=Ñ¡•ÈÍÁ•±°‘…µ…”€ñ¥¹ÁÕĞ¥ô‰‰½¹ÕÍMÁ•±±…µ…•‘©ÕÍÑµ•¹ĞˆÑåÁ”ô‰¹Õµ‰•Èˆµ¥¸ôˆÀˆÙ…±Õ”ôˆÀˆÍÑ•ÀôˆÄˆ€¼ø€ñÍÁ…¸ù¹½Ğ½¸•ÅÕ¥ÁÁ•¥Ñ•µÌğ½ÍÁ…¸øğ½±…‰•°ø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆù	…Í”ÍÁ•±°É¥Ğ€ñ¥¹ÁÕĞ¥ô‰‰…Í•É¥ĞˆÑåÁ”ô‰¹Õµ‰•Èˆµ¥¸ôˆÀˆµ…àôˆÄÀÀˆÙ…±Õ”ôˆÀˆÍÑ•ÀôˆÀ¸Äˆ€¼ø€ñÍÁ…¸ø”ğ½ÍÁ…¸øğ½±…‰•°ø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆùQ½Ñ…°MÁ¥É¥Ğ€ñ¥¹ÁÕĞ¥ô‰Ñ½Ñ…±MÁ¥É¥ĞˆÑåÁ”ô‰¹Õµ‰•Èˆµ¥¸ôˆÀˆÙ…±Õ”ôˆÀˆÍÑ•ÀôˆÄˆ€¼øğ½±…‰•°ø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆùMÕ•ÍÍ™Õ°¡•…±Ì€¼Ñ…É•ÑÌ€¼±¥­Ì€ñ¥¹ÁÕĞ¥ô‰Á…ÉÑåQ…É•ÑÌˆÑåÁ”ô‰¹Õµ‰•Èˆµ¥¸ôˆÄˆµ…àôˆØˆÙ…±Õ”ôˆÔˆÍÑ•ÀôˆÄˆ€¼ø€ñÍÁ…¸ùA½4è€Ä¥¹¥Ñ¥…°¡•…°€¬ÕÀÑ¼€ÔÑÉ…¹Í™•ÉÌì1¥¡Ñİ•±°èÕÀÑ¼€Ô±¥­Ìğ½ÍÁ…¸øğ½±…‰•°ø(€€€€€€€€€€€€ğ½‘¥Øøğ½™¥•±‘Í•Ğø(€€€€€€€€€€€€ñ™¥•±‘Í•Ğ±…ÍÌô‰Í•ÑÑ¥¹ÌµÉ½ÕÀˆøñ±••¹ùQ…±•¹ĞÍÁ•±±Ìğ½±••¹øñ‘¥Ø±…ÍÌô‰ÍÁ•±°µ½¹ÑÉ½±Ìˆø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆøñ¥¹ÁÕĞ¥ô‰¡½±å9½Ù…Q…±•¹ĞˆÑåÁ”ô‰¡•­‰½àˆ€¼ø!½±ä9½Ù„€ ÄÄ!½±äÁ½¥¹ÑÌ¤ğ½±…‰•°ø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆøñ¥¹ÁÕĞ¥ô‰Á•¹…¹•Q…±•¹ĞˆÑåÁ”ô‰¡•­‰½àˆ€¼øA•¹…¹”€ ÈÄ¥Í¥Á±¥¹”Á½¥¹ÑÌ¤ğ½±…‰•°ø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆøñ¥¹ÁÕĞ¥ô‰ÁÉ…å•É=™5•¹‘¥¹Q…±•¹ĞˆÑåÁ”ô‰¡•­‰½àˆ€¼øAÉ…å•È½˜5•¹‘¥¹œ€ ÌÄ!½±äÁ½¥¹ÑÌ¤ğ½±…‰•°ø(€€€€€€€€€€€€ğ½‘¥Øøğ½™¥•±‘Í•Ğø(€€€€€€€€€€€€ñ™¥•±‘Í•Ğ±…ÍÌô‰Í•ÑÑ¥¹ÌµÉ½ÕÀˆøñ±••¹ù!•…±¥¹œ…¹µ…¹„Ñ…±•¹ÑÌğ½±••¹øñ‘¥Ø±…ÍÌô‰ÍÁ•±°µ½¹ÑÉ½±Ìˆø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆùQİ¥¸¥Í¥Á±¥¹•Ì€ñÍ•±•Ğ¥ô‰Ñİ¥¹¥Í¥Á±¥¹•Ìˆøñ½ÁÑ¥½¸Ù…±Õ”ôˆÀˆøÀ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÄˆøÄ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÈˆøÈ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÌˆøÌ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆĞˆøĞ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÔˆøÔ¼Ôğ½½ÁÑ¥½¸øğ½Í•±•Ğøğ½±…‰•°ø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆù%µÁÉ½Ù•A\éL€ñÍ•±•Ğ¥ô‰¥µÁÉ½Ù•‘AİÌˆøñ½ÁÑ¥½¸Ù…±Õ”ôˆÀˆøÀ¼Ìğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÄˆøÄ¼Ìğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÈˆøÈ¼Ìğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÌˆøÌ¼Ìğ½½ÁÑ¥½¸øğ½Í•±•Ğøğ½±…‰•°ø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆù%µÁÉ½Ù•I•¹•Ü€ñÍ•±•Ğ¥ô‰¥µÁÉ½Ù•‘I•¹•Üˆøñ½ÁÑ¥½¸Ù…±Õ”ôˆÀˆøÀ¼Ìğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÄˆøÄ¼Ìğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÈˆøÈ¼Ìğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÌˆøÌ¼Ìğ½½ÁÑ¥½¸øğ½Í•±•Ğøğ½±…‰•°ø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆù!½±äMÁ•¥…±¥é…Ñ¥½¸€ñÍ•±•Ğ¥ô‰¡½±åMÁ•¥…±¥é…Ñ¥½¸ˆøñ½ÁÑ¥½¸Ù…±Õ”ôˆÀˆøÀ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÄˆøÄ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÈˆøÈ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÌˆøÌ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆĞˆøĞ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÔˆøÔ¼Ôğ½½ÁÑ¥½¸øğ½Í•±•Ğøğ½±…‰•°ø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆù¥Ù¥¹”ÕÉä€ñÍ•±•Ğ¥ô‰‘¥Ù¥¹•ÕÉäˆøñ½ÁÑ¥½¸Ù…±Õ”ôˆÀˆøÀ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÄˆøÄ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÈˆøÈ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÌˆøÌ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆĞˆøĞ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÔˆøÔ¼Ôğ½½ÁÑ¥½¸øğ½Í•±•Ğøğ½±…‰•°ø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆùMÁ¥É¥ÑÕ…°!•…±¥¹œ€ñÍ•±•Ğ¥ô‰ÍÁ¥É¥ÑÕ…±!•…±¥¹œˆøñ½ÁÑ¥½¸Ù…±Õ”ôˆÀˆøÀ¼Ìğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÄˆøÄ¼Ìğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÈˆøÈ¼Ìğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÌˆøÌ¼Ìğ½½ÁÑ¥½¸øğ½Í•±•Ğøğ½±…‰•°ø(€€€€€€€€€€€€€€ñ±…‰•°±…ÍÌô‰ÍÑ…Ğµ¥¹ÁÕĞˆùMÁ¥É¥ÑÕ…°Õ¥‘…¹”€ñÍ•±•Ğ¥ô‰ÍÁ¥É¥ÑÕ…±Õ¥‘…¹”ˆøñ½ÁÑ¥½¸Ù…±Õ”ôˆÀˆøÀ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÄˆøÄ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÈˆøÈ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù…±Õ”ôˆÌˆøÌ¼Ôğ½½ÁÑ¥½¸øñ½ÁÑ¥½¸Ù‡_{ÒÚ$z{-®éÜj×e Ã— 0.5)], assuming critical effects deal 150%. Healing and damage use separate crit chances. Both include entered sheet chance, Holy Specialization adds chance to Holy spells, and ready Inner Focus adds 25 percentage points to eligible direct events. Renewed Hope applies to its listed healing spells when Weakened Soul is present; it does not increase damage crit chance.</p>
           <p>Renew can critically heal in Forever, and Renew and Lightwell show a critical tick or event amount. Divine Aegis and Inspiration can trigger from direct critical heals; Penance's three bolts hit one target, so its estimate counts one Aegis when one or more bolts crit. Inspiration shows its armor bonus and per-cast proc chance, but not uptime without a cast rotation. Divine Aegis does not stack and is capped at 1,200 per target.</p>
           <p>Prayer of Mending counts successful heals: one initial heal and up to five transfers. Talent-granted spells appear only when selected in Settings; later ranks require the talent and trainer. Lightwell's level and effects are listed, but acquisition and training cost remain unknown. Unknown trainer prices remain unknown, not free. This fixed-spell table excludes damage-linked healing such as Vampiric Embrace and incoming-hit procs such as Blessed Recovery.</p>
           <p>Every displayed rank's level was compared by spell name and rank with the current Priest level list. Spell IDs, talent requirements, and trainer information were cross-referenced with current per-rank spell records. <a href="https://theforeverera.com/en/spells/priest/levels/" target="_blank" rel="noreferrer" aria-label="The Forever Era Priest ranks by level">reference</a> Â· <a href="https://urgametips.com/wow-forever/priest-guides/spells/" target="_blank" rel="noreferrer" aria-label="UrGameTips Priest ranks, acquisition and training prices">reference</a> Â· <a href="https://warcraftforever.games/classes/priest/spells" target="_blank" rel="noreferrer" aria-label="Warcraft Forever Priest spell records">reference</a> Â· <a href="https://www.wowhead.com/forever/spells/abilities/priest" target="_blank" rel="noreferrer" aria-label="Wowhead Forever Priest spellbook and ranks">link</a></p>
@@ -173,7 +40,7 @@
         <div class="dialog-actions"><span></span><button class="button quiet" type="button" id="cancelArmory">Cancel</button><button class="button primary" id="importArmory" value="import">Import gear</button></div>
       </form>
     </dialog>
-    <script src="spells.js?v=28"></script>
-    <script src="app.js?v=41"></script>
+    <script src="spells.js?v=29"></script>
+    <script src="app.js?v=42"></script>
   </body>
 </html>
