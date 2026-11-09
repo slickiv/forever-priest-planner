@@ -81,6 +81,13 @@ h2 { font-size: clamp(26px, 3.3vw, 36px); letter-spacing: -.045em; margin: 0; li
 .loot-note strong { font-size: 12px; }
 .loot-note p { margin: 4px 0 0; color: var(--soft); font-size: 12px; }
 .spell-controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.settings-disclosure { margin: 12px 0 4px; border: 1px solid var(--line); background: var(--surface); }
+.settings-disclosure > summary { cursor: pointer; padding: 11px 14px; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.settings-disclosure > summary:hover,.settings-disclosure > summary:focus-visible { color: var(--accent); }
+.settings-groups { display: grid; gap: 10px; padding: 0 12px 12px; }
+.settings-group { min-width: 0; margin: 0; border: 1px solid var(--line); padding: 8px 10px 10px; }
+.settings-group legend { padding: 0 5px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.settings-group .spell-controls { justify-content: flex-start; }
 .stat-input { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 11px; }
 .stat-input input,.stat-input select { width: 67px; border: 1px solid var(--line); background: var(--surface); border-radius: var(--round); padding: 7px 8px; font-variant-numeric: tabular-nums; }
 .stat-input input[type="checkbox"] { width: auto; accent-color: var(--accent); }
@@ -106,7 +113,7 @@ h2 { font-size: clamp(26px, 3.3vw, 36px); letter-spacing: -.045em; margin: 0; li
 .chevron { font-size: 17px; color: var(--muted); padding-left: 4px; transition: transform .15s; }
 .spell-card[open] .chevron { transform: rotate(180deg); }
 .rank-table { border-top: 1px solid var(--line); overflow-x: auto; }
-.rank-header,.rank-row { display: grid; grid-template-columns: minmax(130px,1.2fr) minmax(195px,1.7fr) repeat(9,minmax(110px,1fr)) minmax(120px,1fr); gap: 10px; align-items: center; min-width: 1640px; }
+.rank-header,.rank-row { display: grid; grid-template-columns: minmax(130px,1.2fr) minmax(195px,1.7fr) repeat(10,minmax(110px,1fr)) minmax(120px,1fr); gap: 10px; align-items: center; min-width: 1760px; }
 .rank-header { padding: 9px 15px; color: var(--muted); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; background: var(--surface); }
 .sort-header { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; text-transform: inherit; cursor: pointer; }
 .sort-header:hover,.sort-header:focus-visible { color: var(--accent); }
@@ -172,7 +179,7 @@ dialog::backdrop { background: color-mix(in srgb, CanvasText 45%, transparent); 
   .summary-card { grid-template-columns: repeat(2,1fr); }
   .spell-card summary { padding: 9px; gap: 8px; }
   .rank-header { display: grid; }
-  .rank-row { grid-template-columns: minmax(130px,1.2fr) minmax(195px,1.7fr) repeat(9,minmax(110px,1fr)) minmax(120px,1fr); gap: 8px; padding: 9px; }
+  .rank-row { grid-template-columns: minmax(130px,1.2fr) minmax(195px,1.7fr) repeat(10,minmax(110px,1fr)) minmax(120px,1fr); gap: 8px; padding: 9px; }
   .rank-stat span { font-size: 9px; }
   footer { align-items: flex-start; flex-direction: column; justify-content: center; padding: 14px 0; }
 }
