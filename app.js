@@ -296,6 +296,7 @@ function renderSpells() {
   let ranksShown = 0;
   host.innerHTML = window.HEALING_SPELLS.map((spell,index) => {
     const ui=spellUiState[index]??{open:index<3,sortKey:"",direction:""};
+    const renew = spell.name === "Renew";
     ranksShown += spell.ranks.length;
     const shield = spell.kind === "shield";
     const kindLabel = shield ? "ABSORB" : "HEAL";
@@ -305,7 +306,6 @@ function renderSpells() {
       const rankLink = `https://www.wowhead.com/forever/spell=${encodeURIComponent(id)}`;
       const freeReason=m.innerFocusApplies?"Inner Focus":m.holyNovaFree?"Searing Light proc":m.freeFormActive?"Spirit of Redemption":"";
       const note = mana == null ? `<small>${esc(spell.manaNote || "Mana cost unavailable")}</small>` : freeReason?`${mana} → 0 (${freeReason})`:`${m.mana.toLocaleString()} mana${m.litanyRefund?` · ${m.netMana} net`:""}`;
-      const renew = spell.name === "Renew";
       const range = fmtRange(renew ? m.healPerEventMin : m.healMin,renew ? m.healPerEventMax : m.healMax);
       const group = ["Prayer of Healing","Holy Nova","Circle of Healing"].includes(spell.name) ? `${range} / target` : range;
       const learnedText = `${learned == null ? "Lv —" : `Lv ${learned}`} · ${fmtTrainingCost(window.TRAINING_COSTS[id],spell,rank)}`;
