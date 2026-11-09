@@ -7,6 +7,7 @@ const SLOTS = [
 const STORE_KEY = "forever-priest-planner-v1";
 const CHARACTER_LEVEL_KEY = "forever-priest-planner-character-level-v1";
 const SPELL_UI_STATE_KEY = "forever-priest-planner-spell-ui-v1";
+const SPELL_LIST_PREFS_KEY = "forever-priest-planner-spell-list-v1";
 const CORS_RELAY = "https://proxy.cors.dev/";
 let gear = readGear();
 const TALENT_STORE_KEY = "forever-priest-planner-talents-v1";
@@ -14,6 +15,7 @@ const RANK2_FIT_MIGRATION_KEY = "forever-priest-planner-rank2-fit-migrated-v1";
 let talents = readTalents();
 let characterLevel = readCharacterLevel();
 let spellUiState = readSpellUIState();
+let spellListPrefs = readSpellListPrefs();
 let editingSlot = null;
 let editingOriginalItem = null;
 let resolvedItemSubclass = "";
@@ -33,6 +35,13 @@ function readCharacterLevel() {
     return Number.isInteger(saved) && saved >= 1 && saved <= 60 ? saved : 22;
   } catch { return 22; }
 }
+function readSpellListPrefs() {
+  try {
+    const saved=JSON.parse(localStorage.getItem(SPELL_LIST_PREFS_KEY)||"{}");
+    return {sort:["learned","name","category","rank-count"].includes(saved.sort)?saved.sort:"learned",scope:saved.scope==="all"?"all":"level"};
+  } catch { return {sort:"learned",scope:"level"}; }
+}
+function saveSpellListPrefs() { try { localStorage.setItem(SPELL_LIST_PREFS_KEY,JSON.stringify(spellListPrefs)); } catch {} }
 function readSpellUIState() {
   try { return JSON.parse(localStorage.getItem(SPELL_UI_STATE_KEY) || "{}"); }
   catch { return {}; }
@@ -273,10 +282,13 @@ function fmtTrainingCost(copper, spell, rank) {
     const coins = amount % 100;
     return [gold ? `${gold}g` : "", silver ? `${silver}s` : "", coins ? `${coins}c` : ""].filter(Boolean).join(" ") || "Free";
   };
+  const betaRecorder="https://warcraftforever.games/classes/priest/spells";
+  const sourceLabel=url=>url?.includes("urgametips.com")?"UrGameTips":url?.includes("wowforever.ninja")?"X’yera":url?.includes("warcraftforever.games")?"Beta recorder":copper?.source||"Source";
+  const marker=(url,label,kind)=>url?` <a class="training-source-marker" href="${url}" target="_blank" rel="noreferrer" title="${esc(label)}" aria-label="${esc(label)}">${kind}</a>`:` <span class="training-source-marker" title="${esc(label)}">${kind}</span>`;
   if (copper && typeof copper === "object") {
-    if (copper.type === "reference") return fmtCoins(copper.copper);
-    if (copper.type === "free") return "Free · starter";
-    if (copper.type === "manual") return `Manual · ${esc(copper.name)} · price unlisted`;
+    if (copper.type === "reference") return `${fmtCoins(copper.copper)}${marker(copper.url,sourceLabel(copper.url),"ref")}`;
+    if (copper.type === "free") return `Free${marker(copper.url,`${sourceLabel(copper.url)} · starter rank`,"free")}`;
+    if (copper.type === "manual") return `Manual · ${esc(copper.name)}${copper.requirement?` · ${esc(copper.requirement)}`:""}${marker(copper.url,sourceLabel(copper.url),"manual")}`;
   }
   if (copper == null) {
     if ((spell.name === "Penance" && rank[5] === 402174) || (spell.name === "Prayer of Mending" && rank[5] === 401859)) return "Talent";
@@ -284,24 +296,18 @@ function fmtTrainingCost(copper, spell, rank) {
     if (["Desperate Prayer","Divine Grace"].includes(spell.name)) return "Racial ability";
     return "Price unknown";
   }
-  return fmtCoins(copper);
+  return `${fmtCoins(copper)}${marker(betaRecorder,"Beta recorder quote","β")}`;
 }
 function renderTrainingSources(spell) {
   const betaRecorder="https://warcraftforever.games/classes/priest/spells";
-  const betaObserved=new Set(),references=new Map();
+  const references=new Map();
   for (const rank of spell.ranks) {
     const price=window.TRAINING_COSTS[rank[5]];
-    if (typeof price === "number") betaObserved.add(betaRecorder);
-    if (price && typeof price === "object") {
-      if (price.url) references.set(price.url,"UrGameTips");
-      if (price.secondaryUrl) references.set(price.secondaryUrl,"X’yera beta");
-    }
+    if (typeof price === "number") references.set(betaRecorder,"Beta recorder");
+    if (price && typeof price === "object") for (const url of [price.url,price.secondaryUrl]) if (url) references.set(url,url.includes("urgametips.com")?"UrGameTips":url.includes("wowforever.ninja")?"X’yera":price.source||"Reference");
   }
   const link=(url,label)=>`<a href="${url}" target="_blank" rel="noreferrer">${label}</a>`;
-  const groups=[];
-  if (betaObserved.size) groups.push(`Beta recorder quote · ${link(betaRecorder,"Warcraft Forever recorder")}`);
-  if (references.size) groups.push(`Reference prices · ${Array.from(references,([url,label])=>link(url,label)).join(" · ")}`);
-  return groups.length?`<div class="rank-sources"><span>Training sources</span>${groups.map(group=>`<small>${group}</small>`).join("")}</div>`:"";
+  return references.size?`<div class="rank-sources"><span>Training sources</span><small>${Array.from(references,([url,label])=>link(url,label)).join(" · ")}</small></div>`:"";
 }
 function sortSpellRows(table,key,direction) {
   const rows=[...table.querySelectorAll(".rank-row")];
@@ -318,14 +324,17 @@ function renderSpells() {
     spellUiState[index]={open:card.open,sortKey:header?.dataset.sortKey||"",direction:header?.dataset.sortDirection||""};
   });
   try { localStorage.setItem(SPELL_UI_STATE_KEY,JSON.stringify(spellUiState)); } catch {}
-  let ranksShown = 0;
+  let ranksShown = 0, spellsShown = 0;
   host.innerHTML = window.HEALING_SPELLS.map((spell,index) => {
     const ui=spellUiState[index]??{open:index<3,sortKey:"",direction:""};
     const renew = spell.name === "Renew";
-    ranksShown += spell.ranks.length;
+    const visibleRanks=spell.ranks.filter(rank=>spellListPrefs.scope==="all"||(rank[1]!=null&&rank[1]<=characterLevel));
+    if (!visibleRanks.length) return "";
+    spellsShown++;
+    ranksShown += visibleRanks.length;
     const shield = spell.kind === "shield";
     const kindLabel = shield ? "ABSORB" : "HEAL";
-    const rows = spell.ranks.map(rank => {
+    const rows = visibleRanks.map(rank => {
       const [rankNo,learned,baseMin,baseMax,mana,id] = rank;
       const m = spellMetrics(spell,rank);
       const rankLink = `https://www.wowhead.com/forever/spell=${encodeURIComponent(id)}`;
@@ -342,7 +351,7 @@ function renderSpells() {
       const castText = spell.duration ? `${spell.instant ? "1.5s GCD" : `${m.cast}s cast`} · ${spell.duration}s effect` : spell.instant ? `1.5s GCD${shieldCooldown}` : `${m.cast}s ${spell.channel?"channel":"cast"}`;
       const incompleteGrowth = m.growthIncomplete ? `<span class="rank-extra warning">Learned-level base shown; higher-level growth is incomplete.</span>` : "";
       const tickLine = !renew && spell.periodicTicks && m.healMin != null ? `<span class="rank-extra">Healing per tick: ${fmtRange(m.healMin/spell.periodicTicks,m.healMax/spell.periodicTicks)}</span>` : "";
-      const tooltipValue = m.baseMin == null ? "Heal amount not exposed" : renew ? `Base total ${fmtRange(m.baseMin,m.baseMax)} · ${perTickRange} per tick` : `Base ${fmtRange(m.baseMin,m.baseMax)} · with gear / talents ${range}`;
+      const tooltipValue = m.baseMin == null ? "Heal amount not exposed" : renew ? `Base total ${fmtRange(m.baseMin,m.baseMax)}` : `Base ${fmtRange(m.baseMin,m.baseMax)}`;
       const totalLine = renew ? "" : ["Prayer of Healing","Holy Nova","Circle of Healing"].includes(spell.name) ? `<span class="rank-extra">Party mean total (${m.targets}): ${fmt(m.total)}</span>` : spell.name === "Prayer of Mending" ? `<span class="rank-extra">Mean total across ${m.targets} successful heal${m.targets===1?"":"s"}: ${fmt(m.total)}</span>` : spell.name === "Lightwell" ? `<span class="rank-extra">Mean total for ${m.targets} click${m.targets===1?"":"s"}: ${fmt(m.total)}</span>` : "";
       const critPct=m.critChance*100;
       const displayedExpected = renew ? m.expectedHeal/(spell.periodicTicks||1) : m.expectedPerSecond;
@@ -351,7 +360,7 @@ function renderSpells() {
       const expectedPerManaText = m.expectedPerMana == null ? "—" : Math.abs(m.expectedPerMana-(m.perMana??Infinity))<0.005 ? "Same as mean" : `${fmt(m.expectedPerMana,2)} / mana`;
       return `<div class="rank-row ${shield ? "shield-row" : ""}" data-sort-rank="${rankNo}" data-sort-range="${m.heal??-1}" data-sort-cast="${m.cast}" data-sort-cost="${m.netMana??-1}" data-sort-throughput="${renew?m.healPerEvent:m.perSecond??-1}" data-sort-efficiency="${m.perMana??-1}" data-sort-crit="${critPct}" data-sort-critheal="${m.critHeal??-1}" data-sort-expected="${displayedExpected??-1}" data-sort-hpm="${m.expectedPerMana??-1}" data-sort-aegis="${m.aegisExpected}" data-sort-holybinding="${m.holyBindingExpected}" data-sort-inspiration="${m.inspirationExpected}">
         <div class="rank-name"><a href="${rankLink}" target="_blank" rel="noreferrer">R${rankNo} ↗</a><span>${learnedText}</span></div>
-        <div class="rank-amount"><b>${group}</b><span>${kindLabel} · ${tooltipValue}</span>${totalLine}${tickLine}${incompleteGrowth}</div>
+        <div class="rank-amount"><b>${group}</b><span>${kindLabel} · ${tooltipValue}</span>${renew?`<span class="rank-extra">Healing per tick: ${perTickRange}</span>`:tickLine}${totalLine}${incompleteGrowth}</div>
         <div class="rank-stat"><span>Cast / timing</span><b>${castText}</b></div>
         <div class="rank-stat"><span>Mana cost</span><b>${note}</b></div>
         <div class="rank-stat"><span>${shield ? "Absorb / cast time" : renew ? "Healing / tick" : "Healing / cast time"}</span><b>${perTime}</b></div>
@@ -365,12 +374,15 @@ function renderSpells() {
         <div class="rank-stat"><span>Inspiration</span><b>${m.inspirationArmor?`+${fmt(m.inspirationArmor*100,0)}% armor · ${fmt(m.inspirationProcChance*100,1)}% proc`:`—`}</b></div>
       </div>`;
     }).join("");
-    return `<details class="spell-card" data-spell-index="${index}" ${ui.open ? "open" : ""}>
-      <summary><span class="spell-glyph ${shield ? "shield-glyph" : ""}">${shield ? "◈" : "✦"}</span><span class="spell-title"><b>${esc(spell.name)}</b><small>${esc(spell.group)}</small></span><span class="spell-kind ${shield ? "shield-kind" : ""}">${kindLabel}</span><span class="rank-pill">${spell.ranks.length} ${spell.ranks.length === 1 ? "rank" : "ranks"}</span><span class="chevron">⌄</span></summary>
+    const firstKnown=spell.ranks.map(r=>r[1]).filter(v=>v!=null).sort((a,b)=>a-b)[0]??999;
+    const category=spell.group.split("·").slice(1).join(" ").trim()||spell.group.split("·")[0].trim();
+    return `<details class="spell-card" data-spell-index="${index}" data-card-learned="${firstKnown}" data-card-name="${esc(spell.name.toLowerCase())}" data-card-category="${esc(category.toLowerCase())}" data-card-ranks="${spell.ranks.length}" ${ui.open ? "open" : ""}>
+      <summary><span class="spell-glyph ${shield ? "shield-glyph" : ""}">${shield ? "◈" : "✦"}</span><span class="spell-title"><b>${esc(spell.name)}</b><small>${esc(spell.group)}</small></span><span class="spell-kind ${shield ? "shield-kind" : ""}">${kindLabel}</span><span class="rank-pill">${visibleRanks.length}${visibleRanks.length!==spell.ranks.length?` / ${spell.ranks.length}`:""} ${visibleRanks.length === 1 ? "rank" : "ranks"}</span><span class="chevron">⌄</span></summary>
       ${spell.description?`<div class="spell-description">${esc(spell.description)}</div>`:""}
       <div class="rank-table"><div class="rank-header" data-sort-key="${ui.sortKey}" data-sort-direction="${ui.direction}">${[["rank","Rank / level · training"],["range","Healing range"],["cast","Cast"],["cost","Mana"],["throughput",renew?"Mean / tick":"Mean / time"],["efficiency","Mean / mana"],["crit","Crit chance"],["critheal","Crit heal / event"],["expected",renew?"Expected / tick":"Expected / sec"],["holybinding","Holy Binding"],["hpm","Expected / mana"],["aegis","Aegis / cast"],["inspiration","Inspiration value"]].map(([key,label])=>`<button type="button" class="sort-header" data-sort="${key}" aria-label="Sort ${label}">${label} ${ui.sortKey===key?(ui.direction==="asc"?"↑":"↓"):"↕"}</button>`).join("")}</div>${rows}${renderTrainingSources(spell)}</div>
     </details>`;
   }).join("");
+  sortSpellCards(host);
   host.querySelectorAll(".spell-card[data-spell-index]").forEach(card=>{
     const ui=spellUiState[card.dataset.spellIndex]??{};
     card.addEventListener("toggle",()=>{
@@ -380,7 +392,7 @@ function renderSpells() {
     const header=card.querySelector(".rank-header");
     if(ui.sortKey&&ui.direction)sortSpellRows(card.querySelector(".rank-table"),ui.sortKey,ui.direction);
   });
-  document.querySelector("#rankCount").textContent = `${ranksShown} ranks · ${window.HEALING_SPELLS.length} spells`;
+  document.querySelector("#rankCount").textContent = `${ranksShown} ranks · ${spellsShown} spells${spellListPrefs.scope==="level"?` at level ${characterLevel}`:" · all levels"}`;
   host.querySelectorAll(".rank-header [data-sort]").forEach(button=>button.addEventListener("click",()=>{
     const table=button.closest(".rank-table"),key=button.dataset.sort,header=button.parentElement;
     const old=header.dataset.sortKey===key?header.dataset.sortDirection:"";
@@ -395,12 +407,37 @@ function renderSpells() {
   }));
 }
 
+function sortSpellCards(host) {
+  const cards=[...host.querySelectorAll(".spell-card[data-spell-index]")];
+  const key=spellListPrefs.sort;
+  cards.sort((a,b)=>{
+    let order=0;
+    if(key==="name") order=a.dataset.cardName.localeCompare(b.dataset.cardName);
+    else if(key==="category") order=a.dataset.cardCategory.localeCompare(b.dataset.cardCategory)||a.dataset.cardName.localeCompare(b.dataset.cardName);
+    else if(key==="rank-count") order=Number(b.dataset.cardRanks)-Number(a.dataset.cardRanks)||a.dataset.cardName.localeCompare(b.dataset.cardName);
+    else order=Number(a.dataset.cardLearned)-Number(b.dataset.cardLearned)||a.dataset.cardName.localeCompare(b.dataset.cardName);
+    return order;
+  }).forEach(card=>host.append(card));
+}
+
 document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", () => {
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active",t === tab));
   document.querySelector("#gearPanel").classList.toggle("hidden",tab.dataset.tab !== "gear");
   document.querySelector("#spellsPanel").classList.toggle("hidden",tab.dataset.tab !== "spells");
 }));
 document.querySelector("#characterLevel").value=String(characterLevel);
+document.querySelector("#spellSort").value=spellListPrefs.sort;
+document.querySelector("#spellLevelScope").value=spellListPrefs.scope;
+document.querySelector("#spellSort").addEventListener("change",event=>{
+  spellListPrefs.sort=event.currentTarget.value;
+  saveSpellListPrefs();
+  sortSpellCards(document.querySelector("#spellList"));
+});
+document.querySelector("#spellLevelScope").addEventListener("change",event=>{
+  spellListPrefs.scope=event.currentTarget.value;
+  saveSpellListPrefs();
+  renderSpells();
+});
 document.querySelector("#characterLevel").addEventListener("input",event=>{
   const value=Number(event.currentTarget.value);
   if(Number.isInteger(value) && value >= 1 && value <= 60){

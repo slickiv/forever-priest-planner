@@ -19,57 +19,57 @@ window.HEALING_SPELLS = [
   { name:"Lesser Heal", group:"Holy", kind:"heal", cast:1.5, coefficient:0.429, wowhead:2050,
     levelGrowth:{2050:{perLevel:0.3,cap:3,downrankOffset:0.15},2052:{perLevel:0.7,cap:9},2053:{perLevel:1.2,cap:15}}, ranks:[
     [1,1,46,56,30,2050,0.429,1.5],[2,4,86,102,45,2052,0.571,2],[3,10,151,175,75,2053,0.714,2.5]
-  ]},
+  ], description:"A 40-yard direct heal. Higher ranks have longer cast times and larger base healing."},
   { name:"Renew", group:"Holy", kind:"heal", cast:1.5, instant:true, duration:15, periodicTicks:5, coefficient:1, wowhead:139, ranks:[
     [1,8,45,45,30,139],[2,14,75,75,65,6074],[3,20,125,125,105,6075],[4,26,160,160,140,6076],[5,32,205,205,170,6077],
     [6,38,270,270,205,6078],[7,44,370,370,250,10927],[8,50,510,510,305,10928],[9,56,670,670,365,10929],[10,60,830,830,410,25315]
-  ]},
+  ], description:"Applies a 15-second heal over time in five 3-second ticks, starting when the aura is applied. In Forever, each tick can critically heal."},
   { name:"Desperate Prayer", group:"Holy · racial", kind:"heal", cast:1.5, instant:true, coefficient:0.429, wowhead:13908, ranks:[
     [1,10,131,167,0,13908],[2,18,247,305,0,19236],[3,26,414,502,0,19238],[4,34,540,650,0,19240],
     [5,42,781,931,0,19241],[6,50,1046,1240,0,19242],[7,58,1269,1497,0,19243]
-  ]},
+  ], description:"Dwarf Priest racial. Instantly heals the caster; it is self-only and has a 10-minute cooldown."},
   { name:"Heal", group:"Holy", kind:"heal", cast:3, coefficient:0.857, wowhead:2054,
     levelGrowth:{2054:{perLevel:2,cap:21}},
     baseGrowth:{2055:{baseLevel:22,basePoints:375,perLevel:2.9,variance:0.1347826123,cap:27}}, ranks:[
     [1,16,250,290,155,2054],[2,22,350,400,205,2055],[3,28,490,556,255,6063],[4,34,611,691,305,6064]
-  ]},
+  ], description:"A 40-yard, 3-second direct heal for one friendly target."},
   { name:"Flash Heal", group:"Holy", kind:"heal", cast:1.5, coefficient:0.429, wowhead:2061,
     levelGrowth:{2061:{perLevel:2,cap:25}}, ranks:[
     [1,20,174,214,125,2061],[2,26,225,273,155,9472],[3,32,283,341,185,9473],[4,38,349,417,215,9474],
     [5,44,463,551,265,10915],[6,50,589,699,315,10916],[7,56,757,893,380,10917]
-  ]},
+  ], description:"A fast 40-yard direct heal for one friendly target."},
   { name:"Holy Nova", group:"Holy · group", kind:"group", cast:1.5, instant:true, coefficient:0.107, wowhead:15237, ranks:[
     [1,20,47,55,185,15237],[2,28,77,87,290,15430],[3,36,108,124,400,15431],[4,44,147,171,520,27799],[5,52,221,255,635,27800],[6,60,288,334,750,27801]
-  ], description:"Heals nearby party members; healing is shown per target."},
+  ], description:"Requires the Holy Nova talent. An instant explosion around the caster that damages nearby enemies and heals nearby party members; it causes no threat."},
   { name:"Prayer of Healing", group:"Holy · group", kind:"group", cast:3, coefficient:0.286, wowhead:596, ranks:[
     [1,30,172,184,410,596],[2,40,257,273,560,996],[3,50,390,412,770,10960],[4,60,567,599,1030,10961],[5,60,631,667,1070,25316]
-  ], description:"Healing is shown per target; adjust party targets to compare group totals."},
+  ], description:"A 40-yard prayer that heals the selected friendly target and their party members within 40 yards of that target."},
   { name:"Greater Heal", group:"Holy", kind:"heal", cast:3, coefficient:0.857, wowhead:2060, ranks:[
     [1,40,794,894,370,2060],[2,46,1036,1162,455,10963],[3,52,1324,1482,545,10964],[4,58,1685,1879,655,10965],[5,60,1853,2067,710,25314]
-  ]},
+  ], description:"A slow 40-yard direct heal for one friendly target."},
   { name:"Lightwell", group:"Holy · setup / charges", kind:"heal", cast:1.5, duration:10, periodicTicks:5, coefficient:0, wowhead:724, ranks:[
     [1,40,800,800,225,724],[2,50,1165,1165,295,27870],[3,60,1600,1600,365,27871]
   ], description:"Each click heals over 10 seconds. Lightwell has up to five charges; totals use the selected number of successful clicks."},
   { name:"Prayer of Mending", group:"Holy · reactive / jumps", kind:"group", cast:1.5, instant:true, coefficient:0.429, wowhead:401859, ranks:[
     [1,40,172,172,210,401859],[2,50,298,298,305,1240826],[3,60,413,413,390,1240827]
-  ], description:"Jumps to a new target after each successful heal: one initial heal plus up to five transfers. The six-heal maximum follows the client description; verify all five transfers in game."},
+  ], description:"Places a 30-second effect on one target. The next damage taken or non-periodic heal triggers its heal, then it jumps to a nearby party or raid member up to five times. Only one target per caster can carry it."},
   { name:"Circle of Healing", group:"Holy · group", kind:"group", cast:1.5, instant:true, coefficient:0.214, wowhead:401946, ranks:[
     [1,null,875.1986,969.4507,770,401946]
-  ], description:"Level 60 baseline uses the midpoint of Wowhead's 875.1986–969.4507 formula range. Mana cost is 56% of the 1,376 Priest base mana, floored to 770."},
+  ], description:"Instantly heals all members of the selected player's party within 43.5 yards of that player."},
   { name:"Divine Grace", group:"Holy · racial", kind:"heal", cast:1.5, instant:true, coefficient:0.429, wowhead:1277370, ranks:[
     [1,10,131,167,0,1277370],[2,18,247,305,0,1277371],[3,26,414,502,0,1277372],[4,34,540,650,0,1277374],
     [5,42,781,931,0,1277376],[6,50,1046,1240,0,1277377],[7,58,1269,1497,0,1277378]
-  ]},
+  ], description:"Human Priest racial. Instantly heals a friendly target below 50% health and removes Weakened Soul; cannot be cast on self. It has a 10-minute cooldown."},
   { name:"Penance", group:"Discipline · channeled", kind:"heal", school:"discipline", cast:2, channel:true, bolts:3, coefficient:0.19, wowhead:402174,
     levelGrowth:{402289:{perLevel:0.87,cap:39},1240723:{perLevel:0.98,cap:49},1240724:{perLevel:1.27,cap:59}}, ranks:[
     [1,30,126,126,150,402174,0.19,2,402289],[2,40,200,200,220,1240720,0.19,2,1240723],
     [3,50,268,268,270,1240721,0.19,2,1240724],[4,60,425,425,385,1316995,0.19,2,1316991]
-  ], description:"Healing is three per-bolt amounts over a 2 sec channel. Rank links and mana use the cast spell ID; base healing and the 19% coefficient use the bolt effect ID. Twin Disciplines follows Blizzard's note. Inner Focus is modeled as adding 25 percentage points to every bolt; that interaction is unverified in game."},
+  ], description:"Channels three bolts of holy light into one friendly target over 2 seconds."},
   { name:"Power Word: Shield", group:"Discipline · absorb", kind:"shield", cast:1.5, instant:true, coefficient:0.1, wowhead:17,
     levelGrowth:{17:{perLevel:0.8,cap:11},592:{perLevel:1.2,cap:17},600:{perLevel:1.6,cap:23}}, ranks:[
     [1,6,44,44,45,17],[2,12,86,86,80,592],[3,18,154,154,130,600],[4,24,226,226,175,3747],[5,30,291,291,210,6065],
     [6,36,368,368,250,6066],[7,42,470,470,300,10898],[8,48,591,591,355,10899],[9,54,749,749,425,10900],[10,60,928,928,500,10901]
-  ], description:"Absorb is shown as effective shielding; the target cannot absorb more than the incoming damage."}
+  ], description:"Shields a friendly target for 30 seconds. While the shield holds, damage does not interrupt spellcasting; after it is applied, the target cannot be shielded again for 15 seconds."}
 ];
 
 /* Numeric trainer prices (copper) are beta recorder observations read from

@@ -81,6 +81,9 @@ h2 { font-size: clamp(26px, 3.3vw, 36px); letter-spacing: -.045em; margin: 0; li
 .loot-note strong { font-size: 12px; }
 .loot-note p { margin: 4px 0 0; color: var(--soft); font-size: 12px; }
 .spell-controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.spell-list-controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px 14px; }
+.spell-list-controls label { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 10px; }
+.spell-list-controls select { max-width: 100%; border: 1px solid var(--line); border-radius: var(--round); background: var(--surface); padding: 7px 26px 7px 9px; font-size: 11px; }
 .settings-disclosure { margin: 12px 0 4px; border: 1px solid var(--line); background: var(--surface); }
 .settings-disclosure > summary { cursor: pointer; padding: 11px 14px; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .settings-disclosure > summary:hover,.settings-disclosure > summary:focus-visible { color: var(--accent); }
@@ -124,6 +127,8 @@ h2 { font-size: clamp(26px, 3.3vw, 36px); letter-spacing: -.045em; margin: 0; li
 .rank-name a:hover { color: var(--accent); }
 .rank-name span,.rank-stat span,.rank-amount > span { color: var(--muted); font-size: 10px; }
 .rank-name .training-cost { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+.training-source-marker { display: inline-block; margin-left: 3px; color: var(--muted); font-size: 9px; text-decoration: underline; text-underline-offset: 2px; }
+.training-source-marker:hover { color: var(--accent); }
 .rank-sources { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; min-width: 1760px; padding: 8px 15px; border-top: 1px solid var(--line); color: var(--muted); font-size: 9px; }
 .rank-sources > span { color: var(--soft); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
 .rank-sources small { font-size: inherit; }
@@ -180,6 +185,9 @@ dialog::backdrop { background: color-mix(in srgb, CanvasText 45%, transparent); 
   .hero-stat .eyebrow { font-size: 8px; }
   .hero-sub { max-width: 285px; }
   .section-head { align-items: flex-start; flex-direction: column; }
+  .spell-list-controls { width: 100%; justify-content: flex-start; }
+  .spell-list-controls label { flex: 1 1 100%; justify-content: space-between; }
+  .spell-list-controls select { flex: 1; width: auto; }
   .actions { width: 100%; flex-wrap: wrap; }
   .gear-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .gear-slot { min-height: 136px; padding: 11px; }
