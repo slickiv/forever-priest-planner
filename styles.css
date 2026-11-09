@@ -120,6 +120,25 @@ h2 { font-size: clamp(26px, 3.3vw, 36px); letter-spacing: -.045em; margin: 0; li
 .damage-rank-row b { font-size: 12px; line-height: 1.3; }
 .damage-rank-row small { color: var(--muted); font-size: 10px; line-height: 1.35; }
 .damage-rank-row > div:first-child a { font-size: 12px; font-weight: 700; text-decoration: none; }
+.pet-attack-section { margin-top: 16px; border: 1px solid var(--line); background: var(--surface); padding: 12px 14px; }
+.pet-attack-section .section-head { margin: 0 0 7px; }
+.pet-attack-section h3 { margin: 0; font-size: 16px; }
+.pet-attack-section .helper { margin: 6px 0 10px; }
+.pet-active-talents { margin: 0 0 10px; color: var(--soft); font-size: 10px; }
+.pet-attack-card { border: 1px solid var(--line); margin-top: 7px; background: var(--page); }
+.pet-attack-card > summary { display: flex; align-items: center; gap: 10px; min-height: 39px; padding: 8px 11px; cursor: pointer; list-style: none; }
+.pet-attack-card > summary::-webkit-details-marker { display: none; }
+.pet-attack-card > summary small { margin-left: auto; color: var(--muted); font-size: 10px; }
+.pet-attack-card[open] .chevron { transform: rotate(180deg); }
+.pet-attack-table { overflow-x: auto; border-top: 1px solid var(--line); }
+.pet-attack-header,.pet-attack-row { display: grid; grid-template-columns: 100px minmax(210px,1.5fr) minmax(150px,1fr) 100px 70px; gap: 10px; align-items: center; min-width: 740px; }
+.pet-attack-header { padding: 8px 11px; color: var(--muted); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+.pet-attack-row { min-height: 55px; padding: 8px 11px; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.pet-attack-row > div { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.pet-attack-row b { font-size: 11px; line-height: 1.3; }
+.pet-attack-row small { color: var(--muted); font-size: 9px; line-height: 1.35; }
+.pet-attack-row > div:first-child a { font-size: 11px; font-weight: 700; text-decoration: none; }
+.pet-attack-row .rank-reference { font-size: 10px; color: var(--muted); text-decoration: none; }
 .damage-spell-card .chevron { transition: transform .15s; }
 .damage-spell-card[open] .chevron { transform: rotate(180deg); }
 .spell-card summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; min-height: 61px; padding: 10px 15px; }

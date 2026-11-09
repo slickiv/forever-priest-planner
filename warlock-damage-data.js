@@ -1,4 +1,4 @@
-// Warlock rank tooltips and levels are from The Forever Era build 1.60.1.70862; client effect records are from Wago DB2 build 1.60.1.70862 (2026-11-09). Rain of Fire base totals are the server-resolved current-build tooltip values; no spell-power coefficient is inferred. Wowhead Forever links are generated per spell rank.
+// Warlock rank tooltips and levels are from The Forever Era build 1.60.1.70862; client effect records are from Wago DB2 build 1.60.1.70862 (2026-11-09). Shadow Cleave rank levels, costs, base effects, and points per level are cross-checked against Games Lantern; per-rank variance and spell-power coefficients use the Icy Veins client database. Rain of Fire base totals are the server-resolved current-build tooltip values; no spell-power coefficient is inferred. Wowhead Forever links are generated per spell rank.
 window.WARLOCK_DAMAGE_SPELLS = [
   {
     "name": "Immolate",
@@ -321,6 +321,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
     "kind": "direct",
     "class": "Warlock",
     "tree": "Destruction",
+    "hiddenInMetamorphosis": true,
     "ranks": [
       {
         "rank": 1,
@@ -866,7 +867,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
         "id": 17877,
         "mana": 105,
         "castSeconds": 0.0,
-        "cooldown": 0.0,
+        "cooldown": 15.0,
         "duration": 8.0,
         "tooltip": "Instantly blasts the target for 62 to 70 Shadow damage. If a non-trivial target dies within 8 sec of being hit with Shadowburn, the caster gains a Soul Shard.",
         "effects": [
@@ -891,7 +892,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
         "id": 18867,
         "mana": 130,
         "castSeconds": 0.0,
-        "cooldown": 0.0,
+        "cooldown": 15.0,
         "duration": 8.0,
         "tooltip": "Instantly blasts the target for 75 to 85 Shadow damage. If the target dies within 8 sec of Shadowburn, and yields experience or honor, the caster gains a Soul Shard.",
         "effects": [
@@ -916,7 +917,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
         "id": 18868,
         "mana": 190,
         "castSeconds": 0.0,
-        "cooldown": 0.0,
+        "cooldown": 15.0,
         "duration": 8.0,
         "tooltip": "Instantly blasts the target for 111 to 125 Shadow damage. If the target dies within 8 sec of Shadowburn, and yields experience or honor, the caster gains a Soul Shard.",
         "effects": [
@@ -941,7 +942,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
         "id": 18869,
         "mana": 245,
         "castSeconds": 0.0,
-        "cooldown": 0.0,
+        "cooldown": 15.0,
         "duration": 8.0,
         "tooltip": "Instantly blasts the target for 139 to 157 Shadow damage. If the target dies within 8 sec of Shadowburn, and yields experience or honor, the caster gains a Soul Shard.",
         "effects": [
@@ -966,7 +967,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
         "id": 18870,
         "mana": 305,
         "castSeconds": 0.0,
-        "cooldown": 0.0,
+        "cooldown": 15.0,
         "duration": 8.0,
         "tooltip": "Instantly blasts the target for 192 to 214 Shadow damage. If the target dies within 8 sec of Shadowburn, and yields experience or honor, the caster gains a Soul Shard.",
         "effects": [
@@ -991,7 +992,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
         "id": 18871,
         "mana": 365,
         "castSeconds": 0.0,
-        "cooldown": 0.0,
+        "cooldown": 15.0,
         "duration": 8.0,
         "tooltip": "Instantly blasts the target for 251 to 281 Shadow damage. If the target dies within 8 sec of Shadowburn, and yields experience or honor, the caster gains a Soul Shard.",
         "effects": [
@@ -1027,7 +1028,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
         "id": 1293817,
         "mana": 100,
         "castSeconds": 0.0,
-        "cooldown": 0.0,
+        "cooldown": 10.0,
         "duration": 0,
         "tooltip": "Ignites a target that is already afflicted by your Immolate spell, dealing 84 to 106 Fire damage and consuming your Immolate effect.",
         "effects": [
@@ -1052,7 +1053,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
         "id": 1293818,
         "mana": 130,
         "castSeconds": 0.0,
-        "cooldown": 0.0,
+        "cooldown": 10.0,
         "duration": 0,
         "tooltip": "Ignites a target that is already afflicted by your Immolate spell, dealing 107 to 137 Fire damage and consuming your Immolate effect.",
         "effects": [
@@ -1077,7 +1078,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
         "id": 17962,
         "mana": 165,
         "castSeconds": 0.0,
-        "cooldown": 0.0,
+        "cooldown": 10.0,
         "duration": 0,
         "tooltip": "Ignites a target that is already afflicted by your Immolate spell, dealing 128 to 164 Fire damage and consuming your Immolate effect.",
         "effects": [
@@ -1102,7 +1103,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
         "id": 18930,
         "mana": 200,
         "castSeconds": 0.0,
-        "cooldown": 0.0,
+        "cooldown": 10.0,
         "duration": 0,
         "tooltip": "Ignites a target that is already afflicted by your Immolate spell, dealing 172 to 216 Fire damage and consuming your Immolate effect.",
         "effects": [
@@ -1127,7 +1128,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
         "id": 18931,
         "mana": 230,
         "castSeconds": 0.0,
-        "cooldown": 0.0,
+        "cooldown": 10.0,
         "duration": 0,
         "tooltip": "Ignites a target that is already afflicted by your Immolate spell, dealing 212 to 266 Fire damage and consuming your Immolate effect.",
         "effects": [
@@ -1152,7 +1153,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
         "id": 18932,
         "mana": 255,
         "castSeconds": 0.0,
-        "cooldown": 0.0,
+        "cooldown": 10.0,
         "duration": 0,
         "tooltip": "Ignites a target that is already afflicted by your Immolate spell, dealing 251 to 313 Fire damage and consuming your Immolate effect.",
         "effects": [
@@ -2047,7 +2048,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
     "school": "Shadow",
     "kind": "direct",
     "class": "Warlock",
-    "tree": "Destruction",
+    "tree": "Affliction",
     "ranks": [
       {
         "rank": 1,
@@ -2055,7 +2056,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
         "id": 6789,
         "mana": 435,
         "castSeconds": 0.0,
-        "cooldown": 0.0,
+        "cooldown": 120.0,
         "duration": 3.0,
         "tooltip": "Causes the enemy target to run in horror for 3 sec and causes 272 Shadow damage. The caster gains 100% of the damage caused in health.",
         "effects": [
@@ -2080,7 +2081,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
         "id": 17925,
         "mana": 525,
         "castSeconds": 0.0,
-        "cooldown": 0.0,
+        "cooldown": 120.0,
         "duration": 3.0,
         "tooltip": "Causes the enemy target to run in horror for 3 sec and causes 359 Shadow damage. The caster gains 100% of the damage caused in health.",
         "effects": [
@@ -2105,7 +2106,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
         "id": 17926,
         "mana": 600,
         "castSeconds": 0.0,
-        "cooldown": 0.0,
+        "cooldown": 120.0,
         "duration": 3.0,
         "tooltip": "Causes the enemy target to run in horror for 3 sec and causes 454 Shadow damage. The caster gains 100% of the damage caused in health.",
         "effects": [
@@ -2166,5 +2167,52 @@ window.WARLOCK_DAMAGE_SPELLS = [
     "talentSetting": null,
     "periodicCanCrit": true,
     "description": "Single Shadow hit after 60 seconds; unavailable against players. Only one Bane per target."
+  },
+  {
+    "name": "Inferno",
+    "school": "Fire",
+    "kind": "aoe",
+    "class": "Warlock",
+    "tree": "Demonology",
+    "ranks": [
+      {
+        "rank": 1,
+        "level": 50,
+        "id": 1122,
+        "mana": null,
+        "manaCostText": "100% base mana",
+        "castSeconds": 2.0,
+        "cooldown": 3600.0,
+        "duration": 0.0,
+        "tooltip": "Summons a meteor from the Twisting Nether, causing 200 Fire damage and stunning all enemy targets in the area for 2 sec. An Infernal rises from the crater, under the command of the caster for 5 min. Once control is lost, the Infernal must be Subjugated to maintain control. Can only be used outdoors.",
+        "effects": []
+      }
+    ],
+    "talentSetting": null,
+    "periodicCanCrit": false,
+    "description": "Deals 200 Fire damage and stuns enemies in a 10 yd area; requires an Infernal Stone and summons an Infernal. The summon’s attacks are excluded because their damage and uptime depend on pet behavior."
+  },
+  {
+    "name": "Shadow Cleave",
+    "school": "Shadow",
+    "kind": "aoe",
+    "class": "Warlock",
+    "tree": "Destruction",
+    "metamorphosisOnly": true,
+    "ranks": [
+      {"rank":1,"level":1,"id":403835,"tooltipRange":{"min":2,"max":6},"mana":12,"castSeconds":0,"cooldown":6,"duration":0,"tooltip":"Punish up to 10 nearby enemies with a Shadow lash, dealing 2 to 6 Shadow damage to each.","effects":[{"type":"E_SCHOOL_DAMAGE","aura":null,"basePoints":4,"perLevel":0.1,"variance":0.75,"baseLevel":1,"maxLevel":6,"spellPowerCoefficient":0.047}]},
+      {"rank":2,"level":6,"id":403839,"tooltipRange":{"min":6,"max":10},"mana":20,"castSeconds":0,"cooldown":6,"duration":0,"tooltip":"Punish up to 10 nearby enemies with a Shadow lash, dealing 6 to 10 Shadow damage to each.","effects":[{"type":"E_SCHOOL_DAMAGE","aura":null,"basePoints":8,"perLevel":0.2,"variance":0.63,"baseLevel":6,"maxLevel":11,"spellPowerCoefficient":0.1}]},
+      {"rank":3,"level":12,"id":403840,"tooltipRange":{"min":13,"max":21},"mana":35,"castSeconds":0,"cooldown":6,"duration":0,"tooltip":"Punish up to 10 nearby enemies with a Shadow lash, dealing 13 to 21 Shadow damage to each.","effects":[{"type":"E_SCHOOL_DAMAGE","aura":null,"basePoints":17,"perLevel":0.3,"variance":0.47,"baseLevel":12,"maxLevel":17,"spellPowerCoefficient":0.19}]},
+      {"rank":4,"level":20,"id":403841,"tooltipRange":{"min":24,"max":36},"mana":55,"castSeconds":0,"cooldown":6,"duration":0,"tooltip":"Punish up to 10 nearby enemies with a Shadow lash, dealing 24 to 36 Shadow damage to each.","effects":[{"type":"E_SCHOOL_DAMAGE","aura":null,"basePoints":30,"perLevel":0.4,"variance":0.43,"baseLevel":20,"maxLevel":25,"spellPowerCoefficient":0.29}]},
+      {"rank":5,"level":28,"id":403842,"tooltipRange":{"min":40,"max":60},"mana":80,"castSeconds":0,"cooldown":6,"duration":0,"tooltip":"Punish up to 10 nearby enemies with a Shadow lash, dealing 40 to 60 Shadow damage to each.","effects":[{"type":"E_SCHOOL_DAMAGE","aura":null,"basePoints":50,"perLevel":0.5,"variance":0.42,"baseLevel":28,"maxLevel":33,"spellPowerCoefficient":0.29}]},
+      {"rank":6,"level":36,"id":403843,"tooltipRange":{"min":57,"max":87},"mana":105,"castSeconds":0,"cooldown":6,"duration":0,"tooltip":"Punish up to 10 nearby enemies with a Shadow lash, dealing 57 to 87 Shadow damage to each.","effects":[{"type":"E_SCHOOL_DAMAGE","aura":null,"basePoints":72,"perLevel":0.6,"variance":0.42,"baseLevel":36,"maxLevel":41,"spellPowerCoefficient":0.29}]},
+      {"rank":7,"level":44,"id":403844,"tooltipRange":{"min":79,"max":119},"mana":132,"castSeconds":0,"cooldown":6,"duration":0,"tooltip":"Punish up to 10 nearby enemies with a Shadow lash, dealing 79 to 119 Shadow damage to each.","effects":[{"type":"E_SCHOOL_DAMAGE","aura":null,"basePoints":99,"perLevel":0.8,"variance":0.41,"baseLevel":44,"maxLevel":49,"spellPowerCoefficient":0.29}]},
+      {"rank":8,"level":52,"id":403848,"tooltipRange":{"min":101,"max":153},"mana":157,"castSeconds":0,"cooldown":6,"duration":0,"tooltip":"Punish up to 10 nearby enemies with a Shadow lash, dealing 101 to 153 Shadow damage to each.","effects":[{"type":"E_SCHOOL_DAMAGE","aura":null,"basePoints":127,"perLevel":0.9,"variance":0.41,"baseLevel":52,"maxLevel":57,"spellPowerCoefficient":0.29}]},
+      {"rank":9,"level":60,"id":403851,"tooltipRange":{"min":128,"max":192},"mana":185,"castSeconds":0,"cooldown":6,"duration":0,"tooltip":"Punish up to 10 nearby enemies with a Shadow lash, dealing 128 to 192 Shadow damage to each.","effects":[{"type":"E_SCHOOL_DAMAGE","aura":null,"basePoints":160,"perLevel":1,"variance":0.41,"baseLevel":60,"maxLevel":65,"spellPowerCoefficient":0.29}]},
+      {"rank":10,"level":60,"id":403852,"tooltipRange":{"min":136,"max":204},"mana":190,"castSeconds":0,"cooldown":6,"duration":0,"tooltip":"Punish up to 10 nearby enemies with a Shadow lash, dealing 136 to 204 Shadow damage to each.","effects":[{"type":"E_SCHOOL_DAMAGE","aura":null,"basePoints":170,"perLevel":1,"variance":0.4,"baseLevel":60,"maxLevel":65,"spellPowerCoefficient":0.29}]}
+    ],
+    "talentSetting": null,
+    "periodicCanCrit": false,
+    "description": "Metamorphosis replacement for Shadow Bolt. Instant melee Shadow cleave, up to 10 nearby targets, 6-second cooldown. Per-rank spell-power coefficients and base-effect variance use the Forever client records."
   }
 ];
