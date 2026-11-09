@@ -51,7 +51,7 @@ window.HEALING_SPELLS = [
   { name:"Greater Heal", group:"Holy", kind:"heal", cast:3, coefficient:0.857, wowhead:2060, ranks:[
     [1,40,794,894,370,2060],[2,46,1036,1162,455,10963],[3,52,1324,1482,545,10964],[4,58,1685,1879,655,10965],[5,60,1853,2067,710,25314]
   ], description:"A slow 40-yard direct heal for one friendly target."},
-  { name:"Lightwell", group:"Holy · setup / charges", acquisition:"trainer", acquisitionSources:["https://www.wowhead.com/forever/changes/talents/priest"], kind:"heal", cast:1.5, duration:10, periodicTicks:5, coefficient:0, wowhead:724, ranks:[
+  { name:"Lightwell", group:"Holy · setup / charges", acquisition:"unknown", kind:"heal", cast:1.5, duration:10, periodicTicks:5, coefficient:0, wowhead:724, ranks:[
     [1,40,800,800,225,724],[2,50,1165,1165,295,27870],[3,60,1600,1600,365,27871]
   ], description:"Each click heals over 10 seconds. Lightwell has up to five charges; totals use the selected number of successful clicks."},
   { name:"Prayer of Mending", group:"Holy · reactive / jumps", talentSetting:"prayerOfMendingTalent", kind:"group", cast:1.5, instant:true, coefficient:0.429, wowhead:401859, talentRank:1, talentPoints:31, talentTree:"Holy", ranks:[

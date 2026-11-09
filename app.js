@@ -474,12 +474,15 @@ function damageMetrics(spell,rank){
   const coefficient=effect?.spellPowerCoefficient||0;
   const manaBase=rank.mana??null;
   const contagionReduction=spell.name==="Devouring Plague"?[0,.25,.5][talents.devouringContagion]||0:0;
+  const improvedHealingApplies=["Lesser Heal","Heal","Greater Heal","Penance","Prayer of Mending"].includes(spell.name);
+  const mentalAgilityApplies=rank.castSeconds===0||["Smite","Holy Fire","Penance"].includes(spell.name);
+  const manaReductionPercent=(improvedHealingApplies?talents.improvedHealing*5:0)+(mentalAgilityApplies?[0,3,7,10][talents.mentalAgility]:0);
   const innerFocusReady=talents.innerFocus>0&&talents.innerFocusReady;
-  const costReduction=Math.min(1,contagionReduction+(shadow&&talents.shadowform ? .5 : 0));
+  const costReduction=Math.min(1,manaReductionPercent/100+contagionReduction+(shadow&&talents.shadowform ? .5 : 0));
   const freeHolyNova=spell.name==="Holy Nova"&&talents.searingLight>0&&talents.holyNovaProcReady;
   const mana=manaBase==null?null:innerFocusReady||freeHolyNova?0:Math.floor(manaBase*(1-costReduction));
   const baseCrit=Math.max(0,Math.min(100,number(talents.baseCrit)));
-  const directCanCrit=["direct","direct-backlash","humanoid","aoe","channel-bolts"].includes(spell.kind);
+  const directCanCrit=["direct","direct-dot","direct-backlash","humanoid","aoe","channel-bolts"].includes(spell.kind);
   const periodicCanCrit=Boolean(spell.periodicCanCrit);
   const canCrit=directCanCrit||periodicCanCrit;
   const holyCrit=holy?talents.holySpecialization:0;
@@ -500,7 +503,7 @@ function damageMetrics(spell,rank){
   }
   const shadowMultiplier=shadow?1+talents.darkness*.02+(talents.shadowWeaving?talents.shadowWeavingStacks*.02:0)+(talents.shadowform ? .10 : 0):1;
   const holyMultiplier=holy?1+([0,.02,.05][talents.searingLight]||0):1;
-  const instantMultiplier=(rank.castSeconds===0||spell.name==="Penance")&&!['reactive','mana-burn'].includes(spell.kind)?1+talents.twinDisciplines/100:1;
+  const instantMultiplier=(rank.castSeconds===0||["Mind Flay","Starshards","Penance","Shadow Word: Death"].includes(spell.name))&&!['reactive','mana-burn'].includes(spell.kind)?1+talents.twinDisciplines/100:1;
   const powerInfusionMultiplier=talents.powerInfusionTalent&&talents.powerInfusionActive?1.2:1;
   const powerInLightApplies=talents.powerInLightTarget&&["Penance","Smite"].includes(spell.name);
   const powerInLightMultiplier=powerInLightApplies?1+talents.powerInLight*.02:1;
@@ -552,7 +555,7 @@ function damageMetrics(spell,rank){
   const perMana=mana&&spell.kind!=="reactive"?expectedMean/mana:null;
   const directCritMin=directMin==null||!directCanCrit?null:directMin*critMultiplier,directCritMax=directMax==null||!directCanCrit?null:directMax*critMultiplier;
   const tickCritMin=perTickMin==null||!periodicCanCrit?null:perTickMin*critMultiplier,tickCritMax=perTickMax==null||!periodicCanCrit?null:perTickMax*critMultiplier;
-  return {coefficient,ticks,directMin,directMax,perTickMin,perTickMax,totalMin,totalMax,hitCount,fullTotalMin,fullTotalMax,expectedMean,expectedDps,perMana,mana,critChance,directCritChance,periodicCritChance,critMultiplier,directCritMin,directCritMax,tickCritMin,tickCritMax,cycle,cooldown,castAdjusted,enemyTargets,spellPower,talentMultiplier,downrankRetention};
+  return {coefficient,ticks,directMin,directMax,perTickMin,perTickMax,totalMin,totalMax,hitCount,fullTotalMin,fullTotalMax,expectedMean,expectedDps,perMana,mana,critChance,directCritChance,periodicCritChance,critMultiplier,directCritMin,directCritMax,tickCritMin,tickCritMax,cycle,cooldown,castAdjusted,enemyTargets,spellPower,talentMultiplier,downrankRetention,improvedHealingApplies,mentalAgilityApplies};
 }
 function renderDamageSpells(){
   const host=document.querySelector("#damageSpellList");if(!host||!window.DAMAGE_SPELLS)return;
@@ -578,6 +581,8 @@ function renderDamageSpells(){
       if(talents.innerFocusReady&&talents.innerFocus)costModifiers.push("Inner Focus: free cast");
       if(freeHolyNovaProc)costModifiers.push("Searing Light: free proc");
       if(spell.name==="Devouring Plague"&&talents.devouringContagion)costModifiers.push(`Devouring Contagion: ${[0,25,50][talents.devouringContagion]}% reduction`);
+      if(m.improvedHealingApplies&&talents.improvedHealing)costModifiers.push(`Improved Healing: ${talents.improvedHealing*5}% reduction`);
+      if(m.mentalAgilityApplies&&talents.mentalAgility)costModifiers.push(`Mental Agility: ${[0,3,7,10][talents.mentalAgility]}% reduction`);
       if(spell.school==="Shadow"&&talents.shadowform)costModifiers.push("Shadowform: 50% reduction");
       return `<div class="damage-rank-row" data-rank="${r.rank}" data-base="${m.fullTotalMin+m.fullTotalMax}" data-damage="${m.expectedMean}" data-dps="${m.expectedDps??-1}" data-mana="${m.mana??-1}" data-efficiency="${m.perMana??-1}" data-crit="${m.critChance*100}" data-cast="${m.cycle??-1}"><div><a href="${href}" target="_blank" rel="noreferrer">R${r.rank} ↗</a><small>${learned} · ${acquisition}</small></div><div><b>${baseText}</b><small>Rank tooltip baseline</small></div><div><b>${damageText}</b><small>${spell.kind==="reactive"?"Per trigger; no proc rate assumed":spell.kind==="direct-dot"?`${fmt(r.effects.find(e=>e.type==="E_SCHOOL_DAMAGE")?.spellPowerCoefficient||0,3)} direct · ${fmt(r.effects.find(e=>e.aura==="A_PERIODIC_DAMAGE")?.spellPowerCoefficient||0,3)} per tick`: `${fmt(m.coefficient,3)} spell-power coefficient${m.ticks?" per tick":""}`}</small></div><div><b>${timing}</b><small>${spell.kind==="humanoid"?"Humanoid targets only":spell.kind==="mana-burn"?"Expected damage uses full listed drain":""}</small></div><div><b>${m.mana==null?"—":`${m.mana} mana`}</b><small>${costModifiers.join(" · ")||"Mana per cast"}</small></div><div><b>${dps}</b><small>${spell.kind==="aoe"?`At ${m.enemyTargets} target${m.enemyTargets===1?"":"s"}`:spell.kind==="reactive"?"No proc rate":`Includes crit expectation`}</small></div><div><b>${perMana}</b><small>Expected damage / mana</small></div><div><b>${crit}</b><small>${m.critChance?`Crit impact: ${fmt(m.critMultiplier*100,0)}%`:"No crit modeled for this event"}</small></div></div>`;
     }).join("");
