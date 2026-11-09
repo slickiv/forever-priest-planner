@@ -475,13 +475,14 @@ function damageMetrics(spell,rank){
   const coefficient=effect?.spellPowerCoefficient||0;
   const manaBase=rank.mana??null;
   const contagionReduction=spell.name==="Devouring Plague"?[0,.25,.5][talents.devouringContagion]||0:0;
+  const manaReductionStackingUnknown=spell.name==="Devouring Plague"&&contagionReduction>0&&talents.shadowform;
   const improvedHealingApplies=["Lesser Heal","Heal","Greater Heal","Penance","Prayer of Mending"].includes(spell.name);
   const mentalAgilityApplies=rank.castSeconds===0||["Smite","Holy Fire","Penance"].includes(spell.name);
   const manaReductionPercent=(improvedHealingApplies?talents.improvedHealing*5:0)+(mentalAgilityApplies?[0,3,7,10][talents.mentalAgility]:0);
   const innerFocusReady=talents.innerFocus>0&&talents.innerFocusReady;
   const costReduction=Math.min(1,manaReductionPercent/100+contagionReduction+(shadow&&talents.shadowform ? .5 : 0));
   const freeHolyNova=spell.name==="Holy Nova"&&talents.searingLight>0&&talents.holyNovaProcReady;
-  const mana=manaBase==null?null:innerFocusReady||freeHolyNova?0:Math.floor(manaBase*(1-costReduction));
+  const mana=manaBase==null||manaReductionStackingUnknown?null:innerFocusReady||freeHolyNova?0:Math.floor(manaBase*(1-costReduction));
   const baseCrit=Math.max(0,Math.min(100,number(talents.baseCrit)));
   const directCanCrit=["direct","direct-dot","direct-backlash","humanoid","aoe","channel-bolts"].includes(spell.kind);
   const periodicCanCrit=Boolean(spell.periodicCanCrit);
@@ -569,7 +570,7 @@ function damageMetrics(spell,rank){
   const perMana=mana&&spell.kind!=="reactive"?expectedMean/mana:null;
   const directCritMin=directMin==null||!directCanCrit?null:directMin*critMultiplier,directCritMax=directMax==null||!directCanCrit?null:directMax*critMultiplier;
   const tickCritMin=perTickMin==null||!periodicCanCrit?null:perTickMin*critMultiplier,tickCritMax=perTickMax==null||!periodicCanCrit?null:perTickMax*critMultiplier;
-  return {coefficient,ticks,directMin,directMax,directBaseMin:directBase?.min??null,directBaseMax:directBase?.max??null,drainBaseMin:drainBase?.min??null,drainBaseMax:drainBase?.max??null,baseTotalMin,baseTotalMax,tickBaseMin:tickBase?.min??null,tickBaseMax:tickBase?.max??null,perTickMin,perTickMax,totalMin,totalMax,hitCount,fullTotalMin,fullTotalMax,expectedMean,expectedDps,perMana,mana,critChance,directCritChance,periodicCritChance,critMultiplier,directCritMin,directCritMax,tickCritMin,tickCritMax,cycle,cooldown,castAdjusted,enemyTargets,spellPower,talentMultiplier,downrankRetention,improvedHealingApplies,mentalAgilityApplies,hasDamageEffect:Boolean(directEffect||dotEffect||drainBase)};
+  return {coefficient,ticks,directMin,directMax,directBaseMin:directBase?.min??null,directBaseMax:directBase?.max??null,drainBaseMin:drainBase?.min??null,drainBaseMax:drainBase?.max??null,baseTotalMin,baseTotalMax,tickBaseMin:tickBase?.min??null,tickBaseMax:tickBase?.max??null,perTickMin,perTickMax,totalMin,totalMax,hitCount,fullTotalMin,fullTotalMax,expectedMean,expectedDps,perMana,mana,manaReductionStackingUnknown,critChance,directCritChance,periodicCritChance,critMultiplier,directCritMin,directCritMax,tickCritMin,tickCritMax,cycle,cooldown,castAdjusted,enemyTargets,spellPower,talentMultiplier,downrankRetention,improvedHealingApplies,mentalAgilityApplies,hasDamageEffect:Boolean(directEffect||dotEffect||drainBase)};
 }
 function warlockTooltipBase(spell,rank,modelLevel){
   const t=rank.tooltip||"", school=spell.school||"";
@@ -702,6 +703,7 @@ function renderDamageSpells(){
       if(talents.innerFocusReady&&talents.innerFocus)costModifiers.push("Inner Focus: free cast");
       if(freeHolyNovaProc)costModifiers.push("Searing Light: free proc");
       if(spell.name==="Devouring Plague"&&talents.devouringContagion)costModifiers.push(`Devouring Contagion: ${[0,25,50][talents.devouringContagion]}% reduction`);
+      if(m.manaReductionStackingUnknown)costModifiers.push("Devouring Contagion + Shadowform stacking unverified; mana and damage / mana withheld");
       if(m.improvedHealingApplies&&talents.improvedHealing)costModifiers.push(`Improved Healing: ${talents.improvedHealing*5}% reduction`);
       if(m.mentalAgilityApplies&&talents.mentalAgility)costModifiers.push(`Mental Agility: ${[0,3,7,10][talents.mentalAgility]}% reduction`);
       if(spell.school==="Shadow"&&talents.shadowform)costModifiers.push("Shadowform: 50% reduction");
