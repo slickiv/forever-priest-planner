@@ -104,6 +104,24 @@ h2 { font-size: clamp(26px, 3.3vw, 36px); letter-spacing: -.045em; margin: 0; li
 .spell-list { display: flex; flex-direction: column; gap: 7px; padding-top: 11px; }
 .spell-card { border: 1px solid var(--line); background: var(--surface); }
 .spell-card[open] { background: var(--page); }
+.damage-spell-card { border: 1px solid var(--line); background: var(--surface); }
+.damage-spell-card[open] { background: var(--page); }
+.damage-spell-card > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; min-height: 61px; padding: 10px 15px; }
+.damage-spell-card > summary::-webkit-details-marker { display: none; }
+.damage-glyph { color: color-mix(in srgb, var(--accent) 70%, #cf6a36 30%); }
+.damage-spell-card .spell-description { padding-top: 0; }
+.damage-table { border-top: 1px solid var(--line); overflow-x: auto; }
+.damage-rank-header,.damage-rank-row { display: grid; grid-template-columns: 100px 175px minmax(240px,1.5fr) minmax(170px,1.1fr) 110px 140px 145px minmax(160px,1fr); gap: 10px; align-items: center; min-width: 1260px; }
+.damage-rank-header { padding: 9px 15px; color: var(--muted); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; background: var(--surface); }
+.damage-rank-header button { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; text-transform: inherit; cursor: pointer; }
+.damage-rank-header button:hover,.damage-rank-header button:focus-visible { color: var(--accent); }
+.damage-rank-row { min-height: 66px; padding: 11px 15px; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.damage-rank-row > div { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.damage-rank-row b { font-size: 12px; line-height: 1.3; }
+.damage-rank-row small { color: var(--muted); font-size: 10px; line-height: 1.35; }
+.damage-rank-row > div:first-child a { font-size: 12px; font-weight: 700; text-decoration: none; }
+.damage-spell-card .chevron { transition: transform .15s; }
+.damage-spell-card[open] .chevron { transform: rotate(180deg); }
 .spell-card summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; min-height: 61px; padding: 10px 15px; }
 .spell-card summary::-webkit-details-marker { display: none; }
 .spell-description { padding: 0 15px 10px 57px; color: var(--soft); font-size: 11px; line-height: 1.45; }

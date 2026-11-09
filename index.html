@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="Canvas" />
-    <meta name="description" content="Plan cloth-only Priest gear and compare every healing spell rank in World of Warcraft: Forever." />
+    <meta name="description" content="Plan cloth-only Priest gear and compare every healing and damage spell rank in World of Warcraft: Forever." />
     <title>Forever Priest Planner</title>
     <script>
       try {
@@ -12,7 +12,7 @@
         if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
       } catch {}
     </script>
-    <link rel="stylesheet" href="styles.css?v=13" />
+    <link rel="stylesheet" href="styles.css?v=14" />
   </head>
   <body>
     <main class="shell">
@@ -26,9 +26,9 @@
 
       <section class="hero">
         <div class="hero-copy">
-          <p class="eyebrow">FIELD KIT · HEALING & GEAR</p>
+          <p class="eyebrow">FIELD KIT · GEAR & SPELLS</p>
           <h1>WoW Forever Priest Throughput</h1>
-          <p class="hero-sub">Plan your cloth loadout, then compare every healing rank by cast throughput and mana efficiency.</p>
+          <p class="hero-sub">Plan your cloth loadout, then compare healing and damage spell ranks by throughput and mana efficiency.</p>
         </div>
         <div class="hero-stat"><span class="eyebrow">EQUIPPED HEALING</span><strong id="heroHealing">0</strong><span>bonus healing</span></div>
       </section>
@@ -36,6 +36,7 @@
       <nav class="tabs" aria-label="Planner sections">
         <button class="tab active" data-tab="gear">01 <span>Gear planner</span></button>
         <button class="tab" data-tab="spells">02 <span>Healing spells</span></button>
+        <button class="tab" data-tab="damage">03 <span>Damage spells</span></button>
       </nav>
 
       <section id="gearPanel" class="panel">
@@ -73,7 +74,7 @@
           </div>
         </div>
         <details class="settings-disclosure">
-          <summary>Healing settings</summary>
+          <summary>Planner settings</summary>
           <div class="settings-groups">
             <fieldset class="settings-group"><legend>Character and healing stats</legend><div class="spell-controls">
               <label class="stat-input">Character race <select id="characterRace"><option value="">Choose race</option><option>Human</option><option>Dwarf</option><option>Night Elf</option><option>Gnome</option><option>Troll</option><option>Undead</option></select></label>
@@ -84,13 +85,14 @@
               <label class="stat-input">Bonus spell damage <input id="bonusSpellDamage" type="number" min="0" value="0" step="1" /> <span>effective total</span></label>
               <label class="stat-input">Other spell damage <input id="bonusSpellDamageAdjustment" type="number" min="0" value="0" step="1" /> <span>not on equipped items</span></label>
               <label class="stat-input">Base spell crit <input id="baseCrit" type="number" min="0" max="100" value="0" step="0.1" /> <span>%</span></label>
-              <label class="stat-input">Total Spirit <input id="totalSpirit" type="number" min="0" value="0" step="1" /></label>
+              <label class="stat-input">Other Spirit <input id="totalSpiritInput" type="number" min="0" value="0" step="1" /></label>
               <label class="stat-input">Successful heals / targets / clicks <input id="partyTargets" type="number" min="1" max="6" value="5" step="1" /> <span>PoM: 1 initial heal + up to 5 transfers; Lightwell: up to 5 clicks</span></label>
             </div></fieldset>
             <fieldset class="settings-group"><legend>Talent spells</legend><div class="spell-controls">
               <label class="stat-input"><input id="holyNovaTalent" type="checkbox" /> Holy Nova (11 Holy points)</label>
               <label class="stat-input"><input id="penanceTalent" type="checkbox" /> Penance (21 Discipline points)</label>
               <label class="stat-input"><input id="prayerOfMendingTalent" type="checkbox" /> Prayer of Mending (31 Holy points)</label>
+              <label class="stat-input"><input id="mindFlayTalent" type="checkbox" /> Mind Flay (11 Shadow points)</label>
             </div></fieldset>
             <fieldset class="settings-group"><legend>Healing and mana talents</legend><div class="spell-controls">
               <label class="stat-input">Twin Disciplines <select id="twinDisciplines"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
@@ -107,6 +109,21 @@
               <label class="stat-input">Holy Binding <select id="holyBinding"><option value="0">No</option><option value="1">Yes</option></select></label>
               <label class="stat-input">Divine Aegis <select id="divineAegis"><option value="0">0/3</option><option value="1">1/3</option><option value="2">2/3</option><option value="3">3/3</option></select></label>
               <label class="stat-input">Inspiration <select id="inspiration"><option value="0">0/3</option><option value="1">1/3</option><option value="2">2/3</option><option value="3">3/3</option></select></label>
+            </div></fieldset>
+            <fieldset class="settings-group"><legend>Damage talents</legend><div class="spell-controls">
+              <label class="stat-input">Darkness <select id="darkness"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
+              <label class="stat-input">Dark Inspiration <select id="darkInspiration"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
+              <label class="stat-input"><input id="darkInspirationActive" type="checkbox" /> Dark Inspiration buff active (Mind Blast / fully channeled Mind Flay)</label>
+              <label class="stat-input">Improved Mana Burn <select id="improvedManaBurn"><option value="0">0/2</option><option value="1">1/2</option><option value="2">2/2</option></select></label>
+              <label class="stat-input">Devouring Contagion <select id="devouringContagion"><option value="0">0/2</option><option value="1">1/2</option><option value="2">2/2</option></select></label>
+              <label class="stat-input">Improved Mind Blast <select id="improvedMindBlast"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
+              <label class="stat-input">Improved Mind Flay <select id="improvedMindFlay"><option value="0">0/2</option><option value="1">1/2</option><option value="2">2/2</option></select></label>
+              <label class="stat-input">Improved Shadow Word: Pain <select id="improvedShadowWordPain"><option value="0">0/2</option><option value="1">1/2</option><option value="2">2/2</option></select></label>
+              <label class="stat-input"><input id="shadowform" type="checkbox" /> Shadowform active</label>
+              <label class="stat-input">Shadow Weaving <select id="shadowWeaving"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
+              <label class="stat-input">Shadow Weaving stacks <select id="shadowWeavingStacks"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
+              <label class="stat-input">Early Demise <select id="earlyDemise"><option value="0">0/2</option><option value="1">1/2</option><option value="2">2/2</option></select></label>
+              <label class="stat-input"><input id="targetUnder20" type="checkbox" /> Target at or below 20% health</label>
             </div></fieldset>
             <fieldset class="settings-group"><legend>Target conditions and active effects</legend><div class="spell-controls">
               <label class="stat-input"><input id="weakenedSoulTarget" type="checkbox" /> Target has Weakened Soul</label>
@@ -126,7 +143,7 @@
             </div></fieldset>
           </div>
         </details>
-        <p class="helper">Sort spell cards above and ranks by any column. Selected-level view hides later ranks; All levels includes every rank. Damage uses equipped spell damage plus the separate damage input; unknown stats remain flagged in gear totals. Expected healing and damage include the selected crit chance and 150% critical effects. Instants use a 1.5 sec global cooldown for throughput. Racial spells appear only after you select or import a race.</p>
+        <p class="helper">Sort spell cards above and ranks by any column. Selected-level view hides later ranks; All levels includes every rank. Damage power includes equipped and manually entered spell damage, one-third of healing power, and Spiritual Guidance from equipped plus manually entered Spirit; unknown stats remain flagged in gear totals. Damage tables include rank tooltip bases, spell-power coefficients, applicable talents, and crit expectations. Instants use a 1.5 sec global cooldown for throughput. Racial spells appear only after you select or import a race.</p>
         <div class="spell-legend"><span><i class="dot heal-dot"></i> Healing</span><span><i class="dot damage-dot"></i> Damage</span><span><i class="dot shield-dot"></i> Absorb</span><span id="rankCount"></span></div>
         <div id="spellList" class="spell-list"></div>
         <div class="method-note"><strong>How the numbers work</strong>
@@ -135,11 +152,30 @@
           <p>Throughput and mana efficiency use the midpoint of the displayed healing range. Heal and Greater Heal cast times include Divine Fury; instant spells use a 1.5-second global cooldown.</p>
           <p>Expected healing and damage = mean × [1 + (critical chance × 0.5)], assuming critical effects deal 150%. Healing and damage use separate crit chances. Both include entered sheet chance, Holy Specialization adds chance to Holy spells, and ready Inner Focus adds 25 percentage points to eligible direct events. Renewed Hope applies to its listed healing spells when Weakened Soul is present; it does not increase damage crit chance.</p>
           <p>Renew can critically heal in Forever, and Renew and Lightwell show a critical tick or event amount. Divine Aegis and Inspiration can trigger from direct critical heals; Penance's three bolts hit one target, so its estimate counts one Aegis when one or more bolts crit. Inspiration shows its armor bonus and per-cast proc chance, but not uptime without a cast rotation. Divine Aegis does not stack and is capped at 1,200 per target.</p>
-          <p>Prayer of Mending counts successful heals: one initial heal and up to five transfers. Talent-granted spells appear only when selected in Settings; later ranks require the talent and trainer. Lightwell's level and effects are listed, but acquisition and training cost remain unknown. Unknown trainer prices remain unknown, not free. This fixed-spell table excludes damage-linked healing such as Vampiric Embrace and incoming-hit procs such as Blessed Recovery.</p>
+          <p>Prayer of Mending counts successful heals: one initial heal and up to five transfers. Talent-granted spells appear only when selected in Settings; later ranks require the talent and trainer. Trainer prices appear only where a source provides them. This fixed-spell table excludes damage-linked healing such as Vampiric Embrace and incoming-hit procs such as Blessed Recovery.</p>
           <p>Every displayed rank's level was compared by spell name and rank with the current Priest level list. Spell IDs, talent requirements, and trainer information were cross-referenced with current per-rank spell records. <a href="https://theforeverera.com/en/spells/priest/levels/" target="_blank" rel="noreferrer" aria-label="The Forever Era Priest ranks by level">reference</a> · <a href="https://urgametips.com/wow-forever/priest-guides/spells/" target="_blank" rel="noreferrer" aria-label="UrGameTips Priest ranks, acquisition and training prices">reference</a> · <a href="https://warcraftforever.games/classes/priest/spells" target="_blank" rel="noreferrer" aria-label="Warcraft Forever Priest spell records">reference</a> · <a href="https://www.wowhead.com/forever/spells/abilities/priest" target="_blank" rel="noreferrer" aria-label="Wowhead Forever Priest spellbook and ranks">link</a></p>
           <p>Holy Nova damage growth uses its rank-specific client base range and per-level effects. Penance's 3-bolt healing total and damage total are separate from per-bolt and per-tick amounts. It is an instant spell with a 2-second channel: instant-spell talents apply, while throughput uses the full channel duration. Damage applies Twin Disciplines, Searing Light, conditional Power in Light, and active Power Infusion. Penance damage-per-mana uses the full enemy-cast cost, not Litany of Light's healing-only refund. Holy Nova damage is shown per target; damage per second multiplies by the entered enemy count.</p>
           <p>Data cutoff: build 1.60.1.70862 was detected November 7, after launch; its comparison reports no Priest spell changes. This is a post-launch client/hotfix-cache snapshot, not November 2 beta data or direct in-game verification. Training prices are published per-rank list prices before discounts, distinct from older beta acquisition observations. <a href="https://theforeverera.com/en/builds" target="_blank" rel="noreferrer" aria-label="The Forever Era build history and 70862 comparison">reference</a> · <a href="https://worldofwarcraft.blizzard.com/en-us/news/24315281/wow-forever-hotfixes-november-6-2026" target="_blank" rel="noreferrer" aria-label="Blizzard November 6 WoW Forever hotfixes">reference</a> · <a href="https://urgametips.com/wow-forever/priest-guides/spells/" target="_blank" rel="noreferrer" aria-label="UrGameTips published Priest spell prices">reference</a></p>
           <p>For damage data and formulas, see the client-derived <a href="https://foreverdb.net/spell/15237" target="_blank" rel="noreferrer" aria-label="ForeverDB Holy Nova client effects, spell ID 15237">reference</a>, <a href="https://wowforever.gameslantern.com/spells/holy-nova-rank-5" target="_blank" rel="noreferrer" aria-label="Holy Nova rank 5 client effect, spell ID 27800">reference</a>, <a href="https://wowforever.wclbox.com/en/fashu/priest/priest-penance" target="_blank" rel="noreferrer" aria-label="WCLBox Penance spell ranks and IDs">reference</a>, and <a href="https://bindonforever.com/spell/1316995" target="_blank" rel="noreferrer" aria-label="Bind on Forever Penance rank data, spell ID 1316995">reference</a>. Talent effects are cross-checked against Wowhead Forever's <a href="https://www.wowhead.com/forever/spell=1225132/twin-disciplines" target="_blank" rel="noreferrer" aria-label="Wowhead Forever Twin Disciplines">reference</a>, <a href="https://www.wowhead.com/forever/spell=14909/searing-light" target="_blank" rel="noreferrer" aria-label="Wowhead Forever Searing Light">reference</a>, <a href="https://www.wowhead.com/forever/changes/talents/priest" target="_blank" rel="noreferrer" aria-label="Wowhead Forever Power in Light">reference</a>, and <a href="https://www.wowhead.com/forever/spell=425280/renewed-hope" target="_blank" rel="noreferrer" aria-label="Wowhead Forever Renewed Hope">reference</a>. Results are theoretical and do not account for overhealing, proc timing, interruptions, or fight duration.</p></div>
+      </section>
+
+      <section id="damagePanel" class="panel hidden">
+        <div class="section-head spell-head">
+          <div><p class="eyebrow">RANK-BY-RANK REFERENCE</p><h2>Damage spellbook</h2></div>
+          <div class="spell-list-controls" aria-label="Damage spell list controls">
+            <label>Sort spells <select id="damageSort"><option value="learned">Order learned</option><option value="name">Name</option><option value="category">School / type</option><option value="rank-count">Total rank count</option></select></label>
+            <label>Show ranks <select id="damageLevelScope"><option value="level">Available at selected level</option><option value="all">All levels</option></select></label>
+          </div>
+        </div>
+        <p class="helper" id="damageStatSummary">Damage is shown for one target unless the spell is an area effect. Instant spells use the global cooldown; channels use their full channel time. Reactive spells show damage per trigger. Choose race and talents under Planner settings to reveal restricted spells.</p>
+        <div class="spell-legend"><span><i class="dot damage-dot"></i> Damage</span><span id="damageRankCount"></span></div>
+        <div id="damageSpellList" class="spell-list"></div>
+        <div class="method-note"><strong>Damage calculations</strong>
+          <p>Damage base values follow the rank tooltip. Spell power combines equipped and manually entered spell damage, one-third of healing power, and Spiritual Guidance's rank-specific damage share of total Spirit (1/3/5/6/8%). Dark Inspiration can temporarily increase Spirit by 3% per rank; select its buff when active. The damage column adds spell power times the client coefficient, with downrank retention, then applies applicable talent multipliers. DoT spell power applies per tick across the tooltip duration; Improved Shadow Word: Pain adds one tick per rank (3 seconds). Improved Mind Flay compounds each later tick by 10% or 20% over the preceding tick.</p>
+          <p>Expected damage applies the entered crit chance and Holy Specialization to each direct hit and each client-flagged periodic tick. Ready Inner Focus adds 25 percentage points to eligible direct hits and makes that cast free; a ready Searing Light proc makes Holy Nova free. Ordinary critical effects use 150%; Shadowform makes Shadow spell critical hits deal 200% of normal damage. Expected damage per second divides expected damage by the longest of cast/GCD, cooldown, and DoT duration, assuming full DoT uptime. Mind Blast includes its reduced cooldown when Improved Mind Blast is selected; Mana Burn includes Improved Mana Burn cast reductions; Devouring Contagion reduces Devouring Plague mana cost by 25% or 50%. The model assumes hits land and does not add target resistance.</p>
+          <p>Holy Nova is per enemy target, Penance is per bolt and per three-bolt cast, Holy Fire separates its direct hit and periodic component, and Mana Burn damage equals half the Mana actually drained. Shadow Word: Death lists its possible self-backlash outside outgoing damage. Devouring Contagion's reduced mana cost is included; target-death spread damage is excluded from the single-target comparison. Chastise is Dwarf-only and Humanoid-only. Feedback is Human-only, Shadowguard Troll-only, Starshards Night Elf-only, and Touch of Weakness Undead-only.</p>
+          <p>Rank levels, mana, cast times, cooldowns, and restrictions are cross-referenced against Wowhead Forever spell records. Damage spell training prices are not yet verified for this list. <a href="https://www.wowhead.com/forever/guide/classes/priest/holy/healer-abilities" target="_blank" rel="noreferrer" aria-label="Wowhead Forever Priest ability guide">reference</a> · <a href="https://www.wowhead.com/forever/guide/classes/priest/shadow/dps-abilities" target="_blank" rel="noreferrer" aria-label="Wowhead Forever Shadow Priest damage spell guide">reference</a> · <a href="https://www.wowhead.com/forever/changes/talents/priest" target="_blank" rel="noreferrer" aria-label="Wowhead Forever Priest talent changes">reference</a> · <a href="https://www.wowhead.com/forever/spells/abilities/priest" target="_blank" rel="noreferrer" aria-label="Wowhead Forever Priest spell ranks">reference</a></p>
+        </div>
       </section>
 
       <footer><span>FOREVER PRIEST PLANNER</span><span>Spell data: <a href="https://theforeverera.com/en/spells/priest/" target="_blank" rel="noreferrer" aria-label="The Forever Era spell reference">reference</a> · Calculations: <a href="https://foreverchanges.pro/downrank-calculator" target="_blank" rel="noreferrer" aria-label="ForeverChanges downrank calculator">link</a></span></footer>
@@ -173,7 +209,8 @@
         <div class="dialog-actions"><span></span><button class="button quiet" type="button" id="cancelArmory">Cancel</button><button class="button primary" id="importArmory" value="import">Import gear</button></div>
       </form>
     </dialog>
-    <script src="spells.js?v=29"></script>
-    <script src="app.js?v=42"></script>
+    <script src="spells.js?v=30"></script>
+    <script src="damage-data.js?v=2"></script>
+    <script src="app.js?v=45"></script>
   </body>
 </html>
