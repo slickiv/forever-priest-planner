@@ -83,6 +83,7 @@ h2 { font-size: clamp(26px, 3.3vw, 36px); letter-spacing: -.045em; margin: 0; li
 .spell-controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
 .stat-input { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 11px; }
 .stat-input input,.stat-input select { width: 67px; border: 1px solid var(--line); background: var(--surface); border-radius: var(--round); padding: 7px 8px; font-variant-numeric: tabular-nums; }
+.stat-input input[type="checkbox"] { width: auto; accent-color: var(--accent); }
 .stat-input select { width: 74px; }
 .stat-input span { color: var(--muted); }
 .spell-legend { display: flex; align-items: center; gap: 19px; border-bottom: 1px solid var(--line); padding: 2px 0 11px; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; }
@@ -104,9 +105,11 @@ h2 { font-size: clamp(26px, 3.3vw, 36px); letter-spacing: -.045em; margin: 0; li
 .rank-pill { color: var(--muted); font-size: 10px; border: 1px solid var(--line); padding: 3px 7px; border-radius: 99px; }
 .chevron { font-size: 17px; color: var(--muted); padding-left: 4px; transition: transform .15s; }
 .spell-card[open] .chevron { transform: rotate(180deg); }
-.rank-table { border-top: 1px solid var(--line); }
-.rank-header,.rank-row { display: grid; grid-template-columns: 115px minmax(170px,1.45fr) minmax(130px,1fr) minmax(130px,1fr) minmax(115px,.85fr); gap: 10px; align-items: center; }
+.rank-table { border-top: 1px solid var(--line); overflow-x: auto; }
+.rank-header,.rank-row { display: grid; grid-template-columns: minmax(130px,1.2fr) minmax(195px,1.7fr) repeat(9,minmax(110px,1fr)) minmax(120px,1fr); gap: 10px; align-items: center; min-width: 1640px; }
 .rank-header { padding: 9px 15px; color: var(--muted); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; background: var(--surface); }
+.sort-header { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; text-transform: inherit; cursor: pointer; }
+.sort-header:hover,.sort-header:focus-visible { color: var(--accent); }
 .rank-row { padding: 10px 15px; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
 .rank-name { display: flex; flex-direction: column; gap: 3px; }
 .rank-name a { font-weight: 750; text-decoration: none; font-size: 12px; }
@@ -167,14 +170,8 @@ dialog::backdrop { background: color-mix(in srgb, CanvasText 45%, transparent); 
   .gear-slot { min-height: 136px; padding: 11px; }
   .summary-card { grid-template-columns: repeat(2,1fr); }
   .spell-card summary { padding: 9px; gap: 8px; }
-  .rank-header { display: none; }
-  .rank-row { grid-template-columns: 70px 1fr 1fr; gap: 8px; padding: 9px; }
-  .rank-name { grid-row: span 2; }
-  .rank-amount { grid-row: span 2; }
-  .rank-stat { padding-top: 4px; border-top: 1px dashed var(--line); }
-  .rank-stat:nth-of-type(3) { grid-column: 1 / span 2; }
-  .rank-stat:nth-of-type(4) { grid-column: 3; }
-  .rank-stat:nth-of-type(5) { grid-column: 3; }
+  .rank-header { display: grid; }
+  .rank-row { grid-template-columns: minmax(130px,1.2fr) minmax(195px,1.7fr) repeat(9,minmax(110px,1fr)) minmax(120px,1fr); gap: 8px; padding: 9px; }
   .rank-stat span { font-size: 9px; }
   footer { align-items: flex-start; flex-direction: column; justify-content: center; padding: 14px 0; }
 }
