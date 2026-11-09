@@ -122,6 +122,10 @@ h2 { font-size: clamp(26px, 3.3vw, 36px); letter-spacing: -.045em; margin: 0; li
 .rank-name a { font-weight: 750; text-decoration: none; font-size: 12px; }
 .rank-name a:hover { color: var(--accent); }
 .rank-name span,.rank-stat span,.rank-amount > span { color: var(--muted); font-size: 10px; }
+.rank-name .training-cost { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+.training-source { color: var(--soft); font-size: 9px; line-height: 1.2; }
+.training-source a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.training-source a:hover { color: var(--accent); }
 .rank-amount { display: flex; flex-direction: column; gap: 2px; }
 .rank-amount b,.rank-stat b { font-size: 12px; font-weight: 700; }
 .rank-stat { display: flex; flex-direction: column; gap: 3px; }

@@ -72,14 +72,26 @@ window.HEALING_SPELLS = [
   ], detail:"Absorb amount is shown as effective shielding; actual value is capped by incoming damage."}
 ];
 
-/* Observed trainer prices (copper). Read from the spell recorder at
+/* Numeric trainer prices (copper) are live quotes read from the spell recorder at
    https://warcraftforever.games/classes/priest/spells on 2026-11-08.
-   A null value means that source gave no price; it is unknown, not free. */
+   Object values preserve non-live reference/acquisition metadata instead of
+   treating a published reference as a live quote. A null value is unknown. */
 window.TRAINING_COSTS = {
-  2050:null,2052:null,2053:null,
-  139:null,6074:null,6075:null,6076:null,6077:null,6078:null,10927:null,10928:null,10929:null,25315:null,
+  2050:{type:"free",source:"UrGameTips",url:"https://urgametips.com/wow-forever/priest-guides/spells/",note:"Starter rank; no trainer fee listed"},
+  2052:{type:"reference",copper:100,source:"UrGameTips + X’yera",url:"https://urgametips.com/wow-forever/priest-guides/spells/",secondaryUrl:"https://wowforever.ninja/npcs/6014-xyera/"},
+  2053:{type:"reference",copper:300,source:"UrGameTips + X’yera",url:"https://urgametips.com/wow-forever/priest-guides/spells/",secondaryUrl:"https://wowforever.ninja/npcs/6014-xyera/"},
+  139:{type:"reference",copper:200,source:"UrGameTips + X’yera",url:"https://urgametips.com/wow-forever/priest-guides/spells/",secondaryUrl:"https://wowforever.ninja/npcs/6014-xyera/"},
+  6074:{type:"reference",copper:1200,source:"UrGameTips + X’yera",url:"https://urgametips.com/wow-forever/priest-guides/spells/",secondaryUrl:"https://wowforever.ninja/npcs/6014-xyera/"},
+  6075:{type:"reference",copper:3000,source:"UrGameTips + X’yera",url:"https://urgametips.com/wow-forever/priest-guides/spells/",secondaryUrl:"https://wowforever.ninja/npcs/6014-xyera/"},
+  6076:{type:"reference",copper:6000,source:"UrGameTips + X’yera",url:"https://urgametips.com/wow-forever/priest-guides/spells/",secondaryUrl:"https://wowforever.ninja/npcs/6014-xyera/"},
+  6077:{type:"reference",copper:11000,source:"UrGameTips + X’yera",url:"https://urgametips.com/wow-forever/priest-guides/spells/",secondaryUrl:"https://wowforever.ninja/npcs/6014-xyera/"},
+  6078:{type:"reference",copper:16000,source:"UrGameTips + X’yera",url:"https://urgametips.com/wow-forever/priest-guides/spells/",secondaryUrl:"https://wowforever.ninja/npcs/6014-xyera/"},
+  10927:{type:"reference",copper:24000,source:"UrGameTips + X’yera",url:"https://urgametips.com/wow-forever/priest-guides/spells/",secondaryUrl:"https://wowforever.ninja/npcs/6014-xyera/"},
+  10928:{type:"reference",copper:30000,source:"UrGameTips + X’yera",url:"https://urgametips.com/wow-forever/priest-guides/spells/",secondaryUrl:"https://wowforever.ninja/npcs/6014-xyera/"},
+  10929:{type:"reference",copper:42000,source:"UrGameTips + X’yera",url:"https://urgametips.com/wow-forever/priest-guides/spells/",secondaryUrl:"https://wowforever.ninja/npcs/6014-xyera/"},
+  25315:{type:"manual",name:"Codex of Renew X",requirement:"Requires level 60",source:"UrGameTips",url:"https://urgametips.com/wow-forever/priest-guides/spells/"},
   13908:null,19236:null,19238:null,19240:null,19241:null,19242:null,19243:null,
-  2054:3800,2055:7600,6063:11400,6064:null,
+  2054:3800,2055:7600,6063:11400,6064:{type:"reference",copper:12000,source:"UrGameTips + X’yera",url:"https://urgametips.com/wow-forever/priest-guides/spells/",secondaryUrl:"https://wowforever.ninja/npcs/6014-xyera/"},
   2061:2850,9472:5700,9473:10450,9474:15200,10915:22800,10916:28500,10917:39900,
   15237:380,15430:665,15431:1140,27799:1805,27800:2185,27801:null,
   724:null,27870:null,27871:null,

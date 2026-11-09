@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 12685)
+Total output lines: 594
+
 const SLOTS = [
   ["head","Head"],["neck","Neck"],["shoulders","Shoulders"],["back","Back"],["chest","Chest"],
   ["wrists","Wrists"],["hands","Hands"],["waist","Waist"],["legs","Legs"],["feet","Feet"],
@@ -267,48 +270,16 @@ function spellMetrics(spell, rank) {
 function fmt(value, places=1) { return value == null || !Number.isFinite(value) ? "—" : Number(value.toFixed(places)).toLocaleString(undefined,{maximumFractionDigits:places}); }
 function fmtRange(min,max,places=1) { return min == null || max == null ? "—" : min === max ? fmt(min,places) : `${fmt(min,places)}–${fmt(max,places)}`; }
 function fmtTrainingCost(copper, spell, rank) {
-  if (copper == null) {
-    if ((spell.name === "Penance" && rank[5] === 402174) || (spell.name === "Prayer of Mending" && rank[5] === 401859)) return "Talent";
-    if (["Lightwell","Circle of Healing"].includes(spell.name)) return "Acquisition unverified";
-    if (["Desperate Prayer","Divine Grace"].includes(spell.name)) return "Racial ability";
-    return "Price unknown";
-  }
-  const gold = Math.floor(copper / 10000);
-  const silver = Math.floor((copper % 10000) / 100);
-  const coins = copper % 100;
-  return [gold ? `${gold}g` : "", silver ? `${silver}s` : "", coins ? `${coins}c` : ""].filter(Boolean).join(" ");
-}
-function sortSpellRows(table,key,direction) {
-  const rows=[...table.querySelectorAll(".rank-row")];
-  rows.sort((a,b)=>{
-    const av=Number(a.dataset[`sort${key[0].toUpperCase()}${key.slice(1)}`]??0),bv=Number(b.dataset[`sort${key[0].toUpperCase()}${key.slice(1)}`]??0);
-    return (av-bv)*(direction==="asc"?1:-1);
-  }).forEach(row=>table.append(row));
-}
-function renderSpells() {
-  const host = document.querySelector("#spellList");
-  if (!host) return;
-  host.querySelectorAll(".spell-card[data-spell-index]").forEach(card=>{
-    const index=card.dataset.spellIndex,header=card.querySelector(".rank-header");
-    spellUiState[index]={open:card.open,sortKey:header?.dataset.sortKey||"",direction:header?.dataset.sortDirection||""};
-  });
-  try { localStorage.setItem(SPELL_UI_STATE_KEY,JSON.stringify(spellUiState)); } catch {}
-  let ranksShown = 0;
-  host.innerHTML = window.HEALING_SPELLS.map((spell,index) => {
-    const ui=spellUiState[index]??{open:index<3,sortKey:"",direction:""};
-    const renew = spell.name === "Renew";
-    ranksShown += spell.ranks.length;
-    const shield = spell.kind === "shield";
-    const kindLabel = shield ? "ABSORB" : "HEAL";
-    const rows = spell.ranks.map(rank => {
-      const [rankNo,learned,baseMin,baseMax,mana,id] = rank;
-      const m = spellMetrics(spell,rank);
-      const rankLink = `https://www.wowhead.com/forever/spell=${encodeURIComponent(id)}`;
-      const freeReason=m.innerFocusApplies?"Inner Focus":m.holyNovaFree?"Searing Light proc":m.freeFormActive?"Spirit of Redemption":"";
-      const note = mana == null ? `<small>${esc(spell.manaNote || "Mana cost unavailable")}</small>` : freeReason?`${mana} → 0 (${freeReason})`:`${m.mana.toLocaleString()} mana${m.litanyRefund?` · ${m.netMana} net`:""}`;
+  const fmtCoins = amount => {
+    const gold = Math.floor(amount / 10000);
+    const silver = Math.floor((amount % 10000) / 100);
+    const coins = amount % 100;
+    return [gold ? `${gold}g` : "", silver ? `${silver}s` : "", coins ? `${coins}c` : ""].filter(Boolean).join(" ") || "Free";
+  };
+  const sourceLink = (label,url,secondaryUrl) => `<small class="training-source"><a href="${url}" target="_blank" rel="n…685 tokens truncated…eReason?`${mana} → 0 (${freeReason})`:`${m.mana.toLocaleString()} mana${m.litanyRefund?` · ${m.netMana} net`:""}`;
       const range = fmtRange(renew ? m.healPerEventMin : m.healMin,renew ? m.healPerEventMax : m.healMax);
       const group = ["Prayer of Healing","Holy Nova","Circle of Healing"].includes(spell.name) ? `${range} / target` : range;
-      const learnedText = `${learned == null ? "Lv —" : `Lv ${learned}`} · ${fmtTrainingCost(window.TRAINING_COSTS[id],spell,rank)}`;
+      const learnedText = `<span>${learned == null ? "Lv —" : `Lv ${learned}`}</span><span class="training-cost">${fmtTrainingCost(window.TRAINING_COSTS[id],spell,rank)}</span>`;
       const perTime = renew ? fmt(m.healPerEvent) : m.perSecond == null ? "—" : `${fmt(m.perSecond)} / sec`;
       const perMana = m.perMana == null ? "—" : `${fmt(m.perMana,2)} / mana`;
       const effectiveCast = rank[7] ?? spell.cast;
