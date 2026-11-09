@@ -6,7 +6,10 @@
    Growth caps are the last level at which that rank's base continues to rise; LH R3's
    cap at 15 is supported by its level-15 tooltip and Annadra's later tooltip readings.
    LH R1's coefficient exception is fit to the L21/L22 observations and the addon report
-   of ~24% retained at L30; this is a measured exception, not the generic rank formula. */
+   of ~24% retained at L30; this is a measured exception, not the generic rank formula.
+   Other coefficient checks: Wowhead Forever records show Prayer of Healing 0.286,
+   Holy Nova 0.107, Prayer of Mending 0.429, Circle of Healing 0.214, and PW:S 0.1.
+   Penance is 0.19 per bolt × 3; racial direct heals use 0.429. */
 window.HEALING_SPELLS = [
   { name:"Lesser Heal", group:"Holy", kind:"heal", cast:1.5, coefficient:0.429, wowhead:2050,
     levelGrowth:{2050:{perLevel:0.3,cap:3,downrankOffset:0.15},2052:{perLevel:0.7,cap:9},2053:{perLevel:1.2,cap:15}}, ranks:[
@@ -16,7 +19,7 @@ window.HEALING_SPELLS = [
     [1,8,45,45,30,139],[2,14,75,75,65,6074],[3,20,125,125,105,6075],[4,26,160,160,140,6076],[5,32,205,205,170,6077],
     [6,38,270,270,205,6078],[7,44,370,370,250,10927],[8,50,510,510,305,10928],[9,56,670,670,365,10929],[10,60,830,830,410,25315]
   ]},
-  { name:"Desperate Prayer", group:"Holy · racial", kind:"heal", cast:1.5, instant:true, coefficient:0, wowhead:13908, ranks:[
+  { name:"Desperate Prayer", group:"Holy · racial", kind:"heal", cast:1.5, instant:true, coefficient:0.429, wowhead:13908, ranks:[
     [1,10,131,167,0,13908],[2,18,247,305,0,19236],[3,26,414,502,0,19238],[4,34,540,650,0,19240],
     [5,42,781,931,0,19241],[6,50,1046,1240,0,19242],[7,58,1269,1497,0,19243]
   ]},
@@ -29,12 +32,9 @@ window.HEALING_SPELLS = [
     [1,20,174,214,125,2061],[2,26,225,273,155,9472],[3,32,283,341,185,9473],[4,38,349,417,215,9474],
     [5,44,463,551,265,10915],[6,50,589,699,315,10916],[7,56,757,893,380,10917]
   ]},
-  { name:"Holy Nova", group:"Holy · group", kind:"group", cast:1.5, instant:true, coefficient:0, wowhead:15237, ranks:[
+  { name:"Holy Nova", group:"Holy · group", kind:"group", cast:1.5, instant:true, coefficient:0.107, wowhead:15237, ranks:[
     [1,20,47,55,185,15237],[2,28,77,87,290,15430],[3,36,108,124,400,15431],[4,44,147,171,520,27799],[5,52,221,255,635,27800],[6,60,288,334,750,27801]
   ], detail:"Heals nearby party members; value is per target."},
-  { name:"Binding Heal", group:"Holy · two targets", kind:"group", cast:1.5, coefficient:0.429, wowhead:401937, ranks:[
-    [1,25,223,271,155,401937],[2,32,283,341,185,1240770],[3,38,349,417,215,1240771],[4,44,463,551,265,1240772],[5,50,589,699,315,1240773],[6,56,757,893,380,1240774]
-  ], detail:"Heals both the target and caster; two-target total is used for HPM."},
   { name:"Prayer of Healing", group:"Holy · group", kind:"group", cast:3, coefficient:0.286, wowhead:596, ranks:[
     [1,30,172,184,410,596],[2,40,257,273,560,996],[3,50,390,412,770,10960],[4,60,567,599,1030,10961],[5,60,631,667,1070,25316]
   ], detail:"Per-target value; party target count is adjustable."},
@@ -43,20 +43,20 @@ window.HEALING_SPELLS = [
   ]},
   { name:"Lightwell", group:"Holy · setup / charges", kind:"heal", cast:1.5, duration:10, coefficient:0, wowhead:724, ranks:[
     [1,40,800,800,225,724],[2,50,1165,1165,295,27870],[3,60,1600,1600,365,27871]
-  ], detail:"Healing per click over 10 seconds; up to five charges. The target count control estimates one through five successful clicks."},
-  { name:"Prayer of Mending", group:"Holy · reactive / jumps", kind:"group", cast:1.5, instant:true, coefficient:0, wowhead:401859, ranks:[
+  ], detail:"Healing per click over 10 seconds; up to five charges. Total healing assumes the number of successful clicks selected above."},
+  { name:"Prayer of Mending", group:"Holy · reactive / jumps", kind:"group", cast:1.5, instant:true, coefficient:0.429, wowhead:401859, ranks:[
     [1,40,172,172,210,401859],[2,50,298,298,305,1240826],[3,60,413,413,390,1240827]
   ], detail:"Per jump; use the target count control for the number of jumps that land (up to five)."},
   { name:"Circle of Healing", group:"Holy · group", kind:"group", cast:1.5, instant:true, coefficient:0.214, wowhead:401946, ranks:[
     [1,null,875.1986,969.4507,770,401946]
   ], detail:"Level 60 baseline from Wowhead's 875.1986–969.4507 formula range, averaged. Cost uses 56% × 1,376 Priest base mana, floored to 770."},
-  { name:"Divine Grace", group:"Holy · racial", kind:"heal", cast:1.5, instant:true, coefficient:0, wowhead:1277370, ranks:[
+  { name:"Divine Grace", group:"Holy · racial", kind:"heal", cast:1.5, instant:true, coefficient:0.429, wowhead:1277370, ranks:[
     [1,10,131,167,0,1277370],[2,18,247,305,0,1277371],[3,26,414,502,0,1277372],[4,34,540,650,0,1277374],
     [5,42,781,931,0,1277376],[6,50,1046,1240,0,1277377],[7,58,1269,1497,0,1277378]
   ]},
-  { name:"Penance", group:"Discipline · channeled", kind:"heal", cast:2, coefficient:0, wowhead:402174, ranks:[
+  { name:"Penance", group:"Discipline · channeled", kind:"heal", cast:2, coefficient:0.57, wowhead:402174, ranks:[
     [1,30,126,126,150,402174],[2,40,200,200,220,1240720],[3,50,268,268,270,1240721],[4,60,425,425,385,1316991]
-  ], detail:"Each rank’s value is the total across three bolts over a 2 sec channel."},
+  ], detail:"Each rank’s value is the total across three bolts over a 2 sec channel; its 19% spell-healing coefficient per bolt is modeled as 57% per cast."},
   { name:"Power Word: Shield", group:"Discipline · absorb", kind:"shield", cast:1.5, instant:true, coefficient:0.1, wowhead:17,
     levelGrowth:{17:{perLevel:0.8,cap:11},592:{perLevel:1.2,cap:17},600:{perLevel:1.6,cap:23}}, ranks:[
     [1,6,44,44,45,17],[2,12,86,86,80,592],[3,18,154,154,130,600],[4,24,226,226,175,3747],[5,30,291,291,210,6065],
@@ -74,10 +74,9 @@ window.TRAINING_COSTS = {
   2054:3800,2055:7600,6063:11400,6064:null,
   2061:2850,9472:5700,9473:10450,9474:15200,10915:22800,10916:28500,10917:39900,
   15237:380,15430:665,15431:1140,27799:1805,27800:2185,27801:null,
-  401937:10450,1240770:15200,1240771:22800,1240772:28500,1240773:39900,1240774:null,
+  724:null,27870:null,27871:null,
   596:9500,996:17100,10960:28500,10961:43700,25316:null,
   2060:17100,10963:24700,10964:36100,10965:41800,25314:null,
-  724:null,27870:null,27871:null,
   401859:28500,1240826:43700,1240827:null,
   401946:null,
   1277370:null,1277371:null,1277372:null,1277374:null,1277376:null,1277377:null,1277378:null,
