@@ -102,6 +102,7 @@ h2 { font-size: clamp(26px, 3.3vw, 36px); letter-spacing: -.045em; margin: 0; li
 .spell-card[open] { background: var(--page); }
 .spell-card summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; min-height: 61px; padding: 10px 15px; }
 .spell-card summary::-webkit-details-marker { display: none; }
+.spell-description { padding: 0 15px 10px 57px; color: var(--soft); font-size: 11px; line-height: 1.45; }
 .spell-glyph { width: 30px; height: 30px; border: 1px solid var(--line); color: var(--accent); display: grid; place-items: center; border-radius: 50%; font-size: 14px; flex-shrink: 0; }
 .shield-glyph { color: var(--soft); }
 .spell-title { display: flex; flex-direction: column; line-height: 1.25; }
