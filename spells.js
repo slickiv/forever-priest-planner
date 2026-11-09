@@ -99,7 +99,7 @@ window.TRAINING_COSTS = {
   25315:{type:"manual",name:"Codex of Renew X",requirement:"Requires level 60",source:"UrGameTips",url:"https://urgametips.com/wow-forever/priest-guides/spells/"},
   13908:{type:"free",acquisition:"class quest",source:"UrGameTips",url:"https://urgametips.com/wow-forever/priest-guides/spells/"},19236:100,19238:300,19240:600,19241:1100,19242:1500,19243:2200,
   2054:1600,2055:4000,6063:8000,6064:12000,
-  2061:2850,9472:5700,9473:10450,9474:15200,10915:22800,10916:28500,10917:39900,
+  2061:3000,9472:6000,9473:11000,9474:16000,10915:24000,10916:30000,10917:42000,
   15237:null,15430:400,15431:700,27799:1200,27800:1900,27801:2300,
   724:null,27870:null,27871:null,
   596:10000,996:18000,10960:30000,10961:46000,25316:{type:"manual",name:"Codex of Prayer of Healing V",requirement:"Requires level 60",source:"UrGameTips",url:"https://urgametips.com/wow-forever/priest-guides/spells/"},
