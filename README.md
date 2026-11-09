@@ -10,6 +10,8 @@ Open `index.html` in a modern browser or serve this directory with a static file
 
 Spell rank, level, base range, cost, and Wowhead spell ID records are in `spells.js`; the user supplied tooltip observations are in `observations/annadra-level-21-22-tooltips.csv`. The records use the Forever Priest client spellbook and Wowhead Forever entries. Numeric prices from [Warcraft Forever's Priest spell recorder](https://warcraftforever.games/classes/priest/spells) are labeled beta recorder quotes, not live quotes. Lesser Heal, Renew, and Heal Rank 4 prices are separately tagged reference amounts from [UrGameTips](https://urgametips.com/wow-forever/priest-guides/spells/) and [X'yera's beta-observed trainer list](https://wowforever.ninja/npcs/6014-xyera/). Lesser Heal Rank 1 is shown as a free starter rank based on the spell guide's level-1 row with no trainer fee. Renew Rank 10 is learned from the Codex of Renew X manual; its purchase price is not listed. Null prices elsewhere remain unknown rather than free.
 
+Display clarity checks: keep each main healing value aligned with its game tooltip; show Renew's tooltip total as the primary range and its tick healing only in tick metrics; don't repeat “Instant” alongside its 1.5s GCD; group training source links once per spell card; and avoid repeating totals or metrics. When an expected value equals its mean, label it “Same as mean” instead of printing the same number twice. Review the rendered table at narrow and wide widths after display changes.
+
 For each rank, the formula is:
 
 1. Start with that rank's client base healing minimum and maximum, plus per-level base growth where its metadata has been verified and the rank has not reached its cap.

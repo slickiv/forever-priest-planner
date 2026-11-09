@@ -273,11 +273,10 @@ function fmtTrainingCost(copper, spell, rank) {
     const coins = amount % 100;
     return [gold ? `${gold}g` : "", silver ? `${silver}s` : "", coins ? `${coins}c` : ""].filter(Boolean).join(" ") || "Free";
   };
-  const sourceLink = (label,url,secondaryUrl) => `<small class="training-source"><a href="${url}" target="_blank" rel="noreferrer">${label}</a>${secondaryUrl?` · <a href="${secondaryUrl}" target="_blank" rel="noreferrer">X’yera beta</a>`:""}</small>`;
   if (copper && typeof copper === "object") {
-    if (copper.type === "reference") return `${fmtCoins(copper.copper)}${sourceLink("Reference · UrGameTips",copper.url,copper.secondaryUrl)}`;
-    if (copper.type === "free") return `Free · starter${sourceLink(copper.source,copper.url)}`;
-    if (copper.type === "manual") return `Manual · ${esc(copper.name)}${copper.requirement?` · ${esc(copper.requirement)}`:""}${sourceLink(copper.source,copper.url)}`;
+    if (copper.type === "reference") return fmtCoins(copper.copper);
+    if (copper.type === "free") return "Free · starter";
+    if (copper.type === "manual") return `Manual · ${esc(copper.name)} · price unlisted`;
   }
   if (copper == null) {
     if ((spell.name === "Penance" && rank[5] === 402174) || (spell.name === "Prayer of Mending" && rank[5] === 401859)) return "Talent";
@@ -285,7 +284,24 @@ function fmtTrainingCost(copper, spell, rank) {
     if (["Desperate Prayer","Divine Grace"].includes(spell.name)) return "Racial ability";
     return "Price unknown";
   }
-  return `${fmtCoins(copper)}${sourceLink("Beta recorder quote","https://warcraftforever.games/classes/priest/spells")}`;
+  return fmtCoins(copper);
+}
+function renderTrainingSources(spell) {
+  const betaRecorder="https://warcraftforever.games/classes/priest/spells";
+  const betaObserved=new Set(),references=new Map();
+  for (const rank of spell.ranks) {
+    const price=window.TRAINING_COSTS[rank[5]];
+    if (typeof price === "number") betaObserved.add(betaRecorder);
+    if (price && typeof price === "object") {
+      if (price.url) references.set(price.url,"UrGameTips");
+      if (price.secondaryUrl) references.set(price.secondaryUrl,"X’yera beta");
+    }
+  }
+  const link=(url,label)=>`<a href="${url}" target="_blank" rel="noreferrer">${label}</a>`;
+  const groups=[];
+  if (betaObserved.size) groups.push(`Beta recorder quote · ${link(betaRecorder,"Warcraft Forever recorder")}`);
+  if (references.size) groups.push(`Reference prices · ${Array.from(references,([url,label])=>link(url,label)).join(" · ")}`);
+  return groups.length?`<div class="rank-sources"><span>Training sources</span>${groups.map(group=>`<small>${group}</small>`).join("")}</div>`:"";
 }
 function sortSpellRows(table,key,direction) {
   const rows=[...table.querySelectorAll(".rank-row")];
@@ -315,22 +331,25 @@ function renderSpells() {
       const rankLink = `https://www.wowhead.com/forever/spell=${encodeURIComponent(id)}`;
       const freeReason=m.innerFocusApplies?"Inner Focus":m.holyNovaFree?"Searing Light proc":m.freeFormActive?"Spirit of Redemption":"";
       const note = mana == null ? `<small>${esc(spell.manaNote || "Mana cost unavailable")}</small>` : freeReason?`${mana} → 0 (${freeReason})`:`${m.mana.toLocaleString()} mana${m.litanyRefund?` · ${m.netMana} net`:""}`;
-      const range = fmtRange(renew ? m.healPerEventMin : m.healMin,renew ? m.healPerEventMax : m.healMax);
+      const range = fmtRange(m.healMin,m.healMax);
       const group = ["Prayer of Healing","Holy Nova","Circle of Healing"].includes(spell.name) ? `${range} / target` : range;
       const learnedText = `<span>${learned == null ? "Lv —" : `Lv ${learned}`}</span><span class="training-cost">${fmtTrainingCost(window.TRAINING_COSTS[id],spell,rank)}</span>`;
       const perTime = renew ? fmt(m.healPerEvent) : m.perSecond == null ? "—" : `${fmt(m.perSecond)} / sec`;
       const perMana = m.perMana == null ? "—" : `${fmt(m.perMana,2)} / mana`;
       const effectiveCast = rank[7] ?? spell.cast;
       const shieldCooldown=shield?(talents.soulWarding?" · no cooldown":" · 4s cooldown"):"";
-      const castText = spell.duration ? `${spell.instant ? "Instant · 1.5s GCD" : `${m.cast}s cast`} · ${spell.duration}s effect` : spell.instant ? `Instant · 1.5s GCD${shieldCooldown}` : `${m.cast}s ${spell.channel?"channel":"cast"}`;
+      const castText = spell.duration ? `${spell.instant ? "1.5s GCD" : `${m.cast}s cast`} · ${spell.duration}s effect` : spell.instant ? `1.5s GCD${shieldCooldown}` : `${m.cast}s ${spell.channel?"channel":"cast"}`;
       const details = spell.detail ? `<span class="rank-extra">${esc(spell.detail)}</span>` : "";
       const incompleteGrowth = m.growthIncomplete ? `<span class="rank-extra warning">Learned-level base shown; higher-level growth is incomplete.</span>` : "";
-      const tickLine = renew && m.healMin != null ? `<span class="rank-extra">Total healing over ${spell.duration}s: ${fmtRange(m.healMin,m.healMax)}</span>` : spell.periodicTicks && m.healMin != null ? `<span class="rank-extra">Healing per tick: ${fmtRange(m.healMin/spell.periodicTicks,m.healMax/spell.periodicTicks)}</span>` : "";
-      const tooltipValue = m.baseMin == null ? "Heal amount not exposed" : renew ? `Base total ${fmtRange(m.baseMin,m.baseMax)} · with gear / talents per tick ${range}` : `Base ${fmtRange(m.baseMin,m.baseMax)} · with gear / talents ${range}`;
-      const totalLine = ["Prayer of Healing","Holy Nova","Circle of Healing"].includes(spell.name) ? `<span class="rank-extra">Party mean total (${m.targets}): ${fmt(m.total)}</span>` : spell.name === "Prayer of Mending" ? `<span class="rank-extra">Mean total across ${m.targets} successful heal${m.targets===1?"":"s"}: ${fmt(m.total)}</span>` : spell.name === "Lightwell" ? `<span class="rank-extra">Mean total for ${m.targets} click${m.targets===1?"":"s"}: ${fmt(m.total)}</span>` : "";
+      const tickLine = !renew && spell.periodicTicks && m.healMin != null ? `<span class="rank-extra">Healing per tick: ${fmtRange(m.healMin/spell.periodicTicks,m.healMax/spell.periodicTicks)}</span>` : "";
+      const tooltipValue = m.baseMin == null ? "Heal amount not exposed" : renew ? `Base total ${fmtRange(m.baseMin,m.baseMax)}` : `Base ${fmtRange(m.baseMin,m.baseMax)} · with gear / talents ${range}`;
+      const totalLine = renew ? "" : ["Prayer of Healing","Holy Nova","Circle of Healing"].includes(spell.name) ? `<span class="rank-extra">Party mean total (${m.targets}): ${fmt(m.total)}</span>` : spell.name === "Prayer of Mending" ? `<span class="rank-extra">Mean total across ${m.targets} successful heal${m.targets===1?"":"s"}: ${fmt(m.total)}</span>` : spell.name === "Lightwell" ? `<span class="rank-extra">Mean total for ${m.targets} click${m.targets===1?"":"s"}: ${fmt(m.total)}</span>` : "";
       const critPct=m.critChance*100;
       const displayedExpected = renew ? m.expectedHeal/(spell.periodicTicks||1) : m.expectedPerSecond;
-      return `<div class="rank-row ${shield ? "shield-row" : ""}" data-sort-rank="${rankNo}" data-sort-range="${renew?m.healPerEvent:m.heal??-1}" data-sort-cast="${m.cast}" data-sort-cost="${m.netMana??-1}" data-sort-throughput="${renew?m.healPerEvent:m.perSecond??-1}" data-sort-efficiency="${m.perMana??-1}" data-sort-crit="${critPct}" data-sort-critheal="${m.critHeal??-1}" data-sort-expected="${displayedExpected??-1}" data-sort-hpm="${m.expectedPerMana??-1}" data-sort-aegis="${m.aegisExpected}" data-sort-holybinding="${m.holyBindingExpected}" data-sort-inspiration="${m.inspirationExpected}">
+      const displayedMean = renew ? m.healPerEvent : m.perSecond;
+      const expectedText = displayedExpected == null ? "—" : Math.abs(displayedExpected-(displayedMean??Infinity))<0.05 ? "Same as mean" : renew ? fmt(displayedExpected) : `${fmt(displayedExpected)} / sec`;
+      const expectedPerManaText = m.expectedPerMana == null ? "—" : Math.abs(m.expectedPerMana-(m.perMana??Infinity))<0.005 ? "Same as mean" : `${fmt(m.expectedPerMana,2)} / mana`;
+      return `<div class="rank-row ${shield ? "shield-row" : ""}" data-sort-rank="${rankNo}" data-sort-range="${m.heal??-1}" data-sort-cast="${m.cast}" data-sort-cost="${m.netMana??-1}" data-sort-throughput="${renew?m.healPerEvent:m.perSecond??-1}" data-sort-efficiency="${m.perMana??-1}" data-sort-crit="${critPct}" data-sort-critheal="${m.critHeal??-1}" data-sort-expected="${displayedExpected??-1}" data-sort-hpm="${m.expectedPerMana??-1}" data-sort-aegis="${m.aegisExpected}" data-sort-holybinding="${m.holyBindingExpected}" data-sort-inspiration="${m.inspirationExpected}">
         <div class="rank-name"><a href="${rankLink}" target="_blank" rel="noreferrer">R${rankNo} ↗</a><span>${learnedText}</span></div>
         <div class="rank-amount"><b>${group}</b><span>${kindLabel} · ${tooltipValue}</span>${totalLine}${tickLine}${incompleteGrowth}${details}</div>
         <div class="rank-stat"><span>Cast / timing</span><b>${castText}</b></div>
@@ -339,16 +358,16 @@ function renderSpells() {
         <div class="rank-stat"><span>${shield ? "Absorb / mana" : "Healing / mana"}</span><b>${perMana}</b></div>
         <div class="rank-stat"><span>Crit chance</span><b>${shield ? "—" : `${fmt(critPct,1)}%`}</b></div>
         <div class="rank-stat"><span>Crit heal / event</span><b>${m.critHealMin==null?"—":fmtRange(m.critHealMin,m.critHealMax)}</b></div>
-        <div class="rank-stat"><span>${renew?"Expected / tick":"Expected / sec"}</span><b>${displayedExpected==null?"—":renew?fmt(displayedExpected):`${fmt(displayedExpected)} / sec`}</b></div>
+        <div class="rank-stat"><span>${renew?"Expected / tick":"Expected / sec"}</span><b>${expectedText}</b></div>
         <div class="rank-stat"><span>Holy Binding</span><b>${m.holyBindingExpected?`${fmt(m.holyBindingExpected)} extra / cast`:"—"}</b></div>
-        <div class="rank-stat"><span>Expected / mana</span><b>${m.expectedPerMana==null?"—":`${fmt(m.expectedPerMana,2)} / mana`}</b></div>
+        <div class="rank-stat"><span>Expected / mana</span><b>${expectedPerManaText}</b></div>
         <div class="rank-stat"><span>Expected Aegis</span><b>${m.aegisExpected?`${fmt(m.aegisExpected)} / cast`:"—"}</b></div>
         <div class="rank-stat"><span>Inspiration</span><b>${m.inspirationArmor?`+${fmt(m.inspirationArmor*100,0)}% armor · ${fmt(m.inspirationProcChance*100,1)}% proc`:`—`}</b></div>
       </div>`;
     }).join("");
     return `<details class="spell-card" data-spell-index="${index}" ${ui.open ? "open" : ""}>
       <summary><span class="spell-glyph ${shield ? "shield-glyph" : ""}">${shield ? "◈" : "✦"}</span><span class="spell-title"><b>${esc(spell.name)}</b><small>${esc(spell.group)}</small></span><span class="spell-kind ${shield ? "shield-kind" : ""}">${kindLabel}</span><span class="rank-pill">${spell.ranks.length} ${spell.ranks.length === 1 ? "rank" : "ranks"}</span><span class="chevron">⌄</span></summary>
-      <div class="rank-table"><div class="rank-header" data-sort-key="${ui.sortKey}" data-sort-direction="${ui.direction}">${[["rank","Rank / level · training"],["range",renew?"Healing range / tick":"Healing range"],["cast","Cast"],["cost","Mana"],["throughput",renew?"Mean / tick":"Mean / time"],["efficiency","Mean / mana"],["crit","Crit chance"],["critheal","Crit heal / event"],["expected",renew?"Expected / tick":"Expected / sec"],["holybinding","Holy Binding"],["hpm","Expected / mana"],["aegis","Aegis / cast"],["inspiration","Inspiration value"]].map(([key,label])=>`<button type="button" class="sort-header" data-sort="${key}" aria-label="Sort ${label}">${label} ${ui.sortKey===key?(ui.direction==="asc"?"↑":"↓"):"↕"}</button>`).join("")}</div>${rows}</div>
+      <div class="rank-table"><div class="rank-header" data-sort-key="${ui.sortKey}" data-sort-direction="${ui.direction}">${[["rank","Rank / level · training"],["range","Healing range"],["cast","Cast"],["cost","Mana"],["throughput",renew?"Mean / tick":"Mean / time"],["efficiency","Mean / mana"],["crit","Crit chance"],["critheal","Crit heal / event"],["expected",renew?"Expected / tick":"Expected / sec"],["holybinding","Holy Binding"],["hpm","Expected / mana"],["aegis","Aegis / cast"],["inspiration","Inspiration value"]].map(([key,label])=>`<button type="button" class="sort-header" data-sort="${key}" aria-label="Sort ${label}">${label} ${ui.sortKey===key?(ui.direction==="asc"?"↑":"↓"):"↕"}</button>`).join("")}</div>${rows}${renderTrainingSources(spell)}</div>
     </details>`;
   }).join("");
   host.querySelectorAll(".spell-card[data-spell-index]").forEach(card=>{
