@@ -68,17 +68,42 @@
           <div><p class="eyebrow">RANK-BY-RANK REFERENCE</p><h2>Healing spellbook</h2></div>
           <div class="spell-controls">
             <label class="stat-input">Character level <input id="characterLevel" type="number" min="1" max="60" value="22" step="1" /></label>
-            <label class="stat-input">Bonus healing <input id="bonusHealing" type="number" min="0" value="0" step="1" /> <span>from gear</span></label>
+            <label class="stat-input">Bonus healing <input id="bonusHealing" type="number" min="0" value="0" step="1" /> <span>effective total</span></label>
+            <label class="stat-input">Unlisted healing <input id="bonusHealingAdjustment" type="number" min="0" value="3" step="1" /> <span>+3 tooltip correction</span></label>
             <label class="stat-input">Improved Healing <select id="manaReduction"><option value="0">0/3</option><option value="5">1/3</option><option value="10">2/3</option><option value="15">3/3</option></select></label>
+            <label class="stat-input">Improved Renew <select id="improvedRenew"><option value="0">0/3</option><option value="1">1/3</option><option value="2">2/3</option><option value="3">3/3</option></select></label>
+            <label class="stat-input">Holy Binding <select id="holyBinding"><option value="0">No</option><option value="1">Yes</option></select></label>
+            <label class="stat-input"><input id="flashHealOtherTarget" type="checkbox" /> Flash Heal targets someone else</label>
+            <label class="stat-input">Holy Specialization <select id="holySpecialization"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
+            <label class="stat-input">Divine Fury <select id="divineFury"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
+            <label class="stat-input">Spiritual Healing <select id="spiritualHealing"><option value="0">0/3</option><option value="1">1/3</option><option value="2">2/3</option><option value="3">3/3</option></select></label>
+            <label class="stat-input">Spiritual Guidance <select id="spiritualGuidance"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
+            <label class="stat-input">Renewed Hope <select id="renewedHope"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
+            <label class="stat-input">Divine Aegis <select id="divineAegis"><option value="0">0/3</option><option value="1">1/3</option><option value="2">2/3</option><option value="3">3/3</option></select></label>
+            <label class="stat-input">Soul Warding <select id="soulWarding"><option value="0">No</option><option value="1">Yes</option></select></label>
+            <label class="stat-input">Mental Agility <select id="mentalAgility"><option value="0">0/3</option><option value="1">1/3</option><option value="2">2/3</option><option value="3">3/3</option></select></label>
+            <label class="stat-input">Litany of Light <select id="litanyOfLight"><option value="0">0/2</option><option value="1">1/2</option><option value="2">2/2</option></select></label>
+            <label class="stat-input"><input id="differentPreviousHeal" type="checkbox" /> Previous heal was different</label>
+            <label class="stat-input">Inner Focus <select id="innerFocus"><option value="0">Not talented</option><option value="1">Talented</option></select></label>
+            <label class="stat-input"><input id="innerFocusReady" type="checkbox" /> Inner Focus ready for cast</label>
+            <label class="stat-input">Searing Light <select id="searingLight"><option value="0">0/2</option><option value="1">1/2</option><option value="2">2/2</option></select></label>
+            <label class="stat-input"><input id="holyNovaProcReady" type="checkbox" /> Holy Nova free proc ready</label>
+            <label class="stat-input">Power Infusion <select id="powerInfusionTalent"><option value="0">Not talented</option><option value="1">Talented</option></select></label>
+            <label class="stat-input"><input id="powerInfusionActive" type="checkbox" /> Power Infusion active on caster</label>
+            <label class="stat-input">Spirit of Redemption <select id="spiritOfRedemptionTalent"><option value="0">Not talented</option><option value="1">Talented</option></select></label>
+            <label class="stat-input"><input id="spiritOfRedemptionActive" type="checkbox" /> Spirit of Redemption active</label>
             <label class="stat-input">Twin Disciplines <select id="twinDisciplines"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
             <label class="stat-input">Improved PW:S <select id="improvedPws"><option value="0">0/3</option><option value="1">1/3</option><option value="2">2/3</option><option value="3">3/3</option></select></label>
-            <label class="stat-input">Targets / jumps <input id="partyTargets" type="number" min="1" max="5" value="5" step="1" /> <span>for group / proc totals</span></label>
+            <label class="stat-input">Base spell crit <input id="baseCrit" type="number" min="0" max="100" value="0" step="0.1" /> <span>%</span></label>
+            <label class="stat-input">Total Spirit <input id="totalSpirit" type="number" min="0" value="0" step="1" /></label>
+            <label class="stat-input"><input id="weakenedSoulTarget" type="checkbox" /> Target has Weakened Soul</label>
+            <label class="stat-input">Targets / jumps / clicks <input id="partyTargets" type="number" min="1" max="6" value="5" step="1" /> <span>PoM up to six heals; Lightwell up to five clicks</span></label>
           </div>
         </div>
-        <p class="helper">Each rank shows its level-scaled base range and its range after gear and talents. Lower-rank gear healing fades with level. Throughput and efficiency use the midpoint of the displayed range. Instants use a 1.5 sec global cooldown for throughput.</p>
+        <p class="helper">Sort each spell's ranks with the column headers. Expected healing includes the selected crit chance and 150% critical heals. Use the target toggle for Renewed Hope; enter total Spirit for Spiritual Guidance. Instants use a 1.5 sec global cooldown for throughput.</p>
         <div class="spell-legend"><span><i class="dot heal-dot"></i> Healing</span><span><i class="dot shield-dot"></i> Absorb</span><span id="rankCount"></span></div>
         <div id="spellList" class="spell-list"></div>
-        <div class="method-note"><strong>How the numbers work</strong><p>Where client growth data is available, base healing is increased by its per-level amount up to that rank’s growth cap. Bonus healing is multiplied by the spell coefficient and the Forever downranking share: full share for the first 17 levels after learning, then 5 percentage points less per level. Lesser Heal rank 1 uses its separately measured exception. The resulting endpoints are shown as tooltip-style integers; throughput and efficiency use the displayed range midpoint. Power Word: Shield uses 10% of bonus healing and Improved Power Word: Shield applies its rank values (7%, 14%, or 20%); Twin Disciplines does not affect absorbs. Other instant heals use the 1.5 sec global cooldown. Ranks without verified level-growth data retain their listed base values. These are theoretical values before critical heals, overhealing, and target limits.</p></div>
+        <div class="method-note"><strong>How the numbers work</strong><p>Where client growth data is available, base healing rises by its per-level amount up to that rank’s cap. Bonus healing = (gear + unlisted healing) / Spiritual Guidance bonus × rank coefficient × Forever downrank retention; retention is full for the first 17 levels after learning, then falls by 5 percentage points per level. Lesser Heal R1 has its separately measured exception. The default +3 unlisted healing adjustment corrects Annadra’s observed Heal R2 tooltip; change it if your equipped total already includes that healing. Displayed endpoints are floored / ceiled outward; midpoint throughput and efficiency use the displayed integer range. Crit expectation = mean × (1 + crit chance × 0.5), assuming 150% critical heals. Divine Aegis is expected absorb from eligible non-periodic crits, capped at 1,200 per target. Renewed Hope crit applies only to its listed heals when the target has Weakened Soul. Read the <a href="https://foreverchanges.pro/downranking" target="_blank" rel="noreferrer">downranking measurements</a>, <a href="https://www.wowhead.com/forever/spell=2055/heal" target="_blank" rel="noreferrer">Heal R2</a>, and <a href="https://talentsforever.com/priest/talents" target="_blank" rel="noreferrer">Priest talent data</a>. This is theoretical output before overhealing, proc timing, target limits, interruptions, or fight-duration effects.</p></div>
       </section>
 
       <footer><span>FOREVER PRIEST PLANNER</span><span>Spell data: <a href="https://theforeverera.com/en/spells/priest/" target="_blank" rel="noreferrer">The Forever Era ↗</a> · Calculations: <a href="https://foreverchanges.pro/downrank-calculator" target="_blank" rel="noreferrer">ForeverChanges ↗</a></span></footer>
@@ -111,7 +136,7 @@
         <div class="dialog-actions"><span></span><button class="button quiet" type="button" id="cancelArmory">Cancel</button><button class="button primary" id="importArmory" value="import">Import gear</button></div>
       </form>
     </dialog>
-    <script src="spells.js?v=15"></script>
-    <script src="app.js?v=22"></script>
+    <script src="spells.js?v=18"></script>
+    <script src="app.js?v=26"></script>
   </body>
 </html>
