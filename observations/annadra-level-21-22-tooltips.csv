@@ -13,6 +13,7 @@ Annadra Warderer,21,45,3,0,Renew,3,6075,105,1.5,15,heal,175,175,175,175,"Planner
 Annadra Warderer,22,45,3,0,Power Word: Shield,1,17,45,1.5,30,absorb,52,52,52,52,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
 Annadra Warderer,22,45,3,0,Power Word: Shield,2,592,80,1.5,30,absorb,96,96,96,96,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
 Annadra Warderer,22,45,3,0,Power Word: Shield,3,600,130,1.5,30,absorb,164,164,164,164,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
+Annadra Warderer,22,104,0,0,Heal,2,2055,205,3,,heal,439,490,439,490,"User-provided in-game tooltip; the 350–400 base range plus 104 bonus healing at the 85.7% coefficient gives 439.128–489.128, displayed outward as 439–490. +104 is inferred from the match, not visible in the screenshot."
 Annadra Warderer,22,45,3,0,Lesser Heal,1,2050,30,1.5,,heal,59,70,59,70,Rank 1 uses the measured exception calibrated against the L21/L22 tooltips.
 Annadra Warderer,22,45,3,0,Lesser Heal,2,2052,45,2,,heal,113,130,113,130,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
 Annadra Warderer,22,45,3,0,Lesser Heal,3,2053,75,2.5,,heal,189,214,189,214,"Planner model predicted from the implemented level, coefficient-retention, and talent rules."
