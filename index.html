@@ -94,6 +94,14 @@
               <label class="stat-input"><input id="prayerOfMendingTalent" type="checkbox" /> Prayer of Mending (31 Holy points)</label>
               <label class="stat-input"><input id="mindFlayTalent" type="checkbox" /> Mind Flay (11 Shadow points)</label>
             </div></fieldset>
+            <fieldset class="settings-group"><legend>Warlock talent spells</legend><div class="spell-controls">
+              <label class="stat-input"><input id="warlockTalentShadowburn" type="checkbox" /> Shadowburn (Destruction)</label>
+              <label class="stat-input"><input id="warlockTalentConflagrate" type="checkbox" /> Conflagrate (Destruction)</label>
+              <label class="stat-input"><input id="warlockTalentIncinerate" type="checkbox" /> Incinerate (Destruction)</label>
+              <label class="stat-input"><input id="warlockTalentSiphonLife" type="checkbox" /> Siphon Life (Affliction)</label>
+              <label class="stat-input"><input id="warlockTalentWrack" type="checkbox" /> Wrack (Affliction)</label>
+              <label class="stat-input"><input id="warlockTargetImmolate" type="checkbox" /> Target is affected by Immolate</label>
+            </div></fieldset>
             <fieldset class="settings-group"><legend>Healing and mana talents</legend><div class="spell-controls">
               <label class="stat-input">Twin Disciplines <select id="twinDisciplines"><option value="0">0/5</option><option value="1">1/5</option><option value="2">2/5</option><option value="3">3/5</option><option value="4">4/5</option><option value="5">5/5</option></select></label>
               <label class="stat-input">Improved PW:S <select id="improvedPws"><option value="0">0/3</option><option value="1">1/3</option><option value="2">2/3</option><option value="3">3/3</option></select></label>
@@ -163,11 +171,12 @@
         <div class="section-head spell-head">
           <div><p class="eyebrow">RANK-BY-RANK REFERENCE</p><h2>Damage spellbook</h2></div>
           <div class="spell-list-controls" aria-label="Damage spell list controls">
+            <label>Class <select id="damageClass"><option value="priest">Priest</option><option value="warlock">Warlock</option></select></label>
             <label>Sort spells <select id="damageSort"><option value="learned">Order learned</option><option value="name">Name</option><option value="category">School / type</option><option value="rank-count">Total rank count</option></select></label>
             <label>Show ranks <select id="damageLevelScope"><option value="level">Available at selected level</option><option value="all">All levels</option></select></label>
           </div>
         </div>
-        <p class="helper" id="damageStatSummary">Damage is shown for one target unless the spell is an area effect. Instant spells use the global cooldown; channels use their full channel time. Reactive spells show damage per trigger. Choose race and talents under Planner settings to reveal restricted spells.</p>
+        <p class="helper" id="damageStatSummary">Damage uses the selected class and rank tooltips, with spell power and crit where client data exposes them. Talent-granted spells appear only when enabled in Planner settings. Some server-scripted values are not exposed by the client.</p>
         <div class="spell-legend"><span><i class="dot damage-dot"></i> Damage</span><span id="damageRankCount"></span></div>
         <div id="damageSpellList" class="spell-list"></div>
         <div class="method-note"><strong>Damage calculations</strong>
@@ -175,6 +184,7 @@
           <p>Expected damage applies the entered crit chance and Holy Specialization to each direct hit and each client-flagged periodic tick. Ready Inner Focus adds 25 percentage points to eligible direct hits and makes that cast free; a ready Searing Light proc makes Holy Nova free. Ordinary critical effects use 150%; Shadowform makes Shadow spell critical hits deal 200% of normal damage. Expected damage per second divides expected damage by the longest of cast/GCD, cooldown, and DoT duration, assuming full DoT uptime. Twin Disciplines follows its instant-spell rule plus Blizzard's named exceptions: Shadow Word: Death, Mind Flay, Starshards, and Penance. Mind Blast includes its reduced cooldown when Improved Mind Blast is selected; Mana Burn includes Improved Mana Burn cast reductions; Improved Healing and Mental Agility reduce the eligible damage spells' mana costs; Devouring Contagion reduces Devouring Plague mana cost by 25% or 50%. The model assumes hits land and does not add target resistance.</p>
           <p>Holy Nova is per enemy target, Penance is per bolt and per three-bolt cast, Holy Fire separates its direct hit and periodic component, and Mana Burn damage equals half the Mana actually drained. Shadow Word: Death lists its possible self-backlash outside outgoing damage. Devouring Contagion's reduced mana cost is included; target-death spread damage is excluded from the single-target comparison. Chastise is Dwarf-only and Humanoid-only. Feedback is Human-only, Shadowguard Troll-only, Starshards Night Elf-only, and Touch of Weakness Undead-only.</p>
           <p>Rank levels, mana, cast times, cooldowns, and restrictions are cross-referenced against Wowhead Forever spell records. Bonus healing adds one third as much spell damage under Blizzard's itemization rules. Damage spell training prices are not yet verified for this list. <a href="https://worldofwarcraft.blizzard.com/en-us/news/24303313" target="_blank" rel="noreferrer" aria-label="Blizzard World of Warcraft Forever itemization recap">reference</a> · <a href="https://www.wowhead.com/forever/guide/classes/priest/holy/healer-abilities" target="_blank" rel="noreferrer" aria-label="Wowhead Forever Priest ability guide">reference</a> · <a href="https://www.wowhead.com/forever/guide/classes/priest/shadow/dps-abilities" target="_blank" rel="noreferrer" aria-label="Wowhead Forever Shadow Priest damage spell guide">reference</a> · <a href="https://www.wowhead.com/forever/changes/talents/priest" target="_blank" rel="noreferrer" aria-label="Wowhead Forever Priest talent changes">reference</a> · <a href="https://www.wowhead.com/forever/spells/abilities/priest" target="_blank" rel="noreferrer" aria-label="Wowhead Forever Priest spell ranks">reference</a></p>
+          <p>Warlock mode includes 17 damaging spell families and all 80 ranks. Base hit ranges and periodic totals use the current rank tooltip plus client BasePoints, Variance, points per level, and level caps. Spell power uses client coefficients only where exposed; critical expectation uses entered base spell crit. Warlock damage talents and pet attacks are outside this model, while every talent-granted spell stays hidden until its Settings toggle is selected. Conflagrate requires Immolate on the target, and Incinerate gains the tooltip's 25% bonus while Immolate is active. Rain of Fire uses its exact rank tooltip base; no spell-power coefficient is exposed, so none is added. <a href="https://theforeverera.com/en/spells/warlock/" target="_blank" rel="noreferrer" aria-label="The Forever Era Warlock spellbook, rank tooltips and build 1.60.1.70862">reference</a> · <a href="https://www.wowhead.com/forever/spells/abilities/warlock" target="_blank" rel="noreferrer" aria-label="Wowhead Forever Warlock spell ranks">link</a> · <a href="https://www.wowhead.com/forever/spells/talents/warlock/destruction" target="_blank" rel="noreferrer" aria-label="Wowhead Forever Warlock Destruction talents">reference</a> · <a href="https://www.wowhead.com/forever/spells/talents/warlock/affliction" target="_blank" rel="noreferrer" aria-label="Wowhead Forever Warlock Affliction talents">reference</a></p>
         </div>
       </section>
 
@@ -211,6 +221,7 @@
     </dialog>
     <script src="spells.js?v=31"></script>
     <script src="damage-data.js?v=3"></script>
-    <script src="app.js?v=48"></script>
+    <script src="warlock-damage-data.js?v=2"></script>
+    <script src="app.js?v=49"></script>
   </body>
 </html>
