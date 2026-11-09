@@ -120,6 +120,7 @@ h2 { font-size: clamp(26px, 3.3vw, 36px); letter-spacing: -.045em; margin: 0; li
 .rank-stat { display: flex; flex-direction: column; gap: 3px; }
 .rank-stat small { color: var(--muted); font-size: 9px; }
 .rank-extra { font-size: 10px; color: var(--soft); line-height: 1.35; }
+.rank-extra.warning { color: var(--warning, #b56a00); }
 .method-note { margin-top: 20px; border-left: 2px solid var(--accent); padding: 4px 0 4px 14px; max-width: 920px; }
 .method-note strong { font-size: 12px; }
 .method-note p { margin: 5px 0 0; color: var(--soft); font-size: 11px; }
