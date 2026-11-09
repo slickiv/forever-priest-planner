@@ -72,7 +72,7 @@ window.HEALING_SPELLS = [
   ], detail:"Absorb amount is shown as effective shielding; actual value is capped by incoming damage."}
 ];
 
-/* Numeric trainer prices (copper) are live quotes read from the spell recorder at
+/* Numeric trainer prices (copper) are beta recorder observations read from
    https://warcraftforever.games/classes/priest/spells on 2026-11-08.
    Object values preserve non-live reference/acquisition metadata instead of
    treating a published reference as a live quote. A null value is unknown. */

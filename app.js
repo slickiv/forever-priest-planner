@@ -285,7 +285,7 @@ function fmtTrainingCost(copper, spell, rank) {
     if (["Desperate Prayer","Divine Grace"].includes(spell.name)) return "Racial ability";
     return "Price unknown";
   }
-  return `${fmtCoins(copper)}${sourceLink("Live quote","https://warcraftforever.games/classes/priest/spells")}`;
+  return `${fmtCoins(copper)}${sourceLink("Beta recorder quote","https://warcraftforever.games/classes/priest/spells")}`;
 }
 function sortSpellRows(table,key,direction) {
   const rows=[...table.querySelectorAll(".rank-row")];
