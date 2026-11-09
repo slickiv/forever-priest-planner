@@ -1678,7 +1678,21 @@ window.DAMAGE_SPELLS = [
         "damageMax": 92,
         "hits": 3,
         "duration": 2,
-        "effects": [],
+        "effects": [
+          {
+            "id": 1350039,
+            "owner": 1316994,
+            "type": "E_SCHOOL_DAMAGE",
+            "aura": null,
+            "basePoints": 92,
+            "perLevel": 0,
+            "variance": null,
+            "baseLevel": 60,
+            "maxLevel": 60,
+            "spellPowerCoefficient": 0.1899999976158142,
+            "periodMs": null
+          }
+        ],
         "school": "Holy",
         "boltIntervalSeconds": 1
       }
