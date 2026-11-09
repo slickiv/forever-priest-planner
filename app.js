@@ -506,12 +506,13 @@ function damageMetrics(spell,rank){
   };
   const directBase=effectBaseRange(directEffect)??(rank.damageMin==null?null:{min:rank.damageMin,max:rank.damageMax});
   const tickBase=effectBaseRange(dotEffect)??(rank.dotTotalMin==null?null:{min:rank.dotTotalMin/Math.max(1,ticks),max:rank.dotTotalMax/Math.max(1,ticks)});
+  const drainBase=effectBaseRange(rank.effects?.find(e=>e.type==="E_POWER_BURN"))??(rank.drainMin==null?null:{min:rank.drainMin,max:rank.drainMax});
   let baseTotalMin=tickBase==null?null:tickBase.min*ticks,baseTotalMax=tickBase==null?null:tickBase.max*ticks;
   if(spell.name==="Shadow Word: Pain"&&baseTotalMin!=null){ticks+=talents.improvedShadowWordPain;baseTotalMin=tickBase.min*ticks;baseTotalMax=tickBase.max*ticks;}
   let directMin=directBase?.min??null,directMax=directBase?.max??null;
   let perTickMin=null,perTickMax=null,totalMin=null,totalMax=null;
   if(spell.kind==="mana-burn"){
-    directMin=(rank.drainMin||0)*rank.damagePerMana;directMax=(rank.drainMax||0)*rank.damagePerMana;
+    directMin=(drainBase?.min||0)*rank.damagePerMana;directMax=(drainBase?.max||0)*rank.damagePerMana;
   }
   const shadowMultiplier=shadow?1+talents.darkness*.02+(talents.shadowWeaving?talents.shadowWeavingStacks*.02:0)+(talents.shadowform ? .10 : 0):1;
   const holyMultiplier=holy?1+([0,.02,.05][talents.searingLight]||0):1;
@@ -534,8 +535,8 @@ function damageMetrics(spell,rank){
     const directCoef=directEffect?.spellPowerCoefficient||0;
     const dotCoef=dotEffect?.spellPowerCoefficient||0;
     const directMultiplier=holyMultiplier*instantMultiplier*powerInfusionMultiplier;
-    directMin=rank.damageMin==null?null:(rank.damageMin+powerPerCoefficient*directCoef)*directMultiplier;
-    directMax=rank.damageMax==null?null:(rank.damageMax+powerPerCoefficient*directCoef)*directMultiplier;
+    directMin=directBase==null?null:(directBase.min+powerPerCoefficient*directCoef)*directMultiplier;
+    directMax=directBase==null?null:(directBase.max+powerPerCoefficient*directCoef)*directMultiplier;
     perTickMin=baseTotalMin==null?null:baseTotalMin/ticks+powerPerCoefficient*dotCoef;
     perTickMax=baseTotalMax==null?null:baseTotalMax/ticks+powerPerCoefficient*dotCoef;
     totalMin=baseTotalMin==null?null:(baseTotalMin+powerPerCoefficient*dotCoef*ticks)*talentMultiplier;
@@ -567,7 +568,7 @@ function damageMetrics(spell,rank){
   const perMana=mana&&spell.kind!=="reactive"?expectedMean/mana:null;
   const directCritMin=directMin==null||!directCanCrit?null:directMin*critMultiplier,directCritMax=directMax==null||!directCanCrit?null:directMax*critMultiplier;
   const tickCritMin=perTickMin==null||!periodicCanCrit?null:perTickMin*critMultiplier,tickCritMax=perTickMax==null||!periodicCanCrit?null:perTickMax*critMultiplier;
-  return {coefficient,ticks,directMin,directMax,directBaseMin:directBase?.min??null,directBaseMax:directBase?.max??null,baseTotalMin,baseTotalMax,tickBaseMin:tickBase?.min??null,tickBaseMax:tickBase?.max??null,perTickMin,perTickMax,totalMin,totalMax,hitCount,fullTotalMin,fullTotalMax,expectedMean,expectedDps,perMana,mana,critChance,directCritChance,periodicCritChance,critMultiplier,directCritMin,directCritMax,tickCritMin,tickCritMax,cycle,cooldown,castAdjusted,enemyTargets,spellPower,talentMultiplier,downrankRetention,improvedHealingApplies,mentalAgilityApplies,hasDamageEffect:Boolean(directEffect||dotEffect)};
+  return {coefficient,ticks,directMin,directMax,directBaseMin:directBase?.min??null,directBaseMax:directBase?.max??null,drainBaseMin:drainBase?.min??null,drainBaseMax:drainBase?.max??null,baseTotalMin,baseTotalMax,tickBaseMin:tickBase?.min??null,tickBaseMax:tickBase?.max??null,perTickMin,perTickMax,totalMin,totalMax,hitCount,fullTotalMin,fullTotalMax,expectedMean,expectedDps,perMana,mana,critChance,directCritChance,periodicCritChance,critMultiplier,directCritMin,directCritMax,tickCritMin,tickCritMax,cycle,cooldown,castAdjusted,enemyTargets,spellPower,talentMultiplier,downrankRetention,improvedHealingApplies,mentalAgilityApplies,hasDamageEffect:Boolean(directEffect||dotEffect||drainBase)};
 }
 function renderDamageSpells(){
   const host=document.querySelector("#damageSpellList");if(!host||!window.DAMAGE_SPELLS)return;
@@ -581,7 +582,7 @@ function renderDamageSpells(){
       const damageBaseText=spell.kind==="reactive"?fmtRange(m.directMin,m.directMax):spell.kind==="direct-dot"?`${fmtRange(m.directMin,m.directMax)} hit · ${fmtRange(m.totalMin,m.totalMax)} total DoT`:m.ticks?`${fmtRange(m.perTickMin,m.perTickMax)} / tick · ${fmtRange(m.totalMin,m.totalMax)} total`:spell.kind==="channel-bolts"?`${fmtRange(m.directMin,m.directMax)} / bolt · ${fmtRange(m.fullTotalMin,m.fullTotalMax)} / cast`:fmtRange(m.directMin,m.directMax);
       const damageText=damageBaseText+(spell.name==="Shadow Word: Death"?" · 30% max-health backlash if target survives":"");
       const tooltipBaseText=spell.kind==="mana-burn"?`${fmtRange(r.drainMin,r.drainMax)} mana drained`:spell.kind==="direct-dot"?`${fmtRange(r.damageMin,r.damageMax)} hit · ${fmtRange(r.dotTotalMin,r.dotTotalMax)} total DoT`:r.dotTotalMin!=null?`${fmtRange(r.dotTotalMin,r.dotTotalMax)} total · ${m.ticks} ticks`:spell.kind==="channel-bolts"?`${fmtRange(r.damageMin,r.damageMax)} / bolt · ${r.hits||3} bolts`:fmtRange(r.damageMin,r.damageMax);
-      const baseText=spell.kind==="mana-burn"?`${fmtRange(r.drainMin,r.drainMax)} mana drained`:spell.kind==="direct-dot"?`${fmtRange(m.directBaseMin,m.directBaseMax)} hit · ${fmtRange(m.baseTotalMin,m.baseTotalMax)} DoT total`:m.ticks?`${fmtRange(m.tickBaseMin,m.tickBaseMax)} / tick · ${fmtRange(m.baseTotalMin,m.baseTotalMax)} total`:spell.kind==="channel-bolts"?`${fmtRange(m.directBaseMin,m.directBaseMax)} / bolt · ${fmtRange(m.directBaseMin*m.hitCount,m.directBaseMax*m.hitCount)} / cast`:fmtRange(m.directBaseMin,m.directBaseMax);
+      const baseText=spell.kind==="mana-burn"?`${fmtRange(m.drainBaseMin,m.drainBaseMax)} mana drained`:spell.kind==="direct-dot"?`${fmtRange(m.directBaseMin,m.directBaseMax)} hit · ${fmtRange(m.baseTotalMin,m.baseTotalMax)} DoT total`:m.ticks?`${fmtRange(m.tickBaseMin,m.tickBaseMax)} / tick · ${fmtRange(m.baseTotalMin,m.baseTotalMax)} total`:spell.kind==="channel-bolts"?`${fmtRange(m.directBaseMin,m.directBaseMax)} / bolt · ${fmtRange(m.directBaseMin*m.hitCount,m.directBaseMax*m.hitCount)} / cast`:fmtRange(m.directBaseMin,m.directBaseMax);
       const baseSourceText=`${m.hasDamageEffect?`Client base at level ${Math.max(characterLevel,r.level)}`:"Rank tooltip only; no level effect"} · Tooltip snapshot: ${tooltipBaseText}`;
       const effectPeriod=r.effects?.find(e=>e.periodMs)?.periodMs;
       const effectDuration=m.ticks&&effectPeriod?fmt(m.ticks*effectPeriod/1000,1):null;
@@ -598,7 +599,7 @@ function renderDamageSpells(){
       if(m.improvedHealingApplies&&talents.improvedHealing)costModifiers.push(`Improved Healing: ${talents.improvedHealing*5}% reduction`);
       if(m.mentalAgilityApplies&&talents.mentalAgility)costModifiers.push(`Mental Agility: ${[0,3,7,10][talents.mentalAgility]}% reduction`);
       if(spell.school==="Shadow"&&talents.shadowform)costModifiers.push("Shadowform: 50% reduction");
-      return `<div class="damage-rank-row" data-rank="${r.rank}" data-base="${m.fullTotalMin+m.fullTotalMax}" data-damage="${m.expectedMean}" data-dps="${m.expectedDps??-1}" data-mana="${m.mana??-1}" data-efficiency="${m.perMana??-1}" data-crit="${m.critChance*100}" data-cast="${m.cycle??-1}"><div><a href="${href}" target="_blank" rel="noreferrer">R${r.rank} ↗</a><small>${learned} · ${acquisition}</small></div><div><b>${baseText}</b><small>${baseSourceText}</small></div><div><b>${damageText}</b><small>${spell.kind==="reactive"?"Per trigger; no proc rate assumed":spell.kind==="direct-dot"?`${fmt(r.effects.find(e=>e.type==="E_SCHOOL_DAMAGE")?.spellPowerCoefficient||0,3)} direct · ${fmt(r.effects.find(e=>e.aura==="A_PERIODIC_DAMAGE")?.spellPowerCoefficient||0,3)} per tick`: `${fmt(m.coefficient,3)} spell-power coefficient${m.ticks?" per tick":""}`}</small></div><div><b>${timing}</b><small>${spell.kind==="humanoid"?"Humanoid targets only":spell.kind==="mana-burn"?"Expected damage uses full listed drain":""}</small></div><div><b>${m.mana==null?"—":`${m.mana} mana`}</b><small>${costModifiers.join(" · ")||"Mana per cast"}</small></div><div><b>${dps}</b><small>${spell.kind==="aoe"?`At ${m.enemyTargets} target${m.enemyTargets===1?"":"s"}`:spell.kind==="reactive"?"No proc rate":`Includes crit expectation`}</small></div><div><b>${perMana}</b><small>Expected damage / mana</small></div><div><b>${crit}</b><small>${m.critChance?`Crit impact: ${fmt(m.critMultiplier*100,0)}`:"No crit modeled for this event"}</small></div></div>`;
+      return `<div class="damage-rank-row" data-rank="${r.rank}" data-base="${m.fullTotalMin+m.fullTotalMax}" data-damage="${m.expectedMean}" data-dps="${m.expectedDps??-1}" data-mana="${m.mana??-1}" data-efficiency="${m.perMana??-1}" data-crit="${m.critChance*100}" data-cast="${m.cycle??-1}"><div><a href="${href}" target="_blank" rel="noreferrer">R${r.rank} ↗</a><small>${learned} · ${acquisition}</small></div><div><b>${baseText}</b><small>${baseSourceText}</small></div><div><b>${damageText}</b><small>${spell.kind==="reactive"?"Per trigger; no proc rate assumed":spell.kind==="direct-dot"?`${fmt(r.effects.find(e=>e.type==="E_SCHOOL_DAMAGE")?.spellPowerCoefficient||0,3)} direct · ${fmt(r.effects.find(e=>e.aura==="A_PERIODIC_DAMAGE")?.spellPowerCoefficient||0,3)} per tick`: `${fmt(m.coefficient,3)} spell-power coefficient${m.ticks?" per tick":""}`}</small></div><div><b>${timing}</b><small>${spell.kind==="humanoid"?"Humanoid targets only":spell.kind==="mana-burn"?"Assumes the target has enough Mana for the full drain":""}</small></div><div><b>${m.mana==null?"—":`${m.mana} mana`}</b><small>${costModifiers.join(" · ")||"Mana per cast"}</small></div><div><b>${dps}</b><small>${spell.kind==="aoe"?`At ${m.enemyTargets} target${m.enemyTargets===1?"":"s"}`:spell.kind==="reactive"?"No proc rate":`Includes crit expectation`}</small></div><div><b>${perMana}</b><small>Expected damage / mana</small></div><div><b>${crit}</b><small>${m.critChance?`Crit impact: ${fmt(m.critMultiplier*100,0)}`:"No crit modeled for this event"}</small></div></div>`;
     }).join("");
     const firstRank=spell.ranks[0];
     const cat=`${spell.school} · ${spell.kind.replaceAll("-"," ")}`;
