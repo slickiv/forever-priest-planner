@@ -215,7 +215,7 @@ function spellMetrics(spell, rank) {
   const expectedPerMana=expectedTotal==null||!netMana?null:expectedTotal/netMana;
   const aegisRate=[0,.05,.10,.15][talents.divineAegis];
   const aegisTargets=["Prayer of Healing","Holy Nova","Circle of Healing","Prayer of Mending"].includes(spell.name)?targets:1;
-  const aegisExpected=heal==null||!aegisRate||spell.kind==="shield"||["Renew","Lightwell","Penance"].includes(spell.name)?0:Math.min(1200,heal*1.5*aegisRate)*critChance*aegisTargets;
+  const aegisExpected=heal==null||!aegisRate||spell.kind==="shield"||["Renew","Lightwell"].includes(spell.name)?0:Math.min(1200,heal*1.5*aegisRate)*critChance*aegisTargets;
   return {bonus,targets,mana,netMana,litanyRefund,baseMin,baseMax,healMin,healMax,heal,total,perSecond,perMana,amountLabel,talentMultiplier,effectiveCoefficient,coefficientRetention,cast,critChance,critHeal,critHealMin,critHealMax,expectedHeal,expectedTotal,expectedPerSecond,expectedPerMana,aegisExpected,holyBindingExpected,innerFocusApplies,holyNovaFree,freeFormActive};
 }
 function fmt(value, places=1) { return value == null || !Number.isFinite(value) ? "—" : Number(value.toFixed(places)).toLocaleString(undefined,{maximumFractionDigits:places}); }
