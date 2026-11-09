@@ -11,15 +11,16 @@
    Holy Nova 0.107, Prayer of Mending 0.429, Circle of Healing 0.214, and PW:S 0.1.
    Penance base/effect IDs are separate from its cast IDs. Each rank has three bolt heals;
    per-level Penance values are from client effect data and capped at the next-rank level.
-   Heal R2's documented 2.9/level growth does not reproduce published endpoints exactly,
-   so only its learned base is shown and higher-level base estimates are marked incomplete.
+   Heal R2 uses generated client midpoint 375, PPL 2.9, variance 0.1347826123, base level 22,
+   and max level 27; endpoints are rounded to the nearest base-heal integer.
+   https://github.com/wowsims/forever/blob/ae9b8c23a94aafd6f42876030d8ba07ff230e960/sim/core/spelldata/spells_auto_gen.go#L1614
    Racial direct heals use 0.429. */
 window.HEALING_SPELLS = [
   { name:"Lesser Heal", group:"Holy", kind:"heal", cast:1.5, coefficient:0.429, wowhead:2050,
     levelGrowth:{2050:{perLevel:0.3,cap:3,downrankOffset:0.15},2052:{perLevel:0.7,cap:9},2053:{perLevel:1.2,cap:15}}, ranks:[
     [1,1,46,56,30,2050,0.429,1.5],[2,4,86,102,45,2052,0.571,2],[3,10,151,175,75,2053,0.714,2.5]
   ]},
-  { name:"Renew", group:"Holy", kind:"heal", cast:1.5, instant:true, duration:15, coefficient:1, wowhead:139, ranks:[
+  { name:"Renew", group:"Holy", kind:"heal", cast:1.5, instant:true, duration:15, periodicTicks:5, coefficient:1, wowhead:139, ranks:[
     [1,8,45,45,30,139],[2,14,75,75,65,6074],[3,20,125,125,105,6075],[4,26,160,160,140,6076],[5,32,205,205,170,6077],
     [6,38,270,270,205,6078],[7,44,370,370,250,10927],[8,50,510,510,305,10928],[9,56,670,670,365,10929],[10,60,830,830,410,25315]
   ]},
@@ -27,8 +28,9 @@ window.HEALING_SPELLS = [
     [1,10,131,167,0,13908],[2,18,247,305,0,19236],[3,26,414,502,0,19238],[4,34,540,650,0,19240],
     [5,42,781,931,0,19241],[6,50,1046,1240,0,19242],[7,58,1269,1497,0,19243]
   ]},
-  { name:"Heal", group:"Holy", kind:"heal", cast:3, coefficient:0.857, wowhead:2054,incompleteGrowthRanks:[2055],
-    levelGrowth:{2054:{perLevel:2,cap:21}}, ranks:[
+  { name:"Heal", group:"Holy", kind:"heal", cast:3, coefficient:0.857, wowhead:2054,
+    levelGrowth:{2054:{perLevel:2,cap:21}},
+    baseGrowth:{2055:{baseLevel:22,basePoints:375,perLevel:2.9,variance:0.1347826123,cap:27}}, ranks:[
     [1,16,250,290,155,2054],[2,22,350,400,205,2055],[3,28,490,556,255,6063],[4,34,611,691,305,6064]
   ]},
   { name:"Flash Heal", group:"Holy", kind:"heal", cast:1.5, coefficient:0.429, wowhead:2061,
@@ -45,7 +47,7 @@ window.HEALING_SPELLS = [
   { name:"Greater Heal", group:"Holy", kind:"heal", cast:3, coefficient:0.857, wowhead:2060, ranks:[
     [1,40,794,894,370,2060],[2,46,1036,1162,455,10963],[3,52,1324,1482,545,10964],[4,58,1685,1879,655,10965],[5,60,1853,2067,710,25314]
   ]},
-  { name:"Lightwell", group:"Holy · setup / charges", kind:"heal", cast:1.5, duration:10, coefficient:0, wowhead:724, ranks:[
+  { name:"Lightwell", group:"Holy · setup / charges", kind:"heal", cast:1.5, duration:10, periodicTicks:5, coefficient:0, wowhead:724, ranks:[
     [1,40,800,800,225,724],[2,50,1165,1165,295,27870],[3,60,1600,1600,365,27871]
   ], detail:"Healing per click over 10 seconds; up to five charges. Total healing assumes the number of successful clicks selected above."},
   { name:"Prayer of Mending", group:"Holy · reactive / jumps", kind:"group", cast:1.5, instant:true, coefficient:0.429, wowhead:401859, ranks:[
@@ -58,7 +60,7 @@ window.HEALING_SPELLS = [
     [1,10,131,167,0,1277370],[2,18,247,305,0,1277371],[3,26,414,502,0,1277372],[4,34,540,650,0,1277374],
     [5,42,781,931,0,1277376],[6,50,1046,1240,0,1277377],[7,58,1269,1497,0,1277378]
   ]},
-  { name:"Penance", group:"Discipline · channeled", kind:"heal", cast:2, channel:true, bolts:3, coefficient:0.19, wowhead:402174,
+  { name:"Penance", group:"Discipline · channeled", kind:"heal", school:"discipline", cast:2, channel:true, bolts:3, coefficient:0.19, wowhead:402174,
     levelGrowth:{402289:{perLevel:0.87,cap:39},1240723:{perLevel:0.98,cap:49},1240724:{perLevel:1.27,cap:59}}, ranks:[
     [1,30,126,126,150,402174,0.19,2,402289],[2,40,200,200,220,1240720,0.19,2,1240723],
     [3,50,268,268,270,1240721,0.19,2,1240724],[4,60,425,425,385,1316995,0.19,2,1316991]
@@ -70,9 +72,9 @@ window.HEALING_SPELLS = [
   ], detail:"Absorb amount is shown as effective shielding; actual value is capped by incoming damage."}
 ];
 
-/* Trainer prices (copper). Read from the live in-game spell recorder at
+/* Observed trainer prices (copper). Read from the spell recorder at
    https://warcraftforever.games/classes/priest/spells on 2026-11-08.
-   A null value means the rank has no trainer charge in that source. */
+   A null value means that source gave no price; it is unknown, not free. */
 window.TRAINING_COSTS = {
   2050:null,2052:null,2053:null,
   139:null,6074:null,6075:null,6076:null,6077:null,6078:null,10927:null,10928:null,10929:null,25315:null,
