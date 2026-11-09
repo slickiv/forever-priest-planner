@@ -100,6 +100,7 @@ h2 { font-size: clamp(26px, 3.3vw, 36px); letter-spacing: -.045em; margin: 0; li
 .spell-legend > span:last-child { margin-left: auto; }
 .dot { margin-right: 6px; }
 .shield-dot { background: color-mix(in srgb, var(--accent) 52%, CanvasText 48%); }
+.damage-dot { background: color-mix(in srgb, var(--accent) 70%, #cf6a36 30%); }
 .spell-list { display: flex; flex-direction: column; gap: 7px; padding-top: 11px; }
 .spell-card { border: 1px solid var(--line); background: var(--surface); }
 .spell-card[open] { background: var(--page); }
@@ -113,11 +114,12 @@ h2 { font-size: clamp(26px, 3.3vw, 36px); letter-spacing: -.045em; margin: 0; li
 .spell-title small { color: var(--muted); font-size: 10px; margin-top: 3px; }
 .spell-kind { margin-left: auto; color: var(--accent); font-size: 9px; letter-spacing: .13em; font-weight: 800; }
 .shield-kind { color: var(--soft); }
+.mixed-kind { color: var(--warning, #b56a00); }
 .rank-pill { color: var(--muted); font-size: 10px; border: 1px solid var(--line); padding: 3px 7px; border-radius: 99px; }
 .chevron { font-size: 17px; color: var(--muted); padding-left: 4px; transition: transform .15s; }
 .spell-card[open] .chevron { transform: rotate(180deg); }
 .rank-table { border-top: 1px solid var(--line); overflow-x: auto; }
-.rank-header,.rank-row { display: grid; grid-template-columns: minmax(130px,1.2fr) minmax(195px,1.7fr) repeat(10,minmax(110px,1fr)) minmax(120px,1fr); gap: 10px; align-items: center; min-width: 1760px; }
+.rank-header,.rank-row { display: grid; grid-template-columns: minmax(130px,1.2fr) minmax(195px,1.7fr) repeat(13,minmax(110px,1fr)) minmax(120px,1fr); gap: 10px; align-items: center; min-width: 2200px; }
 .rank-header { padding: 9px 15px; color: var(--muted); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; background: var(--surface); }
 .sort-header { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; text-transform: inherit; cursor: pointer; }
 .sort-header:hover,.sort-header:focus-visible { color: var(--accent); }
@@ -127,12 +129,12 @@ h2 { font-size: clamp(26px, 3.3vw, 36px); letter-spacing: -.045em; margin: 0; li
 .rank-name a:hover { color: var(--accent); }
 .rank-name span,.rank-stat span,.rank-amount > span { color: var(--muted); font-size: 10px; }
 .rank-name .training-cost { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
-.training-source-marker { display: inline-block; margin-left: 3px; color: var(--muted); font-size: 9px; text-decoration: underline; text-underline-offset: 2px; }
+.training-source-marker { display: inline-block; margin-left: 3px; color: var(--muted); font-size: 8px; font-weight: 400; text-decoration: underline; text-underline-offset: 2px; }
 .training-source-marker:hover { color: var(--accent); }
-.rank-sources { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; min-width: 1760px; padding: 8px 15px; border-top: 1px solid var(--line); color: var(--muted); font-size: 9px; }
+.rank-sources { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; min-width: 2200px; padding: 8px 15px; border-top: 1px solid var(--line); color: var(--muted); font-size: 8px; }
 .rank-sources > span { color: var(--soft); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
 .rank-sources small { font-size: inherit; }
-.rank-sources a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.rank-sources a { color: inherit; font-size: inherit; font-weight: 400; text-decoration: underline; text-underline-offset: 2px; }
 .rank-sources a:hover { color: var(--accent); }
 .rank-amount { display: flex; flex-direction: column; gap: 2px; }
 .rank-amount b,.rank-stat b { font-size: 12px; font-weight: 700; }
@@ -143,6 +145,7 @@ h2 { font-size: clamp(26px, 3.3vw, 36px); letter-spacing: -.045em; margin: 0; li
 .method-note { margin-top: 20px; border-left: 2px solid var(--accent); padding: 4px 0 4px 14px; max-width: 920px; }
 .method-note strong { font-size: 12px; }
 .method-note p { margin: 5px 0 0; color: var(--soft); font-size: 11px; }
+.method-note a { color: inherit; font-size: 9px; font-weight: 400; }
 footer { border-top: 1px solid var(--line); min-height: 63px; display: flex; justify-content: space-between; align-items: center; gap: 18px; color: var(--muted); font-size: 10px; }
 footer > span:first-child { letter-spacing: .12em; font-weight: 800; }
 footer a { text-underline-offset: 2px; }
@@ -159,7 +162,7 @@ dialog::backdrop { background: color-mix(in srgb, CanvasText 45%, transparent); 
 #armoryForm textarea { resize:vertical; font: 11px ui-monospace,monospace; }
 .lookup-button { margin: -4px 0 10px; }
 #lookupStatus,#armoryStatus { min-height: 1em; }
-.item-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 13px; }
+.item-stats { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; margin-bottom: 13px; }
 .item-stats label { display: flex; flex-direction: column; gap: 5px; color: var(--soft); font-size: 10px; }
 .dialog-note { font-size: 10px; color: var(--muted); margin: 0 0 17px; }
 .dialog-actions { display: flex; align-items: center; gap: 8px; }
@@ -167,7 +170,7 @@ dialog::backdrop { background: color-mix(in srgb, CanvasText 45%, transparent); 
 .dialog-actions button:disabled { opacity: .4; cursor: not-allowed; }
 @media (max-width: 900px) {
   .gear-layout { grid-template-columns: 1fr; }
-  .summary-card { display: grid; grid-template-columns: repeat(4,1fr); gap: 3px 13px; }
+  .summary-card { display: grid; grid-template-columns: repeat(5,1fr); gap: 3px 13px; }
   .summary-card .eyebrow { grid-column: 1/-1; margin-bottom: 5px; }
   .summary-card .summary-rule { display: none; }
   .summary-card .wowhead-button,.summary-card .fineprint { grid-column: 1/-1; }
@@ -194,7 +197,7 @@ dialog::backdrop { background: color-mix(in srgb, CanvasText 45%, transparent); 
   .summary-card { grid-template-columns: repeat(2,1fr); }
   .spell-card summary { padding: 9px; gap: 8px; }
   .rank-header { display: grid; }
-  .rank-row { grid-template-columns: minmax(130px,1.2fr) minmax(195px,1.7fr) repeat(10,minmax(110px,1fr)) minmax(120px,1fr); gap: 8px; padding: 9px; }
+  .rank-row { grid-template-columns: minmax(130px,1.2fr) minmax(195px,1.7fr) repeat(13,minmax(110px,1fr)) minmax(120px,1fr); gap: 8px; padding: 9px; }
   .rank-stat span { font-size: 9px; }
   footer { align-items: flex-start; flex-direction: column; justify-content: center; padding: 14px 0; }
 }
