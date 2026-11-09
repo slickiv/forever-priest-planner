@@ -6,6 +6,7 @@ const SLOTS = [
 ];
 const STORE_KEY = "forever-priest-planner-v1";
 const CHARACTER_LEVEL_KEY = "forever-priest-planner-character-level-v1";
+const CHARACTER_RACE_KEY = "forever-priest-planner-character-race-v1";
 const SPELL_UI_STATE_KEY = "forever-priest-planner-spell-ui-v1";
 const SPELL_LIST_PREFS_KEY = "forever-priest-planner-spell-list-v1";
 const CORS_RELAY = "https://proxy.cors.dev/";
@@ -14,6 +15,7 @@ const TALENT_STORE_KEY = "forever-priest-planner-talents-v1";
 const RANK2_FIT_MIGRATION_KEY = "forever-priest-planner-rank2-fit-migrated-v1";
 let talents = readTalents();
 let characterLevel = readCharacterLevel();
+let characterRace = readCharacterRace();
 let spellUiState = readSpellUIState();
 let spellListPrefs = readSpellListPrefs();
 let editingSlot = null;
@@ -35,6 +37,10 @@ function readCharacterLevel() {
     return Number.isInteger(saved) && saved >= 1 && saved <= 60 ? saved : 22;
   } catch { return 22; }
 }
+function readCharacterRace() {
+  try { const race=localStorage.getItem(CHARACTER_RACE_KEY)||""; return ["Human","Dwarf","Night Elf","Gnome","Troll","Undead"].includes(race)?race:""; }
+  catch { return ""; }
+}
 function readSpellListPrefs() {
   try {
     const saved=JSON.parse(localStorage.getItem(SPELL_LIST_PREFS_KEY)||"{}");
@@ -49,19 +55,20 @@ function readSpellUIState() {
 function readTalents() {
   try {
     const saved=JSON.parse(localStorage.getItem(TALENT_STORE_KEY) || "null");
-    const defaults={twinDisciplines:3,improvedPws:0,improvedRenew:0,holyBinding:0,flashHealOtherTarget:false,bonusHealingAdjustment:0,holySpecialization:0,divineFury:0,spiritualHealing:0,spiritualGuidance:0,renewedHope:0,divineAegis:0,inspiration:0,soulWarding:0,mentalAgility:0,litanyOfLight:0,improvedHealing:0,innerFocus:0,innerFocusReady:false,searingLight:0,holyNovaProcReady:false,powerInfusionTalent:0,powerInfusionActive:false,spiritOfRedemptionTalent:0,spiritOfRedemptionActive:false,differentPreviousHeal:false,baseCrit:0,totalSpirit:0,weakenedSoulTarget:false};
+    const defaults={twinDisciplines:3,improvedPws:0,improvedRenew:0,holyBinding:0,flashHealOtherTarget:false,bonusHealingAdjustment:0,bonusSpellDamageAdjustment:0,holySpecialization:0,divineFury:0,spiritualHealing:0,spiritualGuidance:0,renewedHope:0,divineAegis:0,inspiration:0,soulWarding:0,mentalAgility:0,litanyOfLight:0,improvedHealing:0,innerFocus:0,innerFocusReady:false,searingLight:0,powerInLight:0,powerInLightTarget:false,holyNovaProcReady:false,powerInfusionTalent:0,powerInfusionActive:false,spiritOfRedemptionTalent:0,spiritOfRedemptionActive:false,differentPreviousHeal:false,baseCrit:0,totalSpirit:0,weakenedSoulTarget:false};
     if(!saved) { localStorage.setItem(RANK2_FIT_MIGRATION_KEY,"1"); return defaults; }
     if(localStorage.getItem(RANK2_FIT_MIGRATION_KEY)!=="1") {
       if(saved.bonusHealingAdjustment===3) saved.bonusHealingAdjustment=0;
       localStorage.setItem(RANK2_FIT_MIGRATION_KEY,"1");
     }
-    return Object.fromEntries(Object.entries(defaults).map(([key,value])=>[key,key.endsWith("Ready")||key.endsWith("Active")||key==="weakenedSoulTarget"||key==="differentPreviousHeal"||key==="flashHealOtherTarget"?Boolean(saved[key]??value):key==="baseCrit"||key==="totalSpirit"||key==="bonusHealingAdjustment"?Math.max(0,Number(saved[key]??value)||0):clampRank(saved[key]??value,key==="litanyOfLight"||key==="searingLight"?2:key==="twinDisciplines"||key==="holySpecialization"||key==="divineFury"||key==="spiritualGuidance"||key==="renewedHope"?5:key==="soulWarding"||key==="innerFocus"||key==="powerInfusionTalent"||key==="spiritOfRedemptionTalent"||key==="holyBinding"?1:3)]));
-  } catch { return {twinDisciplines:3,improvedPws:0,improvedRenew:0,holyBinding:0,flashHealOtherTarget:false,bonusHealingAdjustment:0,holySpecialization:0,divineFury:0,spiritualHealing:0,spiritualGuidance:0,renewedHope:0,divineAegis:0,inspiration:0,soulWarding:0,mentalAgility:0,litanyOfLight:0,improvedHealing:0,innerFocus:0,innerFocusReady:false,searingLight:0,holyNovaProcReady:false,powerInfusionTalent:0,powerInfusionActive:false,spiritOfRedemptionTalent:0,spiritOfRedemptionActive:false,differentPreviousHeal:false,baseCrit:0,totalSpirit:0,weakenedSoulTarget:false}; }
+    return Object.fromEntries(Object.entries(defaults).map(([key,value])=>[key,key.endsWith("Ready")||key.endsWith("Active")||key.endsWith("Target")||key==="weakenedSoulTarget"||key==="differentPreviousHeal"||key==="flashHealOtherTarget"?Boolean(saved[key]??value):key==="baseCrit"||key==="totalSpirit"||key==="bonusHealingAdjustment"||key==="bonusSpellDamageAdjustment"?Math.max(0,Number(saved[key]??value)||0):clampRank(saved[key]??value,key==="litanyOfLight"||key==="searingLight"?2:key==="powerInLight"?5:key==="twinDisciplines"||key==="holySpecialization"||key==="divineFury"||key==="spiritualGuidance"||key==="renewedHope"?5:key==="soulWarding"||key==="innerFocus"||key==="powerInfusionTalent"||key==="spiritOfRedemptionTalent"||key==="holyBinding"?1:3)]));
+  } catch { return {twinDisciplines:3,improvedPws:0,improvedRenew:0,holyBinding:0,flashHealOtherTarget:false,bonusHealingAdjustment:0,bonusSpellDamageAdjustment:0,holySpecialization:0,divineFury:0,spiritualHealing:0,spiritualGuidance:0,renewedHope:0,divineAegis:0,inspiration:0,soulWarding:0,mentalAgility:0,litanyOfLight:0,improvedHealing:0,innerFocus:0,innerFocusReady:false,searingLight:0,powerInLight:0,powerInLightTarget:false,holyNovaProcReady:false,powerInfusionTalent:0,powerInfusionActive:false,spiritOfRedemptionTalent:0,spiritOfRedemptionActive:false,differentPreviousHeal:false,baseCrit:0,totalSpirit:0,weakenedSoulTarget:false}; }
 }
 function clampRank(value,max) { return Math.max(0,Math.min(max,Math.floor(Number(value)||0))); }
 function saveTalents() {
-  talents={twinDisciplines:clampRank(document.querySelector("#twinDisciplines").value,5),improvedPws:clampRank(document.querySelector("#improvedPws").value,3),improvedRenew:clampRank(document.querySelector("#improvedRenew").value,3),holyBinding:clampRank(document.querySelector("#holyBinding").value,1),flashHealOtherTarget:document.querySelector("#flashHealOtherTarget").checked,bonusHealingAdjustment:Math.max(0,number(document.querySelector("#bonusHealingAdjustment").value)),holySpecialization:clampRank(document.querySelector("#holySpecialization").value,5),divineFury:clampRank(document.querySelector("#divineFury").value,5),spiritualHealing:clampRank(document.querySelector("#spiritualHealing").value,3),spiritualGuidance:clampRank(document.querySelector("#spiritualGuidance").value,5),renewedHope:clampRank(document.querySelector("#renewedHope").value,5),divineAegis:clampRank(document.querySelector("#divineAegis").value,3),inspiration:clampRank(document.querySelector("#inspiration").value,3),soulWarding:clampRank(document.querySelector("#soulWarding").value,1),mentalAgility:clampRank(document.querySelector("#mentalAgility").value,3),litanyOfLight:clampRank(document.querySelector("#litanyOfLight").value,2),improvedHealing:clampRank(number(document.querySelector("#manaReduction").value)/5,3),innerFocus:clampRank(document.querySelector("#innerFocus").value,1),innerFocusReady:document.querySelector("#innerFocusReady").checked,searingLight:clampRank(document.querySelector("#searingLight").value,2),holyNovaProcReady:document.querySelector("#holyNovaProcReady").checked,powerInfusionTalent:clampRank(document.querySelector("#powerInfusionTalent").value,1),powerInfusionActive:document.querySelector("#powerInfusionActive").checked,spiritOfRedemptionTalent:clampRank(document.querySelector("#spiritOfRedemptionTalent").value,1),spiritOfRedemptionActive:document.querySelector("#spiritOfRedemptionActive").checked,differentPreviousHeal:document.querySelector("#differentPreviousHeal").checked,baseCrit:Math.max(0,Math.min(100,number(document.querySelector("#baseCrit").value))),totalSpirit:Math.max(0,number(document.querySelector("#totalSpirit").value)),weakenedSoulTarget:document.querySelector("#weakenedSoulTarget").checked};
+  talents={twinDisciplines:clampRank(document.querySelector("#twinDisciplines").value,5),improvedPws:clampRank(document.querySelector("#improvedPws").value,3),improvedRenew:clampRank(document.querySelector("#improvedRenew").value,3),holyBinding:clampRank(document.querySelector("#holyBinding").value,1),flashHealOtherTarget:document.querySelector("#flashHealOtherTarget").checked,bonusHealingAdjustment:Math.max(0,number(document.querySelector("#bonusHealingAdjustment").value)),bonusSpellDamageAdjustment:Math.max(0,number(document.querySelector("#bonusSpellDamageAdjustment").value)),holySpecialization:clampRank(document.querySelector("#holySpecialization").value,5),divineFury:clampRank(document.querySelector("#divineFury").value,5),spiritualHealing:clampRank(document.querySelector("#spiritualHealing").value,3),spiritualGuidance:clampRank(document.querySelector("#spiritualGuidance").value,5),renewedHope:clampRank(document.querySelector("#renewedHope").value,5),divineAegis:clampRank(document.querySelector("#divineAegis").value,3),inspiration:clampRank(document.querySelector("#inspiration").value,3),soulWarding:clampRank(document.querySelector("#soulWarding").value,1),mentalAgility:clampRank(document.querySelector("#mentalAgility").value,3),litanyOfLight:clampRank(document.querySelector("#litanyOfLight").value,2),improvedHealing:clampRank(number(document.querySelector("#manaReduction").value)/5,3),innerFocus:clampRank(document.querySelector("#innerFocus").value,1),innerFocusReady:document.querySelector("#innerFocusReady").checked,searingLight:clampRank(document.querySelector("#searingLight").value,2),powerInLight:clampRank(document.querySelector("#powerInLight").value,5),powerInLightTarget:document.querySelector("#powerInLightTarget").checked,holyNovaProcReady:document.querySelector("#holyNovaProcReady").checked,powerInfusionTalent:clampRank(document.querySelector("#powerInfusionTalent").value,1),powerInfusionActive:document.querySelector("#powerInfusionActive").checked,spiritOfRedemptionTalent:clampRank(document.querySelector("#spiritOfRedemptionTalent").value,1),spiritOfRedemptionActive:document.querySelector("#spiritOfRedemptionActive").checked,differentPreviousHeal:document.querySelector("#differentPreviousHeal").checked,baseCrit:Math.max(0,Math.min(100,number(document.querySelector("#baseCrit").value))),totalSpirit:Math.max(0,number(document.querySelector("#totalSpirit").value)),weakenedSoulTarget:document.querySelector("#weakenedSoulTarget").checked};
   document.querySelector("#bonusHealing").value=sumInfo("healing").value+talents.bonusHealingAdjustment;
+  document.querySelector("#bonusSpellDamage").value=sumInfo("damage").value+talents.bonusSpellDamageAdjustment;
   localStorage.setItem(TALENT_STORE_KEY,JSON.stringify(talents));
   localStorage.setItem(RANK2_FIT_MIGRATION_KEY,"1");
   renderSpells();
@@ -81,7 +88,7 @@ function renderGear() {
     const item = gear[id];
     const slotType = id === "back" ? "CLOAK" : (["head","shoulders","chest","wrists","hands","waist","legs","feet"].includes(id) ? "CLOTH" : (["neck","finger1","finger2","trinket1","trinket2"].includes(id) ? "ACCESSORY" : "HELD ITEM"));
     const itemHref = item?.id ? `https://www.wowhead.com/forever/item=${encodeURIComponent(item.id)}` : wowheadItems();
-    const stats = item ? `<div class="slot-stats"><span>${item.healing == null ? "? heal" : `+${item.healing} heal`}</span><span>${item.intellect == null ? "? int" : `${item.intellect} int`}</span><span>${item.spirit == null ? "? spi" : `${item.spirit} spi`}</span><span>${item.mp5 == null ? "? mp5" : `${item.mp5} mp5`}</span></div>` : "";
+    const stats = item ? `<div class="slot-stats"><span>${item.healing == null ? "? heal" : `+${item.healing} heal`}</span><span>${item.damage == null ? "? dmg" : `+${item.damage} dmg`}</span><span>${item.intellect == null ? "? int" : `${item.intellect} int`}</span><span>${item.spirit == null ? "? spi" : `${item.spirit} spi`}</span><span>${item.mp5 == null ? "? mp5" : `${item.mp5} mp5`}</span></div>` : "";
     const source = item?.source ? `<a class="slot-source" href="https://www.wowhead.com/forever/search?q=${encodeURIComponent(item.source)}" target="_blank" rel="noreferrer">Loot source: ${esc(item.source)} ↗</a>` : "";
     return `<article class="gear-slot ${item ? "filled" : ""}">
       <div class="slot-top"><span class="slot-label">${label}</span><span class="cloth-tag">${slotType}</span></div>
@@ -90,10 +97,11 @@ function renderGear() {
     </article>`;
   }).join("");
   host.querySelectorAll("[data-edit]").forEach(button => button.addEventListener("click", () => openItem(button.dataset.edit)));
-  const totals = {healing:sumInfo("healing"),intellect:sumInfo("intellect"),spirit:sumInfo("spirit"),mp5:sumInfo("mp5")};
+  const totals = {healing:sumInfo("healing"),damage:sumInfo("damage"),intellect:sumInfo("intellect"),spirit:sumInfo("spirit"),mp5:sumInfo("mp5")};
   for (const [key,value] of Object.entries(totals)) document.querySelector(`#total${key[0].toUpperCase()}${key.slice(1)}`).textContent = displayTotal(value);
   document.querySelector("#heroHealing").textContent = displayTotal(totals.healing);
   document.querySelector("#bonusHealing").value = totals.healing.value+number(talents.bonusHealingAdjustment);
+  document.querySelector("#bonusSpellDamage").value = totals.damage.value+number(talents.bonusSpellDamageAdjustment);
   renderSpells();
 }
 
@@ -105,6 +113,7 @@ function openItem(slot) {
   document.querySelector("#itemName").value = item.name || "";
   document.querySelector("#itemId").value = item.id || "";
   document.querySelector("#itemHealing").value = item.healing ?? "";
+  document.querySelector("#itemDamage").value = item.damage ?? "";
   document.querySelector("#itemIntellect").value = item.intellect ?? "";
   document.querySelector("#itemSpirit").value = item.spirit ?? "";
   document.querySelector("#itemMp5").value = item.mp5 ?? "";
@@ -119,12 +128,12 @@ async function saveItem() {
   const idInput = document.querySelector("#itemId");
   let wowheadId = idInput.value.trim().replace(/\D/g,"");
   let name = document.querySelector("#itemName").value.trim();
-  let vals = {healing:optionalNumber(document.querySelector("#itemHealing").value),intellect:optionalNumber(document.querySelector("#itemIntellect").value),spirit:optionalNumber(document.querySelector("#itemSpirit").value),mp5:optionalNumber(document.querySelector("#itemMp5").value)};
+  let vals = {healing:optionalNumber(document.querySelector("#itemHealing").value),damage:optionalNumber(document.querySelector("#itemDamage").value),intellect:optionalNumber(document.querySelector("#itemIntellect").value),spirit:optionalNumber(document.querySelector("#itemSpirit").value),mp5:optionalNumber(document.querySelector("#itemMp5").value)};
   if (!wowheadId && !name && Object.values(vals).every(v => v == null)) {
     idInput.setCustomValidity("Enter an item name, Wowhead ID, or at least one stat."); idInput.reportValidity(); return false;
   }
   idInput.setCustomValidity("");
-  const statsUntouched=editingOriginalItem && ["healing","intellect","spirit","mp5"].every(key=>(vals[key]??null)===(editingOriginalItem[key]??null));
+  const statsUntouched=editingOriginalItem && ["healing","damage","intellect","spirit","mp5"].every(key=>(vals[key]??null)===(editingOriginalItem[key]??null));
   const itemChanged=editingOriginalItem ? wowheadId!==String(editingOriginalItem.id||"") : Boolean(wowheadId) && Object.values(vals).every(value=>value==null);
   if(wowheadId && itemChanged && (!editingOriginalItem || statsUntouched)) {
     const status=document.querySelector("#lookupStatus"); status.textContent="Filling item stats from Wowhead…";
@@ -136,9 +145,10 @@ async function saveItem() {
       for(const [key,value] of Object.entries(vals)) document.querySelector(`#item${key[0].toUpperCase()}${key.slice(1)}`).value=value;
       status.textContent=`Filled stats for ${name} from Wowhead.`;
     } catch(error) {
-      if(editingOriginalItem && itemChanged && statsUntouched) vals={healing:null,intellect:null,spirit:null,mp5:null};
+      if(editingOriginalItem && itemChanged && statsUntouched) vals={healing:null,damage:null,intellect:null,spirit:null,mp5:null};
       if(editingOriginalItem && itemChanged && !name) document.querySelector("#itemName").value="";
       document.querySelector("#itemHealing").value=vals.healing??"";
+      document.querySelector("#itemDamage").value=vals.damage??"";
       document.querySelector("#itemIntellect").value=vals.intellect??"";
       document.querySelector("#itemSpirit").value=vals.spirit??"";
       document.querySelector("#itemMp5").value=vals.mp5??"";
@@ -192,6 +202,7 @@ function spellMetrics(spell, rank) {
   const castId=rank[5];
   const effectId=rank[8] ?? castId;
   const hitCount=spell.bolts ?? 1;
+  const damageTargets=spell.name==="Holy Nova"?Math.max(1,Math.min(10,number(document.querySelector("#enemyTargets")?.value)||1)):1;
   const growth=spell.levelGrowth?.[effectId] ?? spell.levelGrowth?.[castId];
   const growthLevels=growth && learnedLevel != null ? Math.max(0,Math.min(characterLevel,growth.cap)-learnedLevel) : 0;
   const rangeGrowth=spell.baseGrowth?.[effectId] ?? spell.baseGrowth?.[castId];
@@ -209,20 +220,26 @@ function spellMetrics(spell, rank) {
   const generalRetention=learnedLevel == null ? 1 : Math.max(0,1-Math.max(0,characterLevel-learnedLevel-17)*0.05);
   const coefficientRetention=Math.max(0,generalRetention-(growth?.downrankOffset || 0));
   const effectiveCoefficient=coefficient*coefficientRetention;
+  const damageGrowth=spell.damageGrowth?.[castId];
+  const damageGrowthLevels=damageGrowth&&learnedLevel!=null?Math.max(0,Math.min(characterLevel,damageGrowth.cap)-learnedLevel):0;
+  const damageBaseMin=damageGrowth?(damageGrowth.min===damageGrowth.max?Math.round(damageGrowth.min+damageGrowth.perLevel*damageGrowthLevels):Math.floor(damageGrowth.min+damageGrowth.perLevel*damageGrowthLevels+1e-9)):null;
+  const damageBaseMax=damageGrowth?(damageGrowth.min===damageGrowth.max?Math.round(damageGrowth.max+damageGrowth.perLevel*damageGrowthLevels):Math.ceil(damageGrowth.max+damageGrowth.perLevel*damageGrowthLevels-1e-9)):null;
   const improvedRenewRate=[0,.05,.10,.15][talents.improvedRenew];
   const spiritualHealingRate=[0,.03,.07,.10][talents.spiritualHealing];
   const inspirationArmor=[0,.08,.17,.25][talents.inspiration];
   const improvedPwsRates=[0,.07,.14,.20];
+  const searingLightDamage=[0,.02,.05][talents.searingLight];
+  const powerInLightDamage=spell.name==="Penance"&&talents.powerInLightTarget?[0,.02,.04,.06,.08,.10][talents.powerInLight]:0;
   const powerInfusionMultiplier=talents.powerInfusionTalent>0 && talents.powerInfusionActive && spell.kind!=="shield"?1.2:1;
   const talentMultiplier=(spell.kind === "shield"
     ? 1 + improvedPwsRates[talents.improvedPws]
-    : (spell.instant || spell.name === "Penance" ? 1 + talents.twinDisciplines / 100 : 1)
+    : (spell.instant ? 1 + talents.twinDisciplines / 100 : 1)
       * (spell.name === "Renew" ? 1 + improvedRenewRate : 1)
       * (1 + spiritualHealingRate)) * powerInfusionMultiplier;
+  const damageTalentMultiplier=(spell.instant?1+talents.twinDisciplines/100:1)*(1+searingLightDamage)*(1+powerInLightDamage)*powerInfusionMultiplier;
   const calculationBaseMin=basePerHitMin==null?null:(hitCount>1?Math.round(basePerHitMin):basePerHitMin);
   const calculationBaseMax=basePerHitMax==null?null:(hitCount>1?Math.round(basePerHitMax):basePerHitMax);
-  // User's L22 in-game Heal R2 tooltip is 3 higher at both endpoints than +101 × 0.857.
-  const tooltipCorrection=spell.name==="Heal"&&castId===2055?3:0;
+  const tooltipCorrection=0;
   const rawPerHitMin = calculationBaseMin == null ? null : (calculationBaseMin + bonus * effectiveCoefficient + tooltipCorrection) * talentMultiplier;
   const rawPerHitMax = calculationBaseMax == null ? null : (calculationBaseMax + bonus * effectiveCoefficient + tooltipCorrection) * talentMultiplier;
   const healPerHitMin = rawPerHitMin == null ? null : Math.floor(rawPerHitMin + 1e-9);
@@ -233,15 +250,15 @@ function spellMetrics(spell, rank) {
   let total = heal;
   if (total != null && spell.name === "Prayer of Healing") total *= targets;
   if (total != null && spell.name === "Holy Nova") total *= targets;
-  if (total != null && ["Prayer of Mending","Circle of Healing","Lightwell"].includes(spell.name)) total *= targets;
+  if (total != null && ["Prayer of Mending","Lightwell"].includes(spell.name)) total *= targets;
   const amountLabel = spell.kind === "shield" ? "Absorb" : "Healing";
   const perSecond = total == null ? null : total / cast;
   const perMana = total == null || !netMana ? null : total / netMana;
   const renewHopeApplies=["Flash Heal","Lesser Heal","Heal","Greater Heal","Penance"].includes(spell.name) && talents.weakenedSoulTarget;
   const canCrit=spell.canCrit!==false && spell.kind!=="shield";
-  const innerFocusCrit=innerFocusApplies && canCrit && !spell.periodicTicks ? 25:0;
+  const innerFocusCrit=innerFocusApplies && canCrit && (!spell.periodicTicks || spell.name==="Penance") ? 25:0;
   const critChance=canCrit ? Math.min(1,(number(talents.baseCrit)+(spell.school === "discipline" ? 0 : talents.holySpecialization)+ (renewHopeApplies ? talents.renewedHope*2 : 0)+innerFocusCrit)/100) : 0;
-  const inspirationProcChance=canCrit&&!spell.periodicTicks ? 1-Math.pow(1-critChance,spell.name==="Penance"?hitCount:1) : 0;
+  const inspirationProcChance=canCrit&&(!spell.periodicTicks||spell.name==="Penance") ? 1-Math.pow(1-critChance,spell.name==="Penance"?hitCount:1) : 0;
   const inspirationExpected=inspirationArmor*inspirationProcChance;
   const critUnit=spell.name==="Penance"?1/3:1/(spell.periodicTicks||1);
   const healPerEvent=heal == null ? null : heal*critUnit;
@@ -253,15 +270,27 @@ function spellMetrics(spell, rank) {
   const expectedHeal=heal == null ? null : heal*(1+critChance*0.5);
   let expectedTotal=expectedHeal;
   if(expectedTotal!=null && ["Prayer of Healing","Holy Nova"].includes(spell.name)) expectedTotal*=targets;
-  if(expectedTotal!=null && ["Prayer of Mending","Circle of Healing","Lightwell"].includes(spell.name)) expectedTotal*=targets;
+  if(expectedTotal!=null && ["Prayer of Mending","Lightwell"].includes(spell.name)) expectedTotal*=targets;
   const holyBindingExpected=spell.name==="Flash Heal"&&talents.holyBinding>0&&talents.flashHealOtherTarget?expectedHeal*0.5:0;
   if(expectedTotal!=null) expectedTotal+=holyBindingExpected;
   const expectedPerSecond=expectedTotal==null?null:expectedTotal/cast;
   const expectedPerMana=expectedTotal==null||!netMana?null:expectedTotal/netMana;
+  const damageRetention=learnedLevel==null?1:Math.max(0,1-Math.max(0,characterLevel-learnedLevel-17)*0.05);
+  const damageCoef=rank[9]??spell.damageCoefficient??0;
+  const damageBonus=number(document.querySelector("#bonusSpellDamage").value)*damageCoef*damageRetention;
+  const damageMultiplier=damageTalentMultiplier;
+  const damagePerHitMin=damageBaseMin==null?null:(damageBaseMin+damageBonus)*damageMultiplier;
+  const damagePerHitMax=damageBaseMax==null?null:(damageBaseMax+damageBonus)*damageMultiplier;
+  const damageTotal=damagePerHitMin==null?null:(damagePerHitMin+damagePerHitMax)/2*hitCount*damageTargets;
+  const expectedDamage=damageTotal==null?null:damageTotal*(1+critChance*0.5);
+  const expectedDamagePerSecond=expectedDamage==null?null:expectedDamage/cast;
+  const expectedDamagePerMana=expectedDamage==null||!netMana?null:expectedDamage/netMana;
+  const critDamageMin=damagePerHitMin==null?null:damagePerHitMin*1.5;
+  const critDamageMax=damagePerHitMax==null?null:damagePerHitMax*1.5;
   const aegisRate=[0,.05,.10,.15][talents.divineAegis];
-  const aegisTargets=["Prayer of Healing","Holy Nova","Circle of Healing","Prayer of Mending"].includes(spell.name)?targets:1;
+  const aegisTargets=["Prayer of Healing","Holy Nova","Prayer of Mending"].includes(spell.name)?targets:1;
   let aegisExpected=0;
-  if(heal!=null&&aegisRate&&canCrit&&!spell.periodicTicks){
+  if(heal!=null&&aegisRate&&canCrit&&(!spell.periodicTicks||spell.name==="Penance")){
     if(spell.name==="Penance"){
       const perBoltAegis=((healPerHitMin+healPerHitMax)/2)*1.5*aegisRate;
       // All three bolts hit the same target and Divine Aegis does not stack.
@@ -271,43 +300,56 @@ function spellMetrics(spell, rank) {
       aegisExpected=Math.min(1200,heal*1.5*aegisRate)*critChance*aegisTargets;
     }
   }
-  return {bonus,targets,mana,netMana,litanyRefund,baseMin,baseMax,basePerHitMin,basePerHitMax,healPerHitMin,healPerHitMax,healMin,healMax,heal,healPerEventMin,healPerEventMax,healPerEvent,total,perSecond,perMana,amountLabel,talentMultiplier,effectiveCoefficient,coefficientRetention,cast,critChance,critHeal,critHealMin,critHealMax,expectedHeal,expectedTotal,expectedPerSecond,expectedPerMana,aegisExpected,inspirationArmor,inspirationProcChance,inspirationExpected,growthIncomplete,holyBindingExpected,innerFocusApplies,holyNovaFree,freeFormActive};
+  return {bonus,targets,damageTargets,mana,netMana,litanyRefund,baseMin,baseMax,basePerHitMin,basePerHitMax,healPerHitMin,healPerHitMax,healMin,healMax,heal,healPerEventMin,healPerEventMax,healPerEvent,total,perSecond,perMana,amountLabel,talentMultiplier,effectiveCoefficient,coefficientRetention,cast,critChance,critHeal,critHealMin,critHealMax,expectedHeal,expectedTotal,expectedPerSecond,expectedPerMana,damageBaseMin,damageBaseMax,damagePerHitMin,damagePerHitMax,damageTotal,expectedDamagePerSecond,expectedDamagePerMana,critDamageMin,critDamageMax,aegisExpected,inspirationArmor,inspirationProcChance,inspirationExpected,growthIncomplete,holyBindingExpected,innerFocusApplies,holyNovaFree,freeFormActive};
 }
 function fmt(value, places=1) { return value == null || !Number.isFinite(value) ? "—" : Number(value.toFixed(places)).toLocaleString(undefined,{maximumFractionDigits:places}); }
 function fmtRange(min,max,places=1) { return min == null || max == null ? "—" : min === max ? fmt(min,places) : `${fmt(min,places)}–${fmt(max,places)}`; }
 function fmtTrainingCost(copper, spell, rank) {
+  const acquisition=rankAcquisition(spell,rank);
+  if(acquisition.startsWith("Talent") || spell.acquisition==="automatic" || copper?.type==="free") return "";
   const fmtCoins = amount => {
     const gold = Math.floor(amount / 10000);
     const silver = Math.floor((amount % 10000) / 100);
     const coins = amount % 100;
     return [gold ? `${gold}g` : "", silver ? `${silver}s` : "", coins ? `${coins}c` : ""].filter(Boolean).join(" ") || "Free";
   };
-  const betaRecorder="https://warcraftforever.games/classes/priest/spells";
+  const trainingSource="https://urgametips.com/wow-forever/priest-guides/spells/";
   const sourceLabel=url=>url?.includes("urgametips.com")?"UrGameTips":url?.includes("wowforever.ninja")?"X’yera":url?.includes("warcraftforever.games")?"Beta recorder":copper?.source||"Source";
-  const marker=(url,label,kind)=>url?` <a class="training-source-marker" href="${url}" target="_blank" rel="noreferrer" title="${esc(label)}" aria-label="${esc(label)}">${kind}</a>`:` <span class="training-source-marker" title="${esc(label)}">${kind}</span>`;
+  const marker=(url,label)=>url?` <a class="training-source-marker" href="${url}" target="_blank" rel="noreferrer" title="${esc(label)}" aria-label="${esc(label)}">reference</a>`:` <span class="training-source-marker" title="${esc(label)}">reference</span>`;
+  if(spell.acquisitionConflictRanks?.includes(rank[0])) return copper==null?"Price unknown":`${fmtCoins(typeof copper==="number"?copper:copper?.copper)}${marker(trainingSource,"Trainer price reference · acquisition source conflict")}`;
   if (copper && typeof copper === "object") {
-    if (copper.type === "reference") return `${fmtCoins(copper.copper)}${marker(copper.url,sourceLabel(copper.url),"ref")}`;
-    if (copper.type === "free") return `Free${marker(copper.url,`${sourceLabel(copper.url)} · starter rank`,"free")}`;
-    if (copper.type === "manual") return `Manual · ${esc(copper.name)}${copper.requirement?` · ${esc(copper.requirement)}`:""}${marker(copper.url,sourceLabel(copper.url),"manual")}`;
+    if (copper.type === "reference") return `${fmtCoins(copper.copper)}${marker(copper.url,sourceLabel(copper.url))}`;
+    if (copper.type === "free") return `${marker(copper.url,`${sourceLabel(copper.url)} · starter rank`)}`;
+    if (copper.type === "manual") return `${esc(copper.name)}${copper.requirement?` · ${esc(copper.requirement)}`:""}${marker(copper.url,sourceLabel(copper.url))}`;
   }
   if (copper == null) {
-    if ((spell.name === "Penance" && rank[5] === 402174) || (spell.name === "Prayer of Mending" && rank[5] === 401859)) return "Talent";
-    if (["Lightwell","Circle of Healing"].includes(spell.name)) return "Acquisition unverified";
-    if (["Desperate Prayer","Divine Grace"].includes(spell.name)) return "Racial ability";
     return "Price unknown";
   }
-  return `${fmtCoins(copper)}${marker(betaRecorder,"Beta recorder quote","β")}`;
+  return `${fmtCoins(copper)}${marker(trainingSource,"Trainer price reference")}`;
+}
+function rankAcquisition(spell,rank){
+  const price=window.TRAINING_COSTS[rank[5]];
+  if(spell.race)return price?.type==="free"?`Racial · ${spell.race} · Class quest · Free`:`Racial · ${spell.race} · Trainer`;
+  if(spell.acquisition==="talent"||rank[0]===(spell.talentRank||0))return spell.talentPoints?`Talent · ${spell.talentPoints} ${spell.talentTree} points`:"Talent";
+  if(spell.acquisitionConflictRanks?.includes(rank[0]))return "Conflict · verify source";
+  if(spell.talentRank&&rank[0]>spell.talentRank)return "Talent-gated · trainer";
+  if(spell.acquisition==="automatic")return "Level-up · Free";
+  if(price?.type==="free")return price.acquisition==="class quest"?"Class quest · Free":"Starter · Free";
+  if(price?.type==="manual")return "Manual";
+  if(price==null)return "Trainer · price unknown";
+  return "Trainer";
 }
 function renderTrainingSources(spell) {
-  const betaRecorder="https://warcraftforever.games/classes/priest/spells";
+  const trainingSource="https://urgametips.com/wow-forever/priest-guides/spells/";
   const references=new Map();
   for (const rank of spell.ranks) {
     const price=window.TRAINING_COSTS[rank[5]];
-    if (typeof price === "number") references.set(betaRecorder,"Beta recorder");
+    if (typeof price === "number") references.set(trainingSource,"Trainer price reference");
     if (price && typeof price === "object") for (const url of [price.url,price.secondaryUrl]) if (url) references.set(url,url.includes("urgametips.com")?"UrGameTips":url.includes("wowforever.ninja")?"X’yera":price.source||"Reference");
   }
-  const link=(url,label)=>`<a href="${url}" target="_blank" rel="noreferrer">${label}</a>`;
-  return references.size?`<div class="rank-sources"><span>Training sources</span><small>${Array.from(references,([url,label])=>link(url,label)).join(" · ")}</small></div>`:"";
+  for (const url of spell.acquisitionSources||[]) references.set(url,"Acquisition reference");
+  const link=(url,label)=>`<a href="${url}" target="_blank" rel="noreferrer" aria-label="${esc(label)}" title="${esc(label)}">reference</a>`;
+  return references.size?`<div class="rank-sources"><span>References</span><small>${Array.from(references,([url,label])=>link(url,label)).join(" · ")}</small></div>`:"";
 }
 function sortSpellRows(table,key,direction) {
   const rows=[...table.querySelectorAll(".rank-row")];
@@ -326,6 +368,7 @@ function renderSpells() {
   try { localStorage.setItem(SPELL_UI_STATE_KEY,JSON.stringify(spellUiState)); } catch {}
   let ranksShown = 0, spellsShown = 0;
   host.innerHTML = window.HEALING_SPELLS.map((spell,index) => {
+    if(spell.race&&spell.race!==characterRace)return "";
     const ui=spellUiState[index]??{open:index<3,sortKey:"",direction:""};
     const renew = spell.name === "Renew";
     const visibleRanks=spell.ranks.filter(rank=>spellListPrefs.scope==="all"||(rank[1]!=null&&rank[1]<=characterLevel));
@@ -333,7 +376,8 @@ function renderSpells() {
     spellsShown++;
     ranksShown += visibleRanks.length;
     const shield = spell.kind === "shield";
-    const kindLabel = shield ? "ABSORB" : "HEAL";
+    const mixed = ["Holy Nova","Penance"].includes(spell.name);
+    const kindLabel = shield ? "ABSORB" : mixed ? "HEAL + DAMAGE" : "HEAL";
     const rows = visibleRanks.map(rank => {
       const [rankNo,learned,baseMin,baseMax,mana,id] = rank;
       const m = spellMetrics(spell,rank);
@@ -342,34 +386,38 @@ function renderSpells() {
       const note = mana == null ? `<small>${esc(spell.manaNote || "Mana cost unavailable")}</small>` : freeReason?`${mana} → 0 (${freeReason})`:`${m.mana.toLocaleString()} mana${m.litanyRefund?` · ${m.netMana} net`:""}`;
       const range = fmtRange(m.healMin,m.healMax);
       const perTickRange = fmtRange(m.healPerEventMin,m.healPerEventMax);
-      const group = ["Prayer of Healing","Holy Nova","Circle of Healing"].includes(spell.name) ? `${range} / target` : range;
-      const learnedText = `<span>${learned == null ? "Lv —" : `Lv ${learned}`}</span><span class="training-cost">${fmtTrainingCost(window.TRAINING_COSTS[id],spell,rank)}</span>`;
-      const perTime = renew ? fmt(m.healPerEvent) : m.perSecond == null ? "—" : `${fmt(m.perSecond)} / sec`;
+      const group = ["Prayer of Healing","Holy Nova"].includes(spell.name) ? `${range} / target` : range;
+      const learnedText = `<span>${learned == null ? "Lv —" : `Lv ${learned}`}</span><span class="acquisition-label">${rankAcquisition(spell,rank)}</span><span class="training-cost">${fmtTrainingCost(window.TRAINING_COSTS[id],spell,rank)}</span>`;
+      const perTime = renew||spell.name==="Penance" ? fmt(m.healPerEvent) : m.perSecond == null ? "—" : `${fmt(m.perSecond)} / sec`;
       const perMana = m.perMana == null ? "—" : `${fmt(m.perMana,2)} / mana`;
       const effectiveCast = rank[7] ?? spell.cast;
       const shieldCooldown=shield?(talents.soulWarding?" · no cooldown":" · 4s cooldown"):"";
       const castText = spell.duration ? `${spell.instant ? "1.5s GCD" : `${m.cast}s cast`} · ${spell.duration}s effect` : spell.instant ? `1.5s GCD${shieldCooldown}` : `${m.cast}s ${spell.channel?"channel":"cast"}`;
       const incompleteGrowth = m.growthIncomplete ? `<span class="rank-extra warning">Learned-level base shown; higher-level growth is incomplete.</span>` : "";
       const tickLine = !renew && spell.periodicTicks && m.healMin != null ? `<span class="rank-extra">Healing per tick: ${fmtRange(m.healMin/spell.periodicTicks,m.healMax/spell.periodicTicks)}</span>` : "";
-      const tooltipValue = m.baseMin == null ? "Heal amount not exposed" : renew ? `Base total ${fmtRange(m.baseMin,m.baseMax)}` : `Base ${fmtRange(m.baseMin,m.baseMax)}`;
-      const totalLine = renew ? "" : ["Prayer of Healing","Holy Nova","Circle of Healing"].includes(spell.name) ? `<span class="rank-extra">Party mean total (${m.targets}): ${fmt(m.total)}</span>` : spell.name === "Prayer of Mending" ? `<span class="rank-extra">Mean total across ${m.targets} successful heal${m.targets===1?"":"s"}: ${fmt(m.total)}</span>` : spell.name === "Lightwell" ? `<span class="rank-extra">Mean total for ${m.targets} click${m.targets===1?"":"s"}: ${fmt(m.total)}</span>` : "";
+      const tooltipValue = m.baseMin == null ? "Heal amount not exposed" : renew||spell.name==="Penance" ? `Base total ${fmtRange(m.baseMin,m.baseMax)}` : `Base ${fmtRange(m.baseMin,m.baseMax)}`;
+      const totalLine = renew ? "" : spell.name==="Penance" ? `<span class="rank-extra">Total healing per cast: ${fmtRange(m.healMin,m.healMax)}</span>` : ["Prayer of Healing","Holy Nova"].includes(spell.name) ? `<span class="rank-extra">Party mean total (${m.targets}): ${fmt(m.total)}</span>` : spell.name === "Prayer of Mending" ? `<span class="rank-extra">Mean total across ${m.targets} successful heal${m.targets===1?"":"s"}: ${fmt(m.total)}</span>` : spell.name === "Lightwell" ? `<span class="rank-extra">Mean total for ${m.targets} click${m.targets===1?"":"s"}: ${fmt(m.total)}</span>` : "";
+      const damageLine=m.damageBaseMin==null?"":`<span class="rank-extra">${spell.name==="Penance"?`Base damage per bolt: ${fmtRange(m.damageBaseMin,m.damageBaseMax)} · total per cast ${fmtRange(m.damageBaseMin*(spell.bolts||1),m.damageBaseMax*(spell.bolts||1))}`:`Base damage per target: ${fmtRange(m.damageBaseMin,m.damageBaseMax)}${spell.name==="Holy Nova"?` · ${m.damageTargets} enemies`:""}`}</span>`;
       const critPct=m.critChance*100;
-      const displayedExpected = renew ? m.expectedHeal/(spell.periodicTicks||1) : m.expectedPerSecond;
-      const displayedMean = renew ? m.healPerEvent : m.perSecond;
-      const expectedText = displayedExpected == null ? "—" : Math.abs(displayedExpected-(displayedMean??Infinity))<0.05 ? "Same as mean" : renew ? fmt(displayedExpected) : `${fmt(displayedExpected)} / sec`;
+      const displayedExpected = renew ? m.expectedHeal/(spell.periodicTicks||1) : spell.name==="Penance" ? m.expectedHeal/3 : m.expectedPerSecond;
+      const displayedMean = renew||spell.name==="Penance" ? m.healPerEvent : m.perSecond;
+      const expectedText = displayedExpected == null ? "—" : Math.abs(displayedExpected-(displayedMean??Infinity))<0.05 ? "Same as mean" : renew||spell.name==="Penance" ? fmt(displayedExpected) : `${fmt(displayedExpected)} / sec`;
       const expectedPerManaText = m.expectedPerMana == null ? "—" : Math.abs(m.expectedPerMana-(m.perMana??Infinity))<0.005 ? "Same as mean" : `${fmt(m.expectedPerMana,2)} / mana`;
-      return `<div class="rank-row ${shield ? "shield-row" : ""}" data-sort-rank="${rankNo}" data-sort-range="${m.heal??-1}" data-sort-cast="${m.cast}" data-sort-cost="${m.netMana??-1}" data-sort-throughput="${renew?m.healPerEvent:m.perSecond??-1}" data-sort-efficiency="${m.perMana??-1}" data-sort-crit="${critPct}" data-sort-critheal="${m.critHeal??-1}" data-sort-expected="${displayedExpected??-1}" data-sort-hpm="${m.expectedPerMana??-1}" data-sort-aegis="${m.aegisExpected}" data-sort-holybinding="${m.holyBindingExpected}" data-sort-inspiration="${m.inspirationExpected}">
-        <div class="rank-name"><a href="${rankLink}" target="_blank" rel="noreferrer">R${rankNo} ↗</a><span>${learnedText}</span></div>
-        <div class="rank-amount"><b>${group}</b><span>${kindLabel} · ${tooltipValue}</span>${renew?`<span class="rank-extra">Healing per tick: ${perTickRange}</span>`:tickLine}${totalLine}${incompleteGrowth}</div>
+      return `<div class="rank-row ${shield ? "shield-row" : ""}" data-sort-rank="${rankNo}" data-sort-range="${m.heal??-1}" data-sort-cast="${m.cast}" data-sort-cost="${m.netMana??-1}" data-sort-throughput="${renew||spell.name==="Penance"?m.healPerEvent:m.perSecond??-1}" data-sort-efficiency="${m.perMana??-1}" data-sort-crit="${critPct}" data-sort-critheal="${m.critHeal??-1}" data-sort-expected="${displayedExpected??-1}" data-sort-hpm="${m.expectedPerMana??-1}" data-sort-damage="${m.expectedDamagePerSecond??-1}" data-sort-dpm="${m.expectedDamagePerMana??-1}" data-sort-critdamage="${m.critDamageMin??-1}" data-sort-aegis="${m.aegisExpected}" data-sort-holybinding="${m.holyBindingExpected}" data-sort-inspiration="${m.inspirationExpected}">
+        <div class="rank-name"><a href="${rankLink}" target="_blank" rel="noreferrer" title="Wowhead Forever ${esc(spell.name)} Rank ${rankNo}" aria-label="Open Wowhead Forever ${esc(spell.name)} Rank ${rankNo}">R${rankNo} ↗</a><span>${learnedText}</span></div>
+        <div class="rank-amount"><b>${group}</b><span>${kindLabel} · ${tooltipValue}</span>${totalLine}${renew||spell.name==="Penance"||spell.name==="Contingency Plan"?`<span class="rank-extra">Healing per tick: ${perTickRange}</span>`:tickLine}${damageLine}${spell.name==="Contingency Plan"?`<span class="rank-extra">Absorb on trigger: ${fmt(spell.shieldBase[rankNo-1])}</span>`:""}${incompleteGrowth}</div>
         <div class="rank-stat"><span>Cast / timing</span><b>${castText}</b></div>
         <div class="rank-stat"><span>Mana cost</span><b>${note}</b></div>
-        <div class="rank-stat"><span>${shield ? "Absorb / cast time" : renew ? "Healing / tick" : "Healing / cast time"}</span><b>${perTime}</b></div>
+        <div class="rank-stat"><span>${shield ? "Absorb / cast time" : renew||spell.name==="Penance"?"Healing / tick":"Healing / cast time"}</span><b>${perTime}</b></div>
         <div class="rank-stat"><span>${shield ? "Absorb / mana" : "Healing / mana"}</span><b>${perMana}</b></div>
         <div class="rank-stat"><span>Crit chance</span><b>${shield ? "—" : `${fmt(critPct,1)}%`}</b></div>
         <div class="rank-stat"><span>Crit heal / event</span><b>${m.critHealMin==null?"—":fmtRange(m.critHealMin,m.critHealMax)}</b></div>
-        <div class="rank-stat"><span>${renew?"Expected / tick":"Expected / sec"}</span><b>${expectedText}</b></div>
+        <div class="rank-stat"><span>${renew||spell.name==="Penance"?"Expected / tick":"Expected / sec"}</span><b>${expectedText}</b></div>
         <div class="rank-stat"><span>Holy Binding</span><b>${m.holyBindingExpected?`${fmt(m.holyBindingExpected)} extra / cast`:"—"}</b></div>
         <div class="rank-stat"><span>Expected / mana</span><b>${expectedPerManaText}</b></div>
+        <div class="rank-stat"><span>Expected damage / sec</span><b>${m.expectedDamagePerSecond==null?"—":`${fmt(m.expectedDamagePerSecond)} / sec`}</b></div>
+        <div class="rank-stat"><span>Expected damage / mana</span><b>${m.expectedDamagePerMana==null?"—":`${fmt(m.expectedDamagePerMana,2)} / mana`}</b></div>
+        <div class="rank-stat"><span>Crit damage / hit</span><b>${m.critDamageMin==null?"—":fmtRange(m.critDamageMin,m.critDamageMax)}</b></div>
         <div class="rank-stat"><span>Expected Aegis</span><b>${m.aegisExpected?`${fmt(m.aegisExpected)} / cast`:"—"}</b></div>
         <div class="rank-stat"><span>Inspiration</span><b>${m.inspirationArmor?`+${fmt(m.inspirationArmor*100,0)}% armor · ${fmt(m.inspirationProcChance*100,1)}% proc`:`—`}</b></div>
       </div>`;
@@ -377,9 +425,9 @@ function renderSpells() {
     const firstKnown=spell.ranks.map(r=>r[1]).filter(v=>v!=null).sort((a,b)=>a-b)[0]??999;
     const category=spell.group.split("·").slice(1).join(" ").trim()||spell.group.split("·")[0].trim();
     return `<details class="spell-card" data-spell-index="${index}" data-card-learned="${firstKnown}" data-card-name="${esc(spell.name.toLowerCase())}" data-card-category="${esc(category.toLowerCase())}" data-card-ranks="${spell.ranks.length}" ${ui.open ? "open" : ""}>
-      <summary><span class="spell-glyph ${shield ? "shield-glyph" : ""}">${shield ? "◈" : "✦"}</span><span class="spell-title"><b>${esc(spell.name)}</b><small>${esc(spell.group)}</small></span><span class="spell-kind ${shield ? "shield-kind" : ""}">${kindLabel}</span><span class="rank-pill">${visibleRanks.length}${visibleRanks.length!==spell.ranks.length?` / ${spell.ranks.length}`:""} ${visibleRanks.length === 1 ? "rank" : "ranks"}</span><span class="chevron">⌄</span></summary>
+      <summary><span class="spell-glyph ${shield ? "shield-glyph" : ""}">${shield ? "◈" : "✦"}</span><span class="spell-title"><b>${esc(spell.name)}</b><small>${esc(spell.group)}</small></span><span class="spell-kind ${shield ? "shield-kind" : mixed ? "mixed-kind" : ""}">${kindLabel}</span><span class="rank-pill">${visibleRanks.length}${visibleRanks.length!==spell.ranks.length?` / ${spell.ranks.length}`:""} ${visibleRanks.length === 1 ? "rank" : "ranks"}</span><span class="chevron">⌄</span></summary>
       ${spell.description?`<div class="spell-description">${esc(spell.description)}</div>`:""}
-      <div class="rank-table"><div class="rank-header" data-sort-key="${ui.sortKey}" data-sort-direction="${ui.direction}">${[["rank","Rank / level · training"],["range","Healing range"],["cast","Cast"],["cost","Mana"],["throughput",renew?"Mean / tick":"Mean / time"],["efficiency","Mean / mana"],["crit","Crit chance"],["critheal","Crit heal / event"],["expected",renew?"Expected / tick":"Expected / sec"],["holybinding","Holy Binding"],["hpm","Expected / mana"],["aegis","Aegis / cast"],["inspiration","Inspiration value"]].map(([key,label])=>`<button type="button" class="sort-header" data-sort="${key}" aria-label="Sort ${label}">${label} ${ui.sortKey===key?(ui.direction==="asc"?"↑":"↓"):"↕"}</button>`).join("")}</div>${rows}${renderTrainingSources(spell)}</div>
+      <div class="rank-table"><div class="rank-header" data-sort-key="${ui.sortKey}" data-sort-direction="${ui.direction}">${[["rank","Rank / level · acquisition"],["range","Healing range"],["cast","Cast"],["cost","Mana"],["throughput",renew||spell.name==="Penance"?"Mean / tick":"Mean / time"],["efficiency","Mean / mana"],["crit","Crit chance"],["critheal","Crit heal / event"],["expected",renew?"Expected / tick":"Expected / sec"],["holybinding","Holy Binding"],["hpm","Expected / mana"],["damage","Damage / sec"],["dpm","Damage / mana"],["critdamage","Crit damage / hit"],["aegis","Aegis / cast"],["inspiration","Inspiration value"]].map(([key,label])=>`<button type="button" class="sort-header" data-sort="${key}" aria-label="Sort ${label}">${label} ${ui.sortKey===key?(ui.direction==="asc"?"↑":"↓"):"↕"}</button>`).join("")}</div>${rows}${renderTrainingSources(spell)}</div>
     </details>`;
   }).join("");
   sortSpellCards(host);
@@ -446,20 +494,24 @@ document.querySelector("#characterLevel").addEventListener("input",event=>{
     renderSpells();
   }
 });
-["#bonusHealing","#manaReduction","#partyTargets"].forEach(selector => document.querySelector(selector).addEventListener("input",renderSpells));
-const talentLimits={twinDisciplines:5,improvedPws:3,improvedRenew:3,holyBinding:1,holySpecialization:5,divineFury:5,spiritualHealing:3,spiritualGuidance:5,renewedHope:5,divineAegis:3,inspiration:3,soulWarding:1,mentalAgility:3,litanyOfLight:2,innerFocus:1,searingLight:2,powerInfusionTalent:1,spiritOfRedemptionTalent:1};
+["#bonusHealing","#bonusSpellDamage","#manaReduction","#partyTargets","#enemyTargets"].forEach(selector => document.querySelector(selector).addEventListener("input",renderSpells));
+document.querySelector("#characterRace").value=characterRace;
+document.querySelector("#characterRace").addEventListener("change",event=>{characterRace=event.currentTarget.value;try{localStorage.setItem(CHARACTER_RACE_KEY,characterRace);}catch{}renderSpells();});
+const talentLimits={twinDisciplines:5,improvedPws:3,improvedRenew:3,holyBinding:1,holySpecialization:5,divineFury:5,spiritualHealing:3,spiritualGuidance:5,renewedHope:5,divineAegis:3,inspiration:3,soulWarding:1,mentalAgility:3,litanyOfLight:2,innerFocus:1,searingLight:2,powerInLight:5,powerInfusionTalent:1,spiritOfRedemptionTalent:1};
 document.querySelector("#manaReduction").addEventListener("change",saveTalents);
 for(const [key] of Object.entries(talentLimits)) document.querySelector(`#${key}`).addEventListener("change",saveTalents);
-for(const selector of ["#baseCrit","#totalSpirit","#bonusHealingAdjustment","#weakenedSoulTarget","#differentPreviousHeal","#flashHealOtherTarget","#innerFocusReady","#holyNovaProcReady","#powerInfusionActive","#spiritOfRedemptionActive"]) document.querySelector(selector).addEventListener("input",saveTalents);
+for(const selector of ["#baseCrit","#totalSpirit","#bonusHealingAdjustment","#bonusSpellDamageAdjustment","#weakenedSoulTarget","#differentPreviousHeal","#flashHealOtherTarget","#innerFocusReady","#holyNovaProcReady","#powerInLightTarget","#powerInfusionActive","#spiritOfRedemptionActive"]) document.querySelector(selector).addEventListener("input",saveTalents);
 for(const [key] of Object.entries(talentLimits)) document.querySelector(`#${key}`).value=String(talents[key]);
 document.querySelector("#manaReduction").value=String(talents.improvedHealing*5);
 document.querySelector("#baseCrit").value=String(talents.baseCrit);
 document.querySelector("#totalSpirit").value=String(talents.totalSpirit);
 document.querySelector("#bonusHealingAdjustment").value=String(talents.bonusHealingAdjustment);
+document.querySelector("#bonusSpellDamageAdjustment").value=String(talents.bonusSpellDamageAdjustment);
 document.querySelector("#weakenedSoulTarget").checked=talents.weakenedSoulTarget;
 document.querySelector("#flashHealOtherTarget").checked=talents.flashHealOtherTarget;
 document.querySelector("#innerFocusReady").checked=talents.innerFocusReady;
 document.querySelector("#holyNovaProcReady").checked=talents.holyNovaProcReady;
+document.querySelector("#powerInLightTarget").checked=talents.powerInLightTarget;
 document.querySelector("#powerInfusionActive").checked=talents.powerInfusionActive;
 document.querySelector("#spiritOfRedemptionActive").checked=talents.spiritOfRedemptionActive;
 document.querySelector("#resetBtn").addEventListener("click", () => {
@@ -486,6 +538,7 @@ function parseWowheadItem(xmlText) {
   if(equipText) { try { equip=JSON.parse(`{${equipText.replace(/^\{|\}$/g,"")}}`); } catch { throw new Error("Could not read the Wowhead item stats."); } }
   return {id,name,subclass,stats:{
     healing:(Number(equip.splheal)||0)+(Number(equip.splpwr)||0),
+    damage:(Number(equip.spldmg)||0)+(Number(equip.splpwr)||0),
     intellect:Number(equip.int)||0,spirit:Number(equip.spi)||0,
     mp5:Number(equip.manargn ?? equip.m5)||0
   }};
@@ -521,6 +574,7 @@ function parseArmory(html) {
   const script=html.match(/var\s+characterProfileInitialState\s*=\s*(\{[\s\S]*?\})\s*;\s*<\/script/i);
   if(!script) throw new Error("No embedded Armory character data was found. Make sure the page source is from a character profile.");
   const state=JSON.parse(script[1]); const character=state.character;
+  const raceName=typeof character?.race==="string"?character.race:character?.race?.name;
   const className=typeof character?.class==="string" ? character.class : character?.class?.name;
   if(className && className.toLowerCase()!=="priest") throw new Error(`${className}s cannot be imported.`);
   if(!character?.gear) throw new Error("The Armory page does not include equipped gear data.");
@@ -533,47 +587,56 @@ function parseArmory(html) {
     const type=slot==="back" ? "CLOAKS" : String(entry.item_subclass?.name || entry.itemSubClass?.type || entry.subclass?.type || entry.armorType || "").toUpperCase();
     if(isArmor && slot!=="back" && !type.includes("CLOTH")) continue;
     if(slot==="back" && !type.includes("CLOAK")) continue;
-    const values={healing:0,intellect:0,spirit:0,mp5:0};
+    const values={healing:0,damage:0,intellect:0,spirit:0,mp5:0};
     const hasStats=Array.isArray(entry.stats);
     let hasHealingStat=false;
+    let hasDamageStat=false;
     for(const stat of entry.stats || []){
       const kind=String(stat.type?.type || stat.type || "").toUpperCase(); const value=Number(stat.value || 0);
       if(kind==="SPELL_HEALING_DONE" || kind==="SPELL_POWER") {values.healing+=value;hasHealingStat=true;}
+      if(kind==="SPELL_POWER" || kind==="SPELL_DAMAGE_DONE") {values.damage+=value;hasDamageStat=true;}
       if(kind==="INTELLECT") values.intellect+=value;
       if(kind==="SPIRIT") values.spirit+=value;
       if(kind==="MANA_REGENERATION" || kind==="MANA_PER_5_SEC") values.mp5+=value;
     }
-    imported[slot]={name:String(entry.name || ""),id:String(entry.id || ""),source:"",armorType:type,healing:hasStats?values.healing:null,intellect:hasStats?values.intellect:null,spirit:hasStats?values.spirit:null,mp5:hasStats?values.mp5:null,_needsWowheadHealingLookup:!hasHealingStat && Boolean(entry.id)};
+    imported[slot]={name:String(entry.name || ""),id:String(entry.id || ""),source:"",armorType:type,healing:hasStats?values.healing:null,damage:hasStats?values.damage:null,intellect:hasStats?values.intellect:null,spirit:hasStats?values.spirit:null,mp5:hasStats?values.mp5:null,_needsWowheadHealingLookup:!hasHealingStat && Boolean(entry.id),_needsWowheadDamageLookup:!hasDamageStat && Boolean(entry.id)};
   }
-  const importedTalents={twinDisciplines:0,improvedPws:0,improvedRenew:0,holyBinding:0,holySpecialization:0,divineFury:0,spiritualHealing:0,spiritualGuidance:0,renewedHope:0,divineAegis:0,inspiration:0,soulWarding:0,mentalAgility:0,litanyOfLight:0,improvedHealing:0,innerFocus:0,searingLight:0,powerInfusionTalent:0,spiritOfRedemptionTalent:0};
+  const importedTalents={twinDisciplines:0,improvedPws:0,improvedRenew:0,holyBinding:0,holySpecialization:0,divineFury:0,spiritualHealing:0,spiritualGuidance:0,renewedHope:0,divineAegis:0,inspiration:0,soulWarding:0,mentalAgility:0,litanyOfLight:0,improvedHealing:0,innerFocus:0,searingLight:0,powerInLight:0,powerInfusionTalent:0,spiritOfRedemptionTalent:0};
   for(const spec of character.specs || []) for(const talent of spec.talents || []) {
     const name=String(talent.name || "").toLowerCase();
-    const talentMap={"twin disciplines":["twinDisciplines",5],"improved power word: shield":["improvedPws",3],"improved renew":["improvedRenew",3],"holy binding":["holyBinding",1],"holy specialization":["holySpecialization",5],"divine fury":["divineFury",5],"spiritual healing":["spiritualHealing",3],"spiritual guidance":["spiritualGuidance",5],"renewed hope":["renewedHope",5],"divine aegis":["divineAegis",3],"inspiration":["inspiration",3],"soul warding":["soulWarding",1],"mental agility":["mentalAgility",3],"litany of light":["litanyOfLight",2],"improved healing":["improvedHealing",3],"inner focus":["innerFocus",1],"searing light":["searingLight",2],"power infusion":["powerInfusionTalent",1],"spirit of redemption":["spiritOfRedemptionTalent",1]};
+    const talentMap={"twin disciplines":["twinDisciplines",5],"improved power word: shield":["improvedPws",3],"improved renew":["improvedRenew",3],"holy binding":["holyBinding",1],"holy specialization":["holySpecialization",5],"divine fury":["divineFury",5],"spiritual healing":["spiritualHealing",3],"spiritual guidance":["spiritualGuidance",5],"renewed hope":["renewedHope",5],"divine aegis":["divineAegis",3],"inspiration":["inspiration",3],"soul warding":["soulWarding",1],"mental agility":["mentalAgility",3],"litany of light":["litanyOfLight",2],"improved healing":["improvedHealing",3],"inner focus":["innerFocus",1],"searing light":["searingLight",2],"power in light":["powerInLight",5],"power infusion":["powerInfusionTalent",1],"spirit of redemption":["spiritOfRedemptionTalent",1]};
     if(talentMap[name]) { const [key,max]=talentMap[name]; importedTalents[key]=clampRank(talent.rank,max); }
   }
   const levelValue=typeof character.level==="object" ? (character.level.level ?? character.level.value) : character.level;
   const level=Number(levelValue);
-  return {name:character.name,level:Number.isInteger(level) && level >= 1 && level <= 60 ? level : null,gear:imported,talents:importedTalents,talentsAvailable:Array.isArray(character.specs)};
+  const race=["Human","Dwarf","Night Elf","Gnome","Troll","Undead"].find(value=>String(raceName||"").toLowerCase()===value.toLowerCase())||"";
+  return {name:character.name,level:Number.isInteger(level) && level >= 1 && level <= 60 ? level : null,race,gear:imported,talents:importedTalents,talentsAvailable:Array.isArray(character.specs)};
 }
 function armoryUrlFromCharacterName(name) {
   const slug=String(name).normalize("NFKD").replace(/[\u0300-\u036f]/g,"").trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
   if(!slug) throw new Error("Enter a character name to look up.");
   return `https://worldofwarcraft.blizzard.com/en-us/forever/us/armory/character/${encodeURIComponent(slug)}`;
 }
-async function fillArmoryHealingFromWowhead(imported) {
-  const candidates=Object.entries(imported).filter(([,item])=>item._needsWowheadHealingLookup);
+async function fillArmorySpellStatsFromWowhead(imported) {
+  const candidates=Object.entries(imported).filter(([,item])=>item._needsWowheadHealingLookup||item._needsWowheadDamageLookup);
   let filled=0,failed=0,next=0;
   const worker=async()=>{
     while(next<candidates.length){
       const index=next++, [slot,item]=candidates[index];
       try {
         const result=await fetchWowheadItem(item.id);
-        if(result.stats.healing>0){item.healing=number(item.healing)+result.stats.healing;filled++;}
+        let itemFilled=false;
+        if(item._needsWowheadHealingLookup&&result.stats.healing>0){item.healing=number(item.healing)+result.stats.healing;itemFilled=true;}
+        if(item._needsWowheadDamageLookup&&result.stats.damage>0){item.damage=number(item.damage)+result.stats.damage;itemFilled=true;}
+        if(itemFilled)filled++;
         delete item._needsWowheadHealingLookup;
+        delete item._needsWowheadDamageLookup;
       } catch {
         failed++;
         if(item.healing===0) item.healing=null;
+        if(item.damage===0) item.damage=null;
         delete item._needsWowheadHealingLookup;
+        delete item._needsWowheadDamageLookup;
       }
     }
   };
@@ -612,8 +675,8 @@ document.querySelector("#armoryForm").addEventListener("submit",async event=>{
   try {
     let html=source;
     if(!html){const url=armoryUrlFromCharacterName(characterName); const response=await fetch(throughCorsRelay(url)); if(!response.ok){if(response.status===404||response.status===500) throw new Error(`No public profile found for ${characterName}.`); throw new Error("The public profile relay returned an error. Paste the page source as a fallback.");} html=await response.text();}
-    const result=parseArmory(html); status.textContent="Checking equipped items on Wowhead for healing stats…";
-    const enrichment=await fillArmoryHealingFromWowhead(result.gear);
+    const result=parseArmory(html); status.textContent="Checking equipped items on Wowhead for healing and damage stats…";
+    const enrichment=await fillArmorySpellStatsFromWowhead(result.gear);
     gear=result.gear; saveGear();
     if(result.level){
       characterLevel=result.level;
@@ -621,14 +684,16 @@ document.querySelector("#armoryForm").addEventListener("submit",async event=>{
       try { localStorage.setItem(CHARACTER_LEVEL_KEY,String(characterLevel)); } catch {}
       renderSpells();
     }
+    if(result.race){characterRace=result.race;document.querySelector("#characterRace").value=characterRace;try{localStorage.setItem(CHARACTER_RACE_KEY,characterRace);}catch{}renderSpells();}
     if(result.talentsAvailable){
       talents={...talents,...result.talents};
       for(const [key] of Object.entries(talentLimits)) document.querySelector(`#${key}`).value=String(talents[key]);
       document.querySelector("#manaReduction").value=String(talents.improvedHealing*5);
+      document.querySelector("#powerInLightTarget").checked=talents.powerInLightTarget;
       localStorage.setItem(TALENT_STORE_KEY,JSON.stringify(talents));
       renderSpells();
     }
-    status.textContent=`Imported ${Object.keys(gear).length} equipped items${result.level?` at level ${result.level}`:""}${result.talentsAvailable?" and current talent ranks":""} from ${result.name}.${enrichment.filled?` Filled healing stats from Wowhead on ${enrichment.filled} item${enrichment.filled===1?"":"s"}.`:""}${enrichment.failed?` ${enrichment.failed} item lookup${enrichment.failed===1?"":"s"} failed; those stats remain unknown.`:""}`;
+    status.textContent=`Imported ${Object.keys(gear).length} equipped items${result.level?` at level ${result.level}`:""}${result.talentsAvailable?" and current talent ranks":""} from ${result.name}.${enrichment.filled?` Filled item healing and damage stats from Wowhead on ${enrichment.filled} item${enrichment.filled===1?"":"s"}.`:""}${enrichment.failed?` ${enrichment.failed} item lookup${enrichment.failed===1?"":"s"} failed; those stats remain unknown.`:""}`;
     setTimeout(()=>document.querySelector("#armoryDialog").close(),900);
   } catch(error) {
     const fallback="Could not reach Blizzard through the public relay. Paste the Armory page source and retry.";
