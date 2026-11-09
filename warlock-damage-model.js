@@ -81,11 +81,10 @@
     if (spell.school === "Shadow" && talents.warlockShadowMastery) damageMultipliers.push(1 + 0.02 * talents.warlockShadowMastery);
     if (spell.tree === "Destruction" && talents.warlockAgonizingFlames) damageMultipliers.push(1 + destructionBonuses[talents.warlockAgonizingFlames]);
     const damageMultiplier = damageMultipliers.reduce((product, multiplier) => product * multiplier, 1);
-    const metamorphosisMultiplier = context.metamorphosisActive ? 0.85 : 1;
-    const directMin = base.direct ? (base.direct.min + spellPower * directCoef) * damageMultiplier * metamorphosisMultiplier : null;
-    const directMax = base.direct ? (base.direct.max + spellPower * directCoef) * damageMultiplier * metamorphosisMultiplier : null;
-    const dotMin = base.periodicTotal ? (base.periodicTotal.min + spellPower * tickCoef * base.ticks) * damageMultiplier * metamorphosisMultiplier : null;
-    const dotMax = base.periodicTotal ? (base.periodicTotal.max + spellPower * tickCoef * base.ticks) * damageMultiplier * metamorphosisMultiplier : null;
+    const directMin = base.direct ? (base.direct.min + spellPower * directCoef) * damageMultiplier : null;
+    const directMax = base.direct ? (base.direct.max + spellPower * directCoef) * damageMultiplier : null;
+    const dotMin = base.periodicTotal ? (base.periodicTotal.min + spellPower * tickCoef * base.ticks) * damageMultiplier : null;
+    const dotMax = base.periodicTotal ? (base.periodicTotal.max + spellPower * tickCoef * base.ticks) * damageMultiplier : null;
     const totalMin = (directMin ?? 0) * immolateBonus + (dotMin ?? 0);
     const totalMax = (directMax ?? 0) * immolateBonus + (dotMax ?? 0);
     const damageKnown = Boolean(base.direct || base.periodicTotal);
@@ -101,7 +100,7 @@
     const pandemicBonus = afflictionCritSpells.includes(spell.name) ? [0, 33, 67, 100][talents.warlockPandemic] : 0;
     const ruinBonus = spell.tree === "Destruction" ? (Number(talents.warlockRuin) || 0) * 20 : 0;
     const critMultiplier = 1.5 + Math.max(pandemicBonus || 0, ruinBonus) / 200;
-    const castTime = context.metamorphosisActive && spell.name === "Searing Pain" ? 0 : spell.name === "Corruption" ? Math.max(0, rank.castSeconds - 0.4 * (Number(talents.warlockImprovedCorruption) || 0)) : rank.castSeconds;
+    const castTime = spell.name === "Corruption" ? Math.max(0, rank.castSeconds - 0.4 * (Number(talents.warlockImprovedCorruption) || 0)) : rank.castSeconds;
     const cast = castTime > 0 ? castTime : 1.5;
     const channel = spell.kind === "channel-dot" || spell.kind === "aoe-dot";
     const cycle = Math.max(channel ? rank.duration : cast, rank.cooldown || 0, base.ticks ? rank.duration : 0);
@@ -115,7 +114,7 @@
     if (baneScenario === 4) targetMultiplier = 1;
     const baneScenarioNote = baneScenario === 1 && isAoeSpell ? "Bane: marked target is among AoE hits" : baneScenario === 2 && isAoeSpell ? "Bane: marked target is outside AoE" : baneScenario === 3 && !isAoeSpell ? "Bane: single-target hit also transfers 15%" : baneScenario === 4 ? "Bane: hit is only on marked target" : "";
     const expected = damageKnown ? eventMean * (critChance ? 1 + critChance * (critMultiplier - 1) : 1) * targetMultiplier : null;
-    return { ...base, directBaseMin, directBaseMax, dotBaseMin, dotBaseMax, directMin: directMin == null ? null : directMin * immolateBonus, directMax: directMax == null ? null : directMax * immolateBonus, dotMin, dotMax, totalMin, totalMax, damageKnown, spellPower, demonicKnowledgeBonus, directCoef, tickCoef, damageMultiplier: damageMultiplier * metamorphosisMultiplier, talentDamageMultiplier: damageMultiplier, metamorphosisMultiplier, metamorphosisActive: Boolean(context.metamorphosisActive), castTime, expectedDps: damageKnown && cycle ? expected / cycle : null, perMana: damageKnown && mana ? expected / mana : null, mana, cycle, critChance, critMultiplier, targets, isAoe, eligible, immolateRequired, targetMultiplier, baneScenarioNote };
+    return { ...base, directBaseMin, directBaseMax, dotBaseMin, dotBaseMax, directMin: directMin == null ? null : directMin * immolateBonus, directMax: directMax == null ? null : directMax * immolateBonus, dotMin, dotMax, totalMin, totalMax, damageKnown, spellPower, demonicKnowledgeBonus, directCoef, tickCoef, damageMultiplier, talentDamageMultiplier: damageMultiplier, castTime, expectedDps: damageKnown && cycle ? expected / cycle : null, perMana: damageKnown && mana ? expected / mana : null, mana, cycle, critChance, critMultiplier, targets, isAoe, eligible, immolateRequired, targetMultiplier, baneScenarioNote };
   }
 
   function isTalentSpellVisible(spell, settings = {}) {
@@ -126,15 +125,7 @@
     return (spells || []).filter(spell => isTalentSpellVisible(spell, settings));
   }
 
-  function isMetamorphosisSpellVisible(spell, settings = {}) {
-    return Boolean(settings.warlockMetamorphosisActive) ? !spell.hiddenInMetamorphosis : !spell.metamorphosisOnly;
-  }
-
-  function filterMetamorphosisSpells(spells, settings = {}) {
-    return (spells || []).filter(spell => isMetamorphosisSpellVisible(spell, settings));
-  }
-
-  const api = { tooltipBase, metrics, isTalentSpellVisible, filterTalentVisibleSpells, isMetamorphosisSpellVisible, filterMetamorphosisSpells };
+  const api = { tooltipBase, metrics, isTalentSpellVisible, filterTalentVisibleSpells };
   root.WARLOCK_DAMAGE_MODEL = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;
 })(typeof window === "undefined" ? globalThis : window);

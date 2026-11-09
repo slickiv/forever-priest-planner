@@ -56,62 +56,16 @@ test("Warlock direct and periodic damage catalog matches its audited rank invent
     "Shadowburn": 6, "Conflagrate": 6, "Hellfire": 3, "Incinerate": 3,
     "Soul Fire": 2, "Corruption": 7, "Bane of Agony": 6, "Drain Soul": 4,
     "Drain Life": 6, "Siphon Life": 4, "Wrack": 1, "Death Coil": 3,
-    "Bane of Doom": 1, "Inferno": 1, "Shadow Cleave": 10
+    "Bane of Doom": 1, "Inferno": 1
   };
-  assert.equal(window.WARLOCK_DAMAGE_SPELLS.length, 19);
-  assert.equal(window.WARLOCK_DAMAGE_SPELLS.reduce((sum, spell) => sum + spell.ranks.length, 0), 91);
+  assert.equal(window.WARLOCK_DAMAGE_SPELLS.length, 18);
+  assert.equal(window.WARLOCK_DAMAGE_SPELLS.reduce((sum, spell) => sum + spell.ranks.length, 0), 81);
   assert.deepEqual(Object.fromEntries(window.WARLOCK_DAMAGE_SPELLS.map(spell => [spell.name, spell.ranks.length])), expectedRanks);
   const ids = window.WARLOCK_DAMAGE_SPELLS.flatMap(spell => spell.ranks.map(entry => entry.id));
   assert.equal(new Set(ids).size, ids.length, "rank IDs must be unique");
   for (const spell of window.WARLOCK_DAMAGE_SPELLS) {
     assert.deepEqual(spell.ranks.map(entry => entry.rank), spell.ranks.map((_, index) => index + 1), `${spell.name} rank sequence`);
   }
-});
-
-test("Metamorphosis replaces Shadow Bolt with Shadow Cleave and applies its player spell effects", () => {
-  const metamorphosis = warlockSpell("Shadow Cleave");
-  const shadowBolt = warlockSpell("Shadow Bolt");
-  assert.equal(model.isMetamorphosisSpellVisible(shadowBolt, {}), true);
-  assert.equal(model.isMetamorphosisSpellVisible(metamorphosis, {}), false);
-  assert.equal(model.isMetamorphosisSpellVisible(shadowBolt, { warlockMetamorphosisActive: true }), false);
-  assert.equal(model.isMetamorphosisSpellVisible(metamorphosis, { warlockMetamorphosisActive: true }), true);
-
-  const observedTooltipRanges = [[2, 6], [6, 10], [13, 21], [24, 36], [40, 60], [57, 87], [79, 119], [101, 153], [128, 192], [136, 204]];
-  metamorphosis.ranks.forEach((entry, index) => {
-    const learned = model.metrics(metamorphosis, entry, { characterLevel: entry.level, spellPower: 0, enemyTargets: 1, talents: {} });
-    assert.deepEqual([learned.directBaseMin, learned.directBaseMax], observedTooltipRanges[index], `Shadow Cleave R${entry.rank} learned tooltip range`);
-  });
-
-  const shadow = metrics("Shadow Bolt", 1, {}, { spellPower: 100 });
-  const shadowForm = model.metrics(shadowBolt, rank(shadowBolt, 1), {
-    characterLevel: 60, spellPower: 100, talents: {}, enemyTargets: 1, metamorphosisActive: true
-  });
-  assert.equal(shadowForm.metamorphosisMultiplier, 0.85);
-  assert.ok(Math.abs(shadowForm.totalMin - shadow.totalMin * 0.85) < 1e-10);
-  assert.ok(Math.abs(shadowForm.totalMax - shadow.totalMax * 0.85) < 1e-10);
-
-  const searingPain = warlockSpell("Searing Pain");
-  const normalPain = model.metrics(searingPain, rank(searingPain, 1), { characterLevel: 60, talents: {} });
-  const formPain = model.metrics(searingPain, rank(searingPain, 1), { characterLevel: 60, talents: {}, metamorphosisActive: true });
-  assert.equal(normalPain.castTime, 1.5);
-  assert.equal(formPain.castTime, 0);
-  assert.equal(formPain.cycle, 1.5, "instant Searing Pain uses the GCD as its repeat interval");
-  assert.ok(Math.abs(formPain.totalMin / normalPain.totalMin - 0.85) < 1e-10);
-
-  const cleave = model.metrics(metamorphosis, rank(metamorphosis, 10), {
-    characterLevel: 60, spellPower: 100, enemyTargets: 4, talents: {}, metamorphosisActive: true
-  });
-  assert.equal(cleave.cycle, 6, "Shadow Cleave's cooldown sets its repeat interval");
-  assert.equal(cleave.targets, 4);
-  assert.equal(cleave.directCoef, 0.29);
-  assert.equal(cleave.metamorphosisMultiplier, 0.85);
-  assert.ok(Math.abs(cleave.expectedDps - ((cleave.totalMin + cleave.totalMax) / 2) * cleave.targets / 6) < 1e-10);
-
-  const petSpell = window.WARLOCK_PET_ATTACKS[0];
-  const petRank = rank(petSpell, 1);
-  const petBase = petModel.perCast(petSpell, petRank, { characterLevel: 60, petSpellPower: 20 });
-  const petInForm = petModel.perCast(petSpell, petRank, { characterLevel: 60, petSpellPower: 20, talents: { warlockMetamorphosisActive: true } });
-  assert.deepEqual([petInForm.min, petInForm.max], [petBase.min, petBase.max], "the form penalty applies to player spells, not pet attacks");
 });
 
 test("instant Warlock cooldowns drive per-cast DPS and display only the GCD plus cooldown", () => {
@@ -137,6 +91,18 @@ test("instant Warlock cooldowns drive per-cast DPS and display only the GCD plus
   const appSource = fs.readFileSync(require.resolve("../app.js"), "utf8");
   assert.match(appSource, /`1\.5s GCD`/);
   assert.doesNotMatch(appSource, /`Instant · 1\.5s GCD`/);
+});
+
+test("Wrack rank 1 scales to 86 damage per tick at level 60 under the current client effect", () => {
+  const spell = warlockSpell("Wrack");
+  const entry = rank(spell, 1);
+  const effect = entry.effects.find(value => value.aura === "A_PERIODIC_DAMAGE");
+  assert.deepEqual([entry.id, entry.level, effect.basePoints, effect.perLevel, effect.baseLevel, effect.maxLevel], [1316697, 40, 36, 2.5, 40, 60]);
+  const current = metrics("Wrack", 1, { warlockTalentWrack: true });
+  assert.equal(current.tickRange.min, 86);
+  assert.equal(current.tickRange.max, 86);
+  assert.equal(current.totalMin, 516);
+  assert.equal(current.totalMax, 516);
 });
 
 test("pet attack view includes audited ranks and reports per-cast damage only", () => {
