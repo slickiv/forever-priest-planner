@@ -6,8 +6,8 @@
     const demonicKnowledgeRate = [0, 0.33, 0.67, 1][Number(talents.warlockDemonicKnowledge) || 0] || 0;
     const demonicKnowledgeBonus = talents.warlockDemonicKnowledgeActive ? petBonusLevel * demonicKnowledgeRate : 0;
     const spellPower = Math.max(0, Number(context.petSpellPower) || 0) + demonicKnowledgeBonus;
-    const baseMin = Math.round(rank.baseValue * (1 - (rank.variance || 0) / 2));
-    const baseMax = Math.round(rank.baseValue * (1 + (rank.variance || 0) / 2));
+    const baseMin = rank.tooltipRange ? Number(rank.tooltipRange.min) : Math.round(rank.baseValue * (1 - (rank.variance || 0) / 2));
+    const baseMax = rank.tooltipRange ? Number(rank.tooltipRange.max) : Math.round(rank.baseValue * (1 + (rank.variance || 0) / 2));
     const unholyPower = 1 + 0.02 * (Number(talents.warlockUnholyPower) || 0);
     const improvedImp = spell.pet === "Imp" && spell.name === "Firebolt" && talents.warlockImprovedImp ? 1.1 : 1;
     const improvedSayaad = spell.pet.startsWith("Sayaad") && spell.name === "Lash of Pain" ? 1 + 0.1 * (Number(talents.warlockImprovedSayaad) || 0) : 1;

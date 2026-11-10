@@ -9,10 +9,10 @@
       castSeconds: 2,
       cooldown: 0,
       ranks: [
-        { rank: 1, level: 1, id: 3110, mana: 10, baseValue: 4, variance: 0.29, coefficient: 0.16 },
-        { rank: 2, level: 8, id: 7799, mana: 20, baseValue: 7, variance: 0.15, coefficient: 0.31 },
-        { rank: 3, level: 18, id: 7800, mana: 35, baseValue: 12, variance: 0.17, coefficient: 0.53 },
-        { rank: 4, level: 28, id: 7801, mana: 50, baseValue: 17, variance: 0.11, coefficient: 0.57 },
+        { rank: 1, level: 1, id: 3110, mana: 10, baseValue: 7, variance: 0, tooltipRange: { min: 6, max: 8 }, coefficient: 0.164 },
+        { rank: 2, level: 8, id: 7799, mana: 20, baseValue: 13, variance: 0, tooltipRange: { min: 12, max: 14 }, coefficient: 0.314 },
+        { rank: 3, level: 18, id: 7800, mana: 35, baseValue: 17, variance: 0, tooltipRange: { min: 15, max: 19 }, coefficient: 0.529 },
+        { rank: 4, level: 28, id: 7801, mana: 50, baseValue: 20, variance: 0, tooltipRange: { min: 18, max: 22 }, coefficient: 0.571 },
         { rank: 5, level: 38, id: 7802, mana: 70, baseValue: 25, variance: 0.12, coefficient: 0.57 },
         { rank: 6, level: 48, id: 11762, mana: 95, baseValue: 35, variance: 0.11, coefficient: 0.57 },
         { rank: 7, level: 58, id: 11763, mana: 115, baseValue: 44, variance: 0.11, coefficient: 0.57 }

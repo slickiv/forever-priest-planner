@@ -2012,6 +2012,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
     "kind": "dot",
     "class": "Warlock",
     "tree": "Affliction",
+    "description": "While channeling, Siphon Life, Corruption, and Bane of Agony on the target deal periodic damage 100% faster. Their accelerated ticks are not added to Wrack's own damage total because partial-channel tick timing is not established. For levels 40–60, growth uses 70% of the prior +2.5-per-level rate (+1.75); this is inferred from the stated 30% reduction, not directly exposed in the cache. The November 10 tooltip says 60 damage per second at level 60; Icy Veins renders 61 from its client record, so this display follows the ForeverChanges value and nearest-integer rounding.",
     "ranks": [
       {
         "rank": 1,
@@ -2021,7 +2022,7 @@ window.WARLOCK_DAMAGE_SPELLS = [
         "castSeconds": 0.0,
         "cooldown": 0.0,
         "duration": 6.0,
-        "tooltip": "Tears the target apart from within, dealing 36 Shadow damage every sec and increasing the damage they take from your other Shadow damage over time effects by 10%. Lasts 6 sec. 200 mana instant 30 yd # 1316697",
+        "tooltip": "Tears the target apart from within for 6 sec, inflicting 60 Shadow damage every 1 sec. While channeling, your Siphon Life, Corruption, and Bane of Agony effects on the target deal their periodic damage 100% faster.",
         "effects": [
           {
             "id": 1349556,
@@ -2029,12 +2030,20 @@ window.WARLOCK_DAMAGE_SPELLS = [
             "type": "A_APPLY_AURA",
             "aura": "A_PERIODIC_DAMAGE",
             "periodMs": 1000,
-            "basePoints": 36.0,
-            "perLevel": 2.5,
+            "basePoints": 25.2,
+            "perLevel": 1.75,
             "variance": 0.0,
             "baseLevel": 40,
             "maxLevel": 60,
-            "spellPowerCoefficient": 0.28600001335
+            "spellPowerCoefficient": 0.2
+          },
+          {
+            "id": 1349557,
+            "owner": 1316697,
+            "type": "A_APPLY_AURA",
+            "aura": "A_DUMMY",
+            "value": 100,
+            "description": "Siphon Life, Corruption, and Bane of Agony tick 100% faster while Wrack is channeled."
           }
         ]
       }

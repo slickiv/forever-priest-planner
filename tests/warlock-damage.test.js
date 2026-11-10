@@ -102,16 +102,19 @@ test("instant Warlock cooldowns drive per-cast DPS and display only the GCD plus
   assert.doesNotMatch(appSource, /`Instant · 1\.5s GCD`/);
 });
 
-test("Wrack rank 1 scales to 86 damage per tick at level 60 under the current client effect", () => {
+test("Wrack matches the November 10 tooltip while withholding the accelerated DoT rotation", () => {
   const spell = warlockSpell("Wrack");
   const entry = rank(spell, 1);
   const effect = entry.effects.find(value => value.aura === "A_PERIODIC_DAMAGE");
-  assert.deepEqual([entry.id, entry.level, effect.basePoints, effect.perLevel, effect.baseLevel, effect.maxLevel], [1316697, 40, 36, 2.5, 40, 60]);
+  assert.deepEqual([entry.id, entry.level, effect.basePoints, effect.perLevel, effect.baseLevel, effect.maxLevel, effect.spellPowerCoefficient], [1316697, 40, 25.2, 1.75, 40, 60, 0.2]);
+  assert.equal(entry.effects.find(value => value.aura === "A_DUMMY").value, 100);
   const current = metrics("Wrack", 1, { warlockTalentWrack: true });
-  assert.equal(current.tickRange.min, 86);
-  assert.equal(current.tickRange.max, 86);
-  assert.equal(current.totalMin, 516);
-  assert.equal(current.totalMax, 516);
+  assert.equal(current.tickRange.min, 60);
+  assert.equal(current.tickRange.max, 60);
+  assert.equal(current.totalMin, 360);
+  assert.equal(current.totalMax, 360);
+  assert.match(spell.description, /partial-channel tick timing is not established/);
+  assert.match(spell.description, /Icy Veins renders 61/);
 });
 
 test("pet attack view includes audited ranks and reports per-cast damage only", () => {
@@ -126,8 +129,13 @@ test("pet attack view includes audited ranks and reports per-cast damage only", 
   ]);
   const ids = attacks.flatMap(spell => spell.ranks.map(entry => entry.id));
   assert.equal(new Set(ids).size, 13);
+  const updatedFireRanges = firebolt.ranks.slice(0, 4).map(entry => {
+    const result = petModel.perCast(firebolt, entry);
+    return [result.baseMin, result.baseMax, result.min, result.max];
+  });
+  assert.deepEqual(updatedFireRanges, [[6, 8, 6, 8], [12, 14, 12, 14], [15, 19, 15, 19], [18, 22, 18, 22]]);
   const fire = petModel.perCast(firebolt, rank(firebolt, 1));
-  assert.deepEqual([fire.baseMin, fire.baseMax, fire.min, fire.max, fire.cycle], [3, 5, 3, 5, 2]);
+  assert.equal(fire.cycle, 2);
   const sayaad = petModel.perCast(lash, rank(lash, 1), {
     characterLevel: 60,
     talents: { warlockUnholyPower: 5, warlockImprovedSayaad: 3, warlockMasterDemonologist: 5 }
