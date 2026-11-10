@@ -85,10 +85,10 @@
     const directMax = base.direct ? (base.direct.max + spellPower * directCoef) * damageMultiplier : null;
     const dotMin = base.periodicTotal ? (base.periodicTotal.min + spellPower * tickCoef * base.ticks) * damageMultiplier : null;
     const dotMax = base.periodicTotal ? (base.periodicTotal.max + spellPower * tickCoef * base.ticks) * damageMultiplier : null;
-    const totalMin = (directMin ?? 0) * immolateBonus + (dotMin ?? 0);
-    const totalMax = (directMax ?? 0) * immolateBonus + (dotMax ?? 0);
     const damageKnown = Boolean(base.direct || base.periodicTotal);
-    const eventMean = (totalMin + totalMax) / 2;
+    const totalMin = damageKnown ? (directMin ?? 0) * immolateBonus + (dotMin ?? 0) : null;
+    const totalMax = damageKnown ? (directMax ?? 0) * immolateBonus + (dotMax ?? 0) : null;
+    const eventMean = damageKnown ? (totalMin + totalMax) / 2 : null;
     const isAoe = spell.kind === "aoe" || spell.kind === "aoe-dot" || spell.name === "Hellfire";
     const targets = isAoe ? Math.max(1, Math.min(10, Number(context.enemyTargets) || 1)) : 1;
     const critEligible = Boolean(base.direct || spell.periodicCanCrit);

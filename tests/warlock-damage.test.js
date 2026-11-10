@@ -102,18 +102,27 @@ test("instant Warlock cooldowns drive per-cast DPS and display only the GCD plus
   assert.doesNotMatch(appSource, /`Instant · 1\.5s GCD`/);
 });
 
-test("Wrack matches the November 10 tooltip while withholding the accelerated DoT rotation", () => {
+test("Wrack withholds damage outputs until current client scaling is established", () => {
   const spell = warlockSpell("Wrack");
   const entry = rank(spell, 1);
   const effect = entry.effects.find(value => value.aura === "A_PERIODIC_DAMAGE");
-  assert.deepEqual([entry.id, entry.level, effect.basePoints, effect.perLevel, effect.baseLevel, effect.maxLevel, effect.spellPowerCoefficient], [1316697, 40, 25.2, 1.75, 40, 60, 0.2]);
+  assert.equal(spell.kind, "channel-dot");
+  assert.deepEqual([entry.id, entry.level, effect.basePoints, effect.perLevel, effect.baseLevel, effect.maxLevel, effect.periodMs, effect.spellPowerCoefficient], [1316697, 40, null, null, 40, 60, 1000, 0.2]);
   assert.equal(entry.effects.find(value => value.aura === "A_DUMMY").value, 100);
-  const current = metrics("Wrack", 1, { warlockTalentWrack: true });
-  assert.equal(current.tickRange.min, 60);
-  assert.equal(current.tickRange.max, 60);
-  assert.equal(current.totalMin, 360);
-  assert.equal(current.totalMax, 360);
-  assert.match(spell.description, /partial-channel tick timing is not established/);
+  for (const characterLevel of [40, 50, 60]) {
+    const current = model.metrics(spell, entry, { characterLevel, spellPower: 100, talents: { warlockTalentWrack: true } });
+    assert.equal(current.ticks, 6);
+    assert.equal(current.cycle, 6);
+    assert.equal(current.tickCoef, 0.2);
+    assert.equal(current.tickRange, null);
+    assert.equal(current.damageKnown, false);
+    assert.equal(current.totalMin, null);
+    assert.equal(current.totalMax, null);
+    assert.equal(current.expectedDps, null);
+    assert.equal(current.perMana, null);
+    assert.ok(![current.totalMin, current.totalMax, current.expectedDps, current.perMana].some(Number.isNaN));
+  }
+  assert.match(spell.description, /remain unknown at every level/);
   assert.match(spell.description, /Icy Veins renders 61/);
 });
 

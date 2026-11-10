@@ -2009,10 +2009,11 @@ window.WARLOCK_DAMAGE_SPELLS = [
   {
     "name": "Wrack",
     "school": "Shadow",
-    "kind": "dot",
+    "kind": "channel-dot",
     "class": "Warlock",
     "tree": "Affliction",
-    "description": "While channeling, Siphon Life, Corruption, and Bane of Agony on the target deal periodic damage 100% faster. Their accelerated ticks are not added to Wrack's own damage total because partial-channel tick timing is not established. For levels 40–60, growth uses 70% of the prior +2.5-per-level rate (+1.75); this is inferred from the stated 30% reduction, not directly exposed in the cache. The November 10 tooltip says 60 damage per second at level 60; Icy Veins renders 61 from its client record, so this display follows the ForeverChanges value and nearest-integer rounding.",
+    "unknownDamageLabel": "Base damage withheld",
+    "description": "Wrack is a 6-second channel with six 1-second ticks. While channeling, Siphon Life, Corruption, and Bane of Agony on the target tick 100% faster; their accelerated damage is not added to Wrack. Its current sources disagree: ForeverChanges says 60 damage per second at level 60, while Icy Veins renders 61 and exposes a 25.2 base with a 0.20 spell-power coefficient. The cache does not expose the level-growth rule, so Wrack's damage totals, DPS, and damage per mana remain unknown at every level; no growth is interpolated. The 0.20 coefficient per tick and six tick intervals are retained.",
     "ranks": [
       {
         "rank": 1,
@@ -2030,8 +2031,8 @@ window.WARLOCK_DAMAGE_SPELLS = [
             "type": "A_APPLY_AURA",
             "aura": "A_PERIODIC_DAMAGE",
             "periodMs": 1000,
-            "basePoints": 25.2,
-            "perLevel": 1.75,
+            "basePoints": null,
+            "perLevel": null,
             "variance": 0.0,
             "baseLevel": 40,
             "maxLevel": 60,
