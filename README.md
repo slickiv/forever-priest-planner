@@ -1,6 +1,6 @@
-# WoW Forever Priest Throughput
+# WoW Forever Spell Planner
 
-A static, client-side Priest gear, healing, and damage throughput planner. Armor slots accept cloth, accessories and held items may be any armor type, and Wowhead remains the live item and loot-table reference. The item planner completes stats by item name or Wowhead ID. Gear and talent inputs are stored in browser local storage.
+A static, client-side planner for Priest healing, Priest damage, and Warlock damage and pet attacks. Its shared Priest and Warlock gear planner uses cloth armor slots; accessories and held items may be any armor type. Wowhead remains the live item and loot-table reference. The item planner completes stats by item name or Wowhead ID. Gear and talent inputs are stored in browser local storage. Paladin and other classes are not implemented.
 
 ## Run and publish
 

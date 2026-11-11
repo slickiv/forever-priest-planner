@@ -4,8 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="Canvas" />
-    <meta name="description" content="Plan cloth-only Priest gear and compare every healing and damage spell rank in World of Warcraft: Forever." />
-    <title>Forever Priest Planner</title>
+    <meta name="description" content="Plan cloth gear and compare Priest healing plus Priest or Warlock damage spell ranks in World of Warcraft: Forever." />
+    <title>Forever Spell Planner</title>
     <script>
       try {
         const theme = localStorage.getItem("forever-priest-planner-theme");
@@ -17,9 +17,9 @@
   <body>
     <main class="shell">
       <header class="masthead">
-        <div class="brand"><span class="brand-mark">✦</span><span>FOREVER<span class="brand-light"> / PRIEST</span></span></div>
+        <div class="brand"><span class="brand-mark">✦</span><span>FOREVER<span class="brand-light"> / SPELL PLANNER</span></span></div>
         <div class="masthead-actions">
-          <div class="header-note"><span class="status-dot"></span> WoW: Forever · cloth only</div>
+          <div class="header-note"><span class="status-dot"></span> WoW: Forever · Priest &amp; Warlock</div>
           <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false"><span aria-hidden="true">◐</span> Dark mode</button>
         </div>
       </header>
@@ -27,15 +27,15 @@
       <section class="hero">
         <div class="hero-copy">
           <p class="eyebrow">FIELD KIT · GEAR & SPELLS</p>
-          <h1>WoW Forever Priest Throughput</h1>
-          <p class="hero-sub">Plan your cloth loadout, then compare healing and damage spell ranks by throughput and mana efficiency.</p>
+          <h1>WoW Forever Spell Planner</h1>
+          <p class="hero-sub">Plan a cloth loadout and compare Priest healing plus Priest and Warlock damage spell ranks by throughput and mana efficiency.</p>
         </div>
         <div class="hero-stat"><span class="eyebrow">EQUIPPED HEALING</span><strong id="heroHealing">0</strong><span>bonus healing</span></div>
       </section>
 
       <nav class="tabs" aria-label="Planner sections">
         <button class="tab active" data-tab="gear">01 <span>Gear planner</span></button>
-        <button class="tab" data-tab="spells">02 <span>Healing spells</span></button>
+        <button class="tab" data-tab="spells">02 <span>Priest healing</span></button>
         <button class="tab" data-tab="damage">03 <span>Damage spells</span></button>
       </nav>
 
@@ -58,7 +58,7 @@
             <div class="total"><span>Spirit</span><b id="totalSpirit">0</b></div>
             <div class="total"><span>Mana per 5 sec</span><b id="totalMp5">0</b></div>
             <div class="summary-rule"></div>
-            <a class="button wowhead-button" href="https://www.wowhead.com/forever/items/class:5" target="_blank" rel="noreferrer">Browse Priest items on Wowhead ↗</a>
+            <a class="button wowhead-button" href="https://www.wowhead.com/forever/items" target="_blank" rel="noreferrer">Browse items on Wowhead ↗</a>
             <p class="fineprint">Wowhead remains the item and loot-table reference. Gear is saved in this browser only.</p>
           </aside>
         </div>
@@ -67,7 +67,7 @@
 
       <section id="spellsPanel" class="panel hidden">
         <div class="section-head spell-head">
-          <div><p class="eyebrow">RANK-BY-RANK REFERENCE</p><h2>Healing spellbook</h2></div>
+          <div><p class="eyebrow">PRIEST · RANK-BY-RANK REFERENCE</p><h2>Priest healing spellbook</h2></div>
           <div class="spell-list-controls" aria-label="Spell list controls">
             <label>Sort spells <select id="spellSort"><option value="learned">Order learned</option><option value="name">Name</option><option value="category">Category</option><option value="rank-count">Total rank count</option></select></label>
             <label>Show ranks <select id="spellLevelScope"><option value="level">Available at selected level</option><option value="all">All levels</option></select></label>
@@ -191,7 +191,7 @@
         <div class="section-head spell-head">
           <div><p class="eyebrow">RANK-BY-RANK REFERENCE</p><h2>Damage spellbook</h2></div>
           <div class="spell-list-controls" aria-label="Damage spell list controls">
-            <label>Class <select id="damageClass"><option value="priest">Priest</option><option value="warlock">Warlock</option></select></label>
+            <label>Damage class <select id="damageClass"><option value="priest">Priest</option><option value="warlock">Warlock</option></select></label>
             <label>Sort spells <select id="damageSort"><option value="learned">Order learned</option><option value="name">Name</option><option value="category">School / type</option><option value="rank-count">Total rank count</option></select></label>
             <label>Show ranks <select id="damageLevelScope"><option value="level">Available at selected level</option><option value="all">All levels</option></select></label>
           </div>
@@ -210,7 +210,7 @@
         </div>
       </section>
 
-      <footer><span>FOREVER PRIEST PLANNER</span><span>Spell data: <a href="https://theforeverera.com/en/spells/priest/" target="_blank" rel="noreferrer" aria-label="The Forever Era spell reference">reference</a> · Calculations: <a href="https://foreverchanges.pro/downrank-calculator" target="_blank" rel="noreferrer" aria-label="ForeverChanges downrank calculator">link</a></span></footer>
+      <footer><span>FOREVER SPELL PLANNER</span><span>Spell data: <a href="https://theforeverera.com/en/spells/priest/" target="_blank" rel="noreferrer" aria-label="The Forever Era spell reference">reference</a> · Calculations: <a href="https://foreverchanges.pro/downrank-calculator" target="_blank" rel="noreferrer" aria-label="ForeverChanges downrank calculator">link</a></span></footer>
     </main>
     <dialog id="itemDialog">
       <form method="dialog" id="itemForm">
@@ -227,7 +227,7 @@
           <label>MP5<input id="itemMp5" type="number" min="0" step="1" placeholder="Unknown" /></label>
         </div>
         <label>Loot source / boss <input id="itemSource" maxlength="80" placeholder="Optional · e.g. Baron Rivendare" /></label>
-        <p class="dialog-note">Armor slots accept cloth only. Accessories and held items are unrestricted. Enter a name or ID to save partial information; blank stats remain unknown.</p>
+        <p class="dialog-note">The shared Priest and Warlock gear planner uses cloth armor slots; accessories and held items are unrestricted. Enter a name or ID to save partial information; blank stats remain unknown.</p>
         <div class="dialog-actions"><button class="button quiet" id="removeItem" type="button">Clear slot</button><span></span><button class="button primary" value="save">Save item</button></div>
       </form>
     </dialog>
@@ -247,6 +247,6 @@
     <script src="warlock-damage-model.js?v=3"></script>
     <script src="warlock-pet-data.js?v=2"></script>
     <script src="warlock-pet-model.js?v=1"></script>
-    <script src="app.js?v=56"></script>
+    <script src="app.js?v=57"></script>
   </body>
 </html>
